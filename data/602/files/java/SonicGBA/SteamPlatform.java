@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -30,7 +32,7 @@ class SteamPlatform extends GimmickObject {
 
    public static boolean isShotting() {
       boolean var0;
-      if (moving && endCount == 3) {
+      if (GameTime.event(SteamPlatform.class, "endCount", "isShotting:35", moving && GameTime.crosses(SteamPlatform.class, "endCount", endCount, 3))) {
          var0 = true;
       } else {
          var0 = false;
@@ -46,16 +48,16 @@ class SteamPlatform extends GimmickObject {
    public static void shot() {
       moving = true;
       velocity = -1450;
-      endCount = 3;
+      endCount = GameTime.set(SteamPlatform.class, "endCount", 3);
    }
 
    public static void staticLogic() {
       if (moving) {
-         velocity += GRAVITY;
-         sPosY += velocity;
+         velocity = GameTime.advance(SteamPlatform.class, "velocity", velocity, GRAVITY);
+         sPosY = GameTime.advance(SteamPlatform.class, "sPosY", sPosY, velocity);
          if (sPosY >= 0) {
             sPosY = 0;
-            --endCount;
+            endCount = GameTime.advance(SteamPlatform.class, "endCount", endCount, -(1));
             if (endCount <= 0) {
                moving = false;
             } else {

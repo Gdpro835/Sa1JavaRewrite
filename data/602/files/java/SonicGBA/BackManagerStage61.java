@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -102,13 +104,13 @@ class BackManagerStage61 extends BackGroundManager {
       }
 
       if (!GameObject.IsGamePause) {
-         this.cloudY -= 30;
+         this.cloudY = GameTime.advance(this, "cloudY", this.cloudY, -(30));
          this.cloudY += 32768;
          this.cloudY %= 32768;
-         this.starY1 -= 120;
+         this.starY1 = GameTime.advance(this, "starY1", this.starY1, -(120));
          this.starY1 += 65536;
          this.starY1 %= 65536;
-         this.starY2 -= 15;
+         this.starY2 = GameTime.advance(this, "starY2", this.starY2, -(15));
          this.starY2 += 65536;
          this.starY2 %= 65536;
       }
@@ -145,7 +147,7 @@ class BackManagerStage61 extends BackGroundManager {
             }
 
             if (!GameObject.IsGamePause) {
-               this.bgY += 480;
+               this.bgY = GameTime.advance(this, "bgY", this.bgY, 480);
                this.bgY %= 16384;
             }
          }
@@ -188,9 +190,9 @@ class BackManagerStage61 extends BackGroundManager {
 
          if (!GameObject.IsGamePause) {
             if (this.passingY < -960) {
-               this.passingY += 480;
+               this.passingY = GameTime.advance(this, "passingY", this.passingY, 480);
             } else {
-               this.passingY = MyAPI.calNextPosition((double)this.passingY, 0.0D, 1, 2);
+               this.passingY = MyAPI.calNextPosition(this, "passingY", (double)this.passingY, 0.0D, 1, 2);
             }
          }
 

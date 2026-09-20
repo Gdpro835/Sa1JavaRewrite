@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -19,7 +21,7 @@ class Bonus100pts extends EnemyObject {
       }
 
       this.bonusdrawer = BonusAnimation.getDrawer(0, false, 0);
-      this.frame = 0;
+      this.frame = GameTime.set(this, "frame", 0);
       this.posX = var2;
       this.posY = var3;
    }
@@ -52,9 +54,9 @@ class Bonus100pts extends EnemyObject {
             this.dead = true;
          }
 
-         ++this.frame;
+         this.frame = GameTime.advance(this, "frame", this.frame, 1);
          if (this.frame < 16) {
-            this.posY -= this.movement;
+            this.posY = GameTime.advance(this, "posY", this.posY, -(this.movement));
          }
 
          this.refreshCollisionRect(this.posX, this.posY);

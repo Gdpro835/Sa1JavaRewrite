@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -171,7 +173,7 @@ public class PlayerAmy extends PlayerObject {
 
    public void beSpring(int var1, int var2) {
       this.attackLevel = 0;
-      this.attackCount = 0;
+      this.attackCount = GameTime.set(this, "attackCount", 0);
       this.jumpAttackUsed = false;
       super.beSpring(var1, var2);
       if (this.myAnimationID == 6 || this.myAnimationID == 7) {
@@ -522,7 +524,7 @@ public class PlayerAmy extends PlayerObject {
                      var22 = -1;
                   }
 
-                  var17.actionLogic(var2 * 768, 0, var22 * 768);
+                  var17.moveVelocity(var2 * 768, 0, var22 * 768);
                   return;
                }
 
@@ -611,7 +613,7 @@ public class PlayerAmy extends PlayerObject {
       }
 
       if (this.attackCount > 0) {
-         --this.attackCount;
+         this.attackCount = Math.max(0, GameTime.advance(this, "attackCount", this.attackCount, -(1)));
          if (this.attackCount == 0) {
             this.attackLevel = 0;
          }
@@ -644,7 +646,7 @@ public class PlayerAmy extends PlayerObject {
                var1 = 10;
             }
 
-            this.attackCount = var1;
+            this.attackCount = GameTime.set(this, "attackCount", var1);
             this.attackLevel = 1;
          } else if (this.attackCount > 0 && this.attackLevel < 2) {
             ++this.attackLevel;
@@ -665,7 +667,7 @@ public class PlayerAmy extends PlayerObject {
       }
 
       if (this.attackCount > 0) {
-         --this.attackCount;
+         this.attackCount = Math.max(0, GameTime.advance(this, "attackCount", this.attackCount, -(1)));
          if (this.attackCount == 0) {
             this.attackLevel = 0;
          }
@@ -694,7 +696,7 @@ public class PlayerAmy extends PlayerObject {
                var1 = 10;
             }
 
-            this.attackCount = var1;
+            this.attackCount = GameTime.set(this, "attackCount", var1);
             this.attackLevel = 1;
          } else if (this.attackCount > 0 && this.attackLevel < 2) {
             ++this.attackLevel;
@@ -707,12 +709,12 @@ public class PlayerAmy extends PlayerObject {
 
       if (this.slipping) {
          if (Key.repeat(Key.gLeft) && this.myAnimationID == 38) {
-            this.totalVelocity -= 30;
+            this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(30));
          } else if (Key.repeat(Key.gDown | Key.gRight) && this.faceDegree < 135) {
-            this.totalVelocity += MyAPI.dSin(this.faceDegree) * 150 / 100;
+            this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, MyAPI.dSin(this.faceDegree) * 150 / 100);
          }
 
-         this.totalVelocity -= 30;
+         this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(30));
          this.totalVelocity = Math.max(this.totalVelocity, 192);
          this.animationID = -1;
          this.faceDirection = true;
@@ -731,7 +733,7 @@ public class PlayerAmy extends PlayerObject {
             }
          }
 
-         ++slidingFrame;
+         slidingFrame = GameTime.advanceOnce(PlayerObject.class, "slidingFrame", slidingFrame, 1);
          if (slidingFrame == 4) {
             soundInstance.playLoopSe(9);
          }
@@ -803,7 +805,7 @@ public class PlayerAmy extends PlayerObject {
 
    public void resetAttackLevel() {
       this.attackLevel = 0;
-      this.attackCount = 0;
+      this.attackCount = GameTime.set(this, "attackCount", 0);
    }
 
    public void setCannotAttack(boolean var1) {
@@ -943,8 +945,10 @@ public class PlayerAmy extends PlayerObject {
                   var1 = 1536;
                }
 
-               this.velY += (-var1 - this.getGravity()) * MyAPI.dCos(this.faceDegree) / 100;
-               this.velX += (-var1 - this.getGravity()) * -MyAPI.dSin(this.faceDegree) / 100;
+               this.velY -= var1 * MyAPI.dCos(this.faceDegree) / 100;
+                  this.velY = GameTime.advance(this, "velY", this.velY, -this.getGravity() * MyAPI.dCos(this.faceDegree) / 100);
+               this.velX += var1 * MyAPI.dSin(this.faceDegree) / 100;
+                  this.velX = GameTime.advance(this, "velX", this.velX, this.getGravity() * MyAPI.dSin(this.faceDegree) / 100);
                soundInstance.playSe(11);
             } else if (Math.abs(this.getVelX()) <= 64 && this.getDegreeDiff(this.faceDegree, this.degreeStable) <= 45) {
                this.focusMovingState = 2;

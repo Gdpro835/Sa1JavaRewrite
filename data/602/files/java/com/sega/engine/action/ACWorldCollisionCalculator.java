@@ -3,6 +3,8 @@
 //
 package com.sega.engine.action;
 
+import GameEngine.time.GameTime;
+
 import com.sega.engine.lib.CrlFP32;
 import com.sega.engine.lib.MyAPI;
 
@@ -1933,6 +1935,18 @@ public class ACWorldCollisionCalculator extends ACMoveCalculator implements ACPa
             }
         }
 
+    }
+
+    public void moveVelocity(int x, int y) {
+        int tangent = (MyAPI.dCos(this.footDegree) * x + MyAPI.dSin(this.footDegree) * y) / 100;
+        moveVelocity(x, y, tangent);
+    }
+
+    public void moveVelocity(int x, int y, int tangent) {
+        // checkInMap sweeps this displacement in tile-sized spatial segments.
+        // These are collision queries, not extra simulation ticks.
+        actionLogic(GameTime.distance(this, "worldX", GameTime.integratedVelocity(acObj, "velX", x)), GameTime.distance(this, "worldY", GameTime.integratedVelocity(acObj, "velY", y)),
+                GameTime.distance(this, "worldTangent", GameTime.integratedVelocity(acObj, "totalVelocity", tangent)));
     }
 
     public void actionLogic(int var1, int var2) {

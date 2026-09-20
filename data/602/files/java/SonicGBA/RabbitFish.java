@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -104,8 +106,8 @@ class RabbitFish extends EnemyObject {
             int var2 = this.posY;
             this.alert_state = this.checkPlayerInEnemyAlertRange(var4 >> 6, var2 >> 6, 80, 80);
             if (this.velocity > 0) {
-               this.posX += this.velocity;
-               this.move_cnt += Math.abs(this.velocity);
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
+               this.move_cnt = GameTime.advance(this, "move_cnt", this.move_cnt, Math.abs(this.velocity));
                this.drawer.setActionId(0);
                this.drawer.setTrans(2);
                if (this.posX >= this.limitRightX) {
@@ -113,8 +115,8 @@ class RabbitFish extends EnemyObject {
                   this.velocity = -this.velocity;
                }
             } else {
-               this.posX += this.velocity;
-               this.move_cnt += Math.abs(this.velocity);
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
+               this.move_cnt = GameTime.advance(this, "move_cnt", this.move_cnt, Math.abs(this.velocity));
                this.drawer.setActionId(0);
                this.drawer.setTrans(0);
                if (this.posX <= this.limitLeftX) {
@@ -126,8 +128,8 @@ class RabbitFish extends EnemyObject {
             if (this.alert_state == 0 && this.IsFacetoPlayer() && this.move_cnt >= 5120) {
                this.state = 1;
                this.drawer.setActionId(1);
-               this.defend_cnt = 0;
-               this.move_cnt = 0;
+               this.defend_cnt = GameTime.set(this, "defend_cnt", 0);
+               this.move_cnt = GameTime.set(this, "move_cnt", 0);
                if (this.velocity > 0) {
                   this.drawer.setTrans(2);
                } else {
@@ -139,7 +141,7 @@ class RabbitFish extends EnemyObject {
             break;
          case 1:
             if (this.defend_cnt < this.defend_frame) {
-               ++this.defend_cnt;
+               this.defend_cnt = Math.min(this.defend_frame, GameTime.advance(this, "defend_cnt", this.defend_cnt, 1));
             } else {
                this.state = 0;
                this.drawer.setActionId(0);

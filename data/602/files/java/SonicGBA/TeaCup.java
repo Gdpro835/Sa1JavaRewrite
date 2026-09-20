@@ -3,6 +3,8 @@
 //
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import Lib.SoundSystem;
@@ -46,7 +48,7 @@ class TeaCup extends GimmickObject
             }
             try {
                 TeaCup.teacupImage = MFImage.createImage("/gimmick/teacup_" + StageManager.getCurrentZoneId() + ".png");
-                this.changeTime = 0;
+                this.changeTime = GameTime.set(this, "changeTime", 0);
                 this.state = 0;
                 this.degreeSpeed = 0;
             }
@@ -82,7 +84,7 @@ class TeaCup extends GimmickObject
                     playerObject.setNoKey();
                     this.prePosY = this.posY;
                     this.state = 1;
-                    this.changeTime = 2;
+                    this.changeTime = GameTime.set(this, "changeTime", 2);
                     SoundSystem.getInstance().playLongSe(72);
                     break;
                 }
@@ -102,14 +104,14 @@ class TeaCup extends GimmickObject
     public void logic() {
         if (!TeaCup.player.isDead) {
             if (this.changeTime > 0) {
-                ++this.changeTimeCount;
+                this.changeTimeCount = GameTime.advance(this, "changeTimeCount", this.changeTimeCount, 1);
                 if (this.changeTimeCount >= this.changeTime) {
                     this.drawCount = (byte)((this.drawCount + 1) % 2);
-                    this.changeTimeCount = 0;
+                    this.changeTimeCount = GameTime.set(this, "changeTimeCount", 0);
                 }
             }
             if (this.count > 0) {
-                --this.count;
+                this.count = Math.max(0, GameTime.advance(this, "count", this.count, -(1)));
             }
             switch (this.state) {
                 case 0: {
@@ -119,17 +121,17 @@ class TeaCup extends GimmickObject
                 case 1: {
                     TeaCup.player.setNoKey();
                     TeaCup.player.setAnimationId(4);
-                    this.playerDegree += this.degreeSpeed;
-                    this.playerDegree %= 360;
+                    this.playerDegree = GameTime.advance(this, "playerDegree", this.playerDegree, this.degreeSpeed);
+                    this.playerDegree = GameTime.wrap(this, "playerDegree", this.playerDegree, 360);
                     TeaCup.player.setFootPositionX(this.posX + (2240 - (this.posY - this.prePosY) * 1920 / 7168) * MyAPI.dSin(this.playerDegree) / 100);
                     this.checkWithPlayer(this.posX, this.posY, this.posX, this.posY + 192);
-                    this.posY += 192;
+                    this.posY = GameTime.advance(this, "posY", this.posY, 192);
                     if (this.posY >= this.prePosY + 7168) {
                         this.posY = this.prePosY + 7168;
                         TeaCup.player.setFootPositionX(this.posX);
                         this.state = 2;
-                        this.count = 16;
-                        this.changeTime = 1;
+                        this.count = GameTime.set(this, "count", 16);
+                        this.changeTime = GameTime.set(this, "changeTime", 1);
                         this.collisionHeight = 256;
                     }
                     this.degreeSpeed = (this.posY - this.prePosY) * 60 / 7168 + 0;
@@ -138,14 +140,14 @@ class TeaCup extends GimmickObject
                 case 2: {
                     TeaCup.player.setNoKey();
                     TeaCup.player.setAnimationId(4);
-                    this.playerDegree += this.degreeSpeed;
-                    this.playerDegree %= 360;
+                    this.playerDegree = GameTime.advance(this, "playerDegree", this.playerDegree, this.degreeSpeed);
+                    this.playerDegree = GameTime.wrap(this, "playerDegree", this.playerDegree, 360);
                     TeaCup.player.setFootPositionX(this.posX + MyAPI.dSin(this.playerDegree) * 320 / 100);
                     this.checkWithPlayer(this.posX, this.posY, this.posX, this.posY);
                     if (this.count == 0) {
                         TeaCup.player.setFootPositionX(this.posX);
                         this.state = 3;
-                        this.changeTime = 2;
+                        this.changeTime = GameTime.set(this, "changeTime", 2);
                         final PlayerObject player = TeaCup.player;
                         final PlayerObject player2 = TeaCup.player;
                         player.beSpring(1800, 0);
@@ -160,9 +162,9 @@ class TeaCup extends GimmickObject
                     if (this.changeTime <= 0 || this.changeTimeCount != 0) {
                         break;
                     }
-                    ++this.changeTime;
+                    this.changeTime = GameTime.advance(this, "changeTime", this.changeTime, 1);
                     if (this.changeTime > 6) {
-                        this.changeTime = 0;
+                        this.changeTime = GameTime.set(this, "changeTime", 0);
                         SoundSystem.getInstance().stopLongSe();
                         break;
                     }

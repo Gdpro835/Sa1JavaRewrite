@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 
 class RollHobin extends BallHobin {
@@ -34,9 +36,9 @@ class RollHobin extends BallHobin {
    }
 
    public static void staticLogic() {
-      degree -= 4;
+      degree = GameTime.advance(RollHobin.class, "degree", degree, -(4));
       degree += 360;
-      degree %= 360;
+      degree = GameTime.wrap(RollHobin.class, "degree", degree, 360);
    }
 
    public void close() {

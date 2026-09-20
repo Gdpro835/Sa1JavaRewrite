@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -43,7 +45,7 @@ class SnowRobotV extends EnemyObject {
       this.endPosY = this.posY + this.mHeight;
       this.dir = false;
       this.state = 0;
-      this.wait_cn = 0;
+      this.wait_cn = GameTime.set(this, "wait_cn", 0);
       this.IsFire = false;
    }
 
@@ -69,13 +71,13 @@ class SnowRobotV extends EnemyObject {
          switch(this.state) {
          case 0:
             if (!this.dir) {
-               this.posY += 128;
+               this.posY = GameTime.advance(this, "posY", this.posY, 128);
                if (this.posY >= this.endPosY) {
                   this.dir = true;
                   this.posY = this.endPosY;
                }
             } else {
-               this.posY -= 128;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(128));
                if (this.posY <= this.startPosY) {
                   this.dir = false;
                   this.posY = this.startPosY;
@@ -106,7 +108,7 @@ class SnowRobotV extends EnemyObject {
             break;
          case 1:
             if (this.wait_cn < 30) {
-               ++this.wait_cn;
+               this.wait_cn = Math.min(30, GameTime.advance(this, "wait_cn", this.wait_cn, 1));
                if (this.drawer.checkEnd() && this.IsFire) {
                   this.IsFire = false;
                   int var3 = this.posX;
@@ -128,7 +130,7 @@ class SnowRobotV extends EnemyObject {
                   BulletObject.addBullet(17, var3 + var7, var6, var8, 0);
                }
             } else {
-               this.wait_cn = 0;
+               this.wait_cn = GameTime.set(this, "wait_cn", 0);
                this.drawer.setActionId(0);
                this.drawer.setTrans(this.iTrans);
                this.drawer.setLoop(true);

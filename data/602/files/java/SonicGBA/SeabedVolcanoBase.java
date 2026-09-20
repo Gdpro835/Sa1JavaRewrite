@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -36,9 +38,9 @@ class SeabedVolcanoBase extends GimmickObject {
    }
 
    public static void staticLogic() {
-      ++count;
-      count = (byte)(count % 50);
-      if (count == 3) {
+      count = (byte) GameTime.advance(SeabedVolcanoBase.class, "count", count, 1);
+      count = (byte) GameTime.wrap(SeabedVolcanoBase.class, "count", count, 50);
+      if (GameTime.event(SeabedVolcanoBase.class, "count", "staticLogic:43", GameTime.crosses(SeabedVolcanoBase.class, "count", count, 3))) {
          SeabedVolcanoPlatform.shot();
       }
 
@@ -61,7 +63,7 @@ class SeabedVolcanoBase extends GimmickObject {
          SoundSystem var2 = soundInstance;
          SoundSystem var3 = soundInstance;
          var2.playSe(53);
-         count = 1;
+         count = (byte) GameTime.set(SeabedVolcanoBase.class, "count", 1);
       }
 
       this.drawInMap(var1, this.drawer, this.posX, this.posY + 192);

@@ -3,6 +3,8 @@
 //
 package State;
 
+import GameEngine.time.GameTime;
+
 import Common.BarWord;
 import Common.NumberDrawer;
 import Common.WhiteBarDrawer;
@@ -683,8 +685,8 @@ public class SpecialStageState extends State implements SSDef, BarWord {
         var4.setActionId(var5 + 27);
         muiAniDrawer.draw(var1, (SCREEN_WIDTH >> 1) - 96, this.optionDrawOffsetY + 40 + this.optionslide_y + 96);
 
-        this.optionOffsetX -= 4;
-        this.optionOffsetX %= 100;
+        this.optionOffsetX = GameTime.advance(this, "optionOffsetX", this.optionOffsetX, -(4));
+        this.optionOffsetX = GameTime.wrap(this, "optionOffsetX", this.optionOffsetX, 100);
         muiAniDrawer.setActionId(51);
 
         for(var2 = this.optionOffsetX; var2 < SCREEN_WIDTH * 2; var2 += 100) {
@@ -827,7 +829,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                         this.optionDrawOffsetY = 0;
                         this.optionYDirect = 0;
                     } else {
-                        this.optionDrawOffsetY += var1;
+                        this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, var1);
                     }
                 } else if (this.optionDrawOffsetY < this.optionDrawOffsetBottomY) {
                     this.optionYDirect = 2;
@@ -841,7 +843,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                         this.optionDrawOffsetY = this.optionDrawOffsetBottomY;
                         this.optionYDirect = 0;
                     } else {
-                        this.optionDrawOffsetY += var1;
+                        this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, var1);
                     }
                 }
             }
@@ -990,7 +992,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
         SpecialObject.player.velZ = 0;
         this.state = 6;
         Key.touchGamePauseInit(0);
-        this.pausecnt = 0;
+        this.pausecnt = GameTime.set(this, "pausecnt", 0);
         this.pause_saw_x = -50;
         this.pause_saw_y = 0;
         this.pause_saw_speed = 30;
@@ -1024,18 +1026,18 @@ public class SpecialStageState extends State implements SSDef, BarWord {
     }
 
     private void pauseLogic() {
-        ++this.pausecnt;
+        this.pausecnt = GameTime.advance(this, "pausecnt", this.pausecnt, 1);
         if (this.pausecnt >= 5 && this.pausecnt <= 7) {
             if (this.pause_saw_x + this.pause_saw_speed > 0) {
                 this.pause_saw_x = 0;
             } else {
-                this.pause_saw_x += this.pause_saw_speed;
+                this.pause_saw_x = GameTime.advance(this, "pause_saw_x", this.pause_saw_x, this.pause_saw_speed);
             }
 
             if (this.pause_item_x + this.pause_item_speed < (SCREEN_WIDTH >> 1) - 40) {
                 this.pause_item_x = (SCREEN_WIDTH >> 1) - 40;
             } else {
-                this.pause_item_x += this.pause_item_speed;
+                this.pause_item_x = GameTime.advance(this, "pause_item_x", this.pause_item_x, this.pause_item_speed);
             }
         } else if (this.pausecnt > 7) {
             int var1;
@@ -1057,8 +1059,8 @@ public class SpecialStageState extends State implements SSDef, BarWord {
 
             if (this.pause_returnFlag) {
                 if (this.pausecnt > this.pause_returnframe && this.pausecnt <= this.pause_returnframe + 3) {
-                    this.pause_saw_x -= this.pause_saw_speed;
-                    this.pause_item_x -= this.pause_item_speed;
+                    this.pause_saw_x = GameTime.advance(this, "pause_saw_x", this.pause_saw_x, -(this.pause_saw_speed));
+                    this.pause_item_x = GameTime.advance(this, "pause_item_x", this.pause_item_x, -(this.pause_item_speed));
                 } else if (this.pausecnt > this.pause_returnframe + 3) {
                     this.BacktoGame();
                     isDrawTouchPad = true;
@@ -1561,7 +1563,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                     }
 
                     if (!this.changingState) {
-                        this.characterY -= 15;
+                        this.characterY = GameTime.advance(this, "characterY", this.characterY, -(15));
                         if (this.characterY < -40) {
                             fadeInitAndStart(0, 255);
                             this.changingState = true;
@@ -1577,7 +1579,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                 int var6;
                 for(var5 = 0; var5 < this.speedLightVec.size(); var5 = var6 + 1) {
                     var7 = (int[])this.speedLightVec.elementAt(var5);
-                    var7[1] += 60;
+                    var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], 60);
                     var6 = var5;
                     if (var7[1] > SCREEN_HEIGHT + this.speedLight.getHeight()) {
                         this.speedLightVec.removeElementAt(var5);
@@ -1633,7 +1635,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                     var9.initBar(this, var8);
                     this.barDrawer.setPause(true);
                     this.changingState = false;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
 
                     for(var5 = 0; var5 < this.bonusY.length; ++var5) {
                         this.bonusY[var5] = BONUS_Y_ORIGINAL;
@@ -1678,7 +1680,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                 }
                 break;
             case 3:
-                ++this.count;
+                this.count = GameTime.advance(this, "count", this.count, 1);
                 double var1;
                 double var3;
                 if (this.count >= 13) {
@@ -1687,7 +1689,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                             var7 = this.bonusY;
                             var1 = (double)this.bonusY[var5];
                             var3 = (double)(BONUS_Y_START + var5 * 18);
-                            var7[var5] = MyAPI.calNextPosition(var1, var3, 1, 4);
+                            var7[var5] = MyAPI.calNextPosition(var7, String.valueOf(var5), var1, var3, 1, 4);
                         }
                     }
                 }
@@ -1698,20 +1700,20 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                             var7 = this.emeraldX;
                             var3 = (double)this.emeraldX[var5];
                             var1 = (double)(EMERALD_X_START + var5 * 32);
-                            var7[var5] = MyAPI.calNextPosition(var3, var1, 1, 4);
+                            var7[var5] = MyAPI.calNextPosition(var7, String.valueOf(var5), var3, var1, 1, 4);
                         }
                     }
                 }
 
                 if (this.count > 46) {
                     if (this.ringScore > 0) {
-                        var5 = Math.min(400, this.ringScore);
+                        var5 = Math.min(GameTime.distance(this, "ringScoreTransfer", 400), this.ringScore);
                         this.ringScore -= var5;
                         this.totalScore += var5;
                     }
 
                     if (this.clearScore > 0) {
-                        var5 = Math.min(400, this.clearScore);
+                        var5 = Math.min(GameTime.distance(this, "clearScoreTransfer", 400), this.clearScore);
                         this.clearScore -= var5;
                         this.totalScore += var5;
                     }
@@ -1725,7 +1727,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                     if (this.ringScore == 0 && this.clearScore == 0) {
                         PlayerObject.setScore(PlayerObject.getScore() + this.totalScore);
                         this.state = 5;
-                        this.count = 0;
+                        this.count = GameTime.set(this, "count", 0);
                     }
                 }
                 break;
@@ -1750,8 +1752,8 @@ public class SpecialStageState extends State implements SSDef, BarWord {
                 }
                 break;
             case 5:
-                ++this.count;
-                if (this.count == 128) {
+                this.count = GameTime.advance(this, "count", this.count, 1);
+                if (GameTime.event(this, "count", "logic:1756", GameTime.crosses(this, "count", this.count, 128))) {
                     this.barDrawer.setPause(false);
                 }
 

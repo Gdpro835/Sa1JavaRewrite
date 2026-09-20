@@ -1,5 +1,7 @@
 package PlatformStandard;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Def;
 import GameEngine.Key;
 import Lib.Animation;
@@ -203,34 +205,34 @@ public class Standard2 implements Def {
 
     private static void splashInit1() {
         splashImage1 = MFImage.createImage("/standard/sega_logo.png");
-        count = 0;
+        count = GameTime.set(Standard2.class, "count", 0);
     }
 
     private static void splashLogic1() {
-        count++;
+        count = GameTime.advance(Standard2.class, "count", count, 1);
         switch (state) {
             case 0:
                 splashInit1();
                 state = 1;
                 return;
             case 1:
-                if (count == 16) {
+                if (GameTime.event(Standard2.class, "count", "splashLogic1:219", GameTime.crosses(Standard2.class, "count", count, 16))) {
                     state = 2;
-                    count = 0;
+                    count = GameTime.set(Standard2.class, "count", 0);
                     return;
                 }
                 return;
             case 2:
-                if (count == 60) {
+                if (GameTime.event(Standard2.class, "count", "splashLogic1:226", GameTime.crosses(Standard2.class, "count", count, 60))) {
                     state = 3;
-                    count = 0;
+                    count = GameTime.set(Standard2.class, "count", 0);
                     return;
                 }
                 return;
             case 3:
-                if (count == 16) {
+                if (GameTime.event(Standard2.class, "count", "splashLogic1:233", GameTime.crosses(Standard2.class, "count", count, 16))) {
                     state = 4;
-                    count = 0;
+                    count = GameTime.set(Standard2.class, "count", 0);
                     return;
                 }
                 return;
@@ -277,11 +279,11 @@ public class Standard2 implements Def {
 
     private static void splashInit2() {
         splashImage2 = MFImage.createImage("/standard/sonic_team.png");
-        count = 0;
+        count = GameTime.set(Standard2.class, "count", 0);
     }
 
     private static void splashLogic2() {
-        count++;
+        count = GameTime.advance(Standard2.class, "count", count, 1);
         switch (state) {
             case 0:
                 splashInit2();
@@ -289,18 +291,18 @@ public class Standard2 implements Def {
                 SoundSystem.getInstance().preLoadSequenceSe(12);
                 return;
             case 1:
-                if (count == 30) {
+                if (GameTime.event(Standard2.class, "count", "splashLogic2:294", GameTime.crosses(Standard2.class, "count", count, 30))) {
                     state = 2;
                     // SoundSystem.getInstance().playSequenceSeSingle();
                     SoundSystem.getInstance().playSe(12);
-                    count = 0;
+                    count = GameTime.set(Standard2.class, "count", 0);
                     return;
                 }
                 return;
             case 2:
-                if (count == 36) {
+                if (GameTime.event(Standard2.class, "count", "splashLogic2:303", GameTime.crosses(Standard2.class, "count", count, 36))) {
                     state = 4;
-                    count = 0;
+                    count = GameTime.set(Standard2.class, "count", 0);
                     return;
                 }
                 return;
@@ -403,7 +405,7 @@ public class Standard2 implements Def {
     }
 
     public static void drawFade(MFGraphics g) {
-        fadeAlpha = MyAPI.calNextPosition((double) fadeAlpha, (double) fadeToValue, 1, 3, 3.0d);
+        fadeAlpha = MyAPI.calNextPosition(Standard2.class, "fadeAlpha", (double) fadeAlpha, (double) fadeToValue, 1, 3, 3.0d);
         if (fadeAlpha != 0) {
             if (preFadeAlpha != fadeAlpha) {
                 for (int w = 0; w < 40; w++) {
@@ -431,7 +433,7 @@ public class Standard2 implements Def {
 
     public static void secondEnsureInit() {
         isConfirm = false;
-        confirmframe = 0;
+        confirmframe = GameTime.set(Standard2.class, "confirmframe", 0);
         confirmcursor = 0;
         if (muiAniDrawer == null) {
             muiAniDrawer = new Animation("/lang" + GlobalResource.languageConfig + "/mui").getDrawer(0, false, 0);
@@ -451,14 +453,14 @@ public class Standard2 implements Def {
             confirmcursor = 1;
         }
         if (isConfirm) {
-            confirmframe++;
+            confirmframe = GameTime.advance(Standard2.class, "confirmframe", confirmframe, 1);
             if (confirmframe > 8) {
                 return 1;
             }
         }
         if (Key.touchsecondensureyes.IsButtonPress() && confirmcursor == 0 && !isConfirm) {
             isConfirm = true;
-            confirmframe = 0;
+            confirmframe = GameTime.set(Standard2.class, "confirmframe", 0);
             SoundSystem.getInstance().playSe(1);
             return 0;
         } else if (Key.touchsecondensureno.IsButtonPress() && confirmcursor == 1 && !isConfirm) {
@@ -506,7 +508,7 @@ public class Standard2 implements Def {
         animationDrawer2.setActionId(i2 + 61);
         muiAniDrawer.draw(g, 0, SCREEN_HEIGHT);
         if (isConfirm) {
-            if (confirmframe == 1) {
+            if (GameTime.event(Standard2.class, "confirmframe", "SecondEnsurePanelDraw:511", GameTime.crosses(Standard2.class, "confirmframe", confirmframe, 1))) {
                 fadeInit(220, 255);
             }
             drawFade(g);

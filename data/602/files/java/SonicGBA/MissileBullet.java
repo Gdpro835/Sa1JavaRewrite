@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -69,18 +71,18 @@ class MissileBullet extends BulletObject {
       int var1 = this.posY;
       this.missleNoiseControl();
       if (!this.IsHitted()) {
-         ++this.flyCounter;
+         this.flyCounter = GameTime.advance(this, "flyCounter", this.flyCounter, 1);
          if (this.flyCounter < 8) {
-            this.velX += this.velA;
+            this.velX = GameTime.advance(this, "velX", this.velX, this.velA);
          } else {
-            this.velX += this.velA2;
+            this.velX = GameTime.advance(this, "velX", this.velX, this.velA2);
          }
 
-         this.posX += this.velX;
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
          int var3 = this.posY;
          int var4 = player.getCheckPositionY();
          this.velY = -(var3 - var4 >> 3);
-         this.posY += this.velY;
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
       } else {
          this.boomdrawer.setActionId(0);
          this.boomdrawer.setLoop(false);

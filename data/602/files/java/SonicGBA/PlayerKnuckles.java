@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -155,17 +157,17 @@ public class PlayerKnuckles extends PlayerObject {
          byte var9;
          if ((Key.repeat(4 | Key.gUp | 33554432)) && !this.isAntiGravity || Key.repeat(Key.gDown) && this.isAntiGravity) {
             if (!this.isInWater) {
-               ++this.waterframe;
-               this.waterframe %= 3;
-               if (this.waterframe == 1) {
+               this.waterframe = GameTime.advance(this, "waterframe", this.waterframe, 1);
+               this.waterframe = GameTime.wrap(this, "waterframe", this.waterframe, 3);
+               if (GameTime.event(this, "waterframe", "inputLogicClimb:162", GameTime.crosses(this, "waterframe", this.waterframe, 1))) {
                   var8 = soundInstance;
                   var7 = soundInstance;
                   var8.playSequenceSe(18);
                }
             } else {
-               ++this.waterframe;
-               this.waterframe %= 6;
-               if (this.waterframe == 1) {
+               this.waterframe = GameTime.advance(this, "waterframe", this.waterframe, 1);
+               this.waterframe = GameTime.wrap(this, "waterframe", this.waterframe, 6);
+               if (GameTime.event(this, "waterframe", "inputLogicClimb:170", GameTime.crosses(this, "waterframe", this.waterframe, 1))) {
                   var8 = soundInstance;
                   var7 = soundInstance;
                   var8.playSequenceSe(18);
@@ -190,17 +192,17 @@ public class PlayerKnuckles extends PlayerObject {
 
          if (Key.repeat(Key.gDown) && !this.isAntiGravity || (Key.repeat(4 | Key.gUp | 33554432)) && this.isAntiGravity) {
             if (!this.isInWater) {
-               ++this.waterframe;
-               this.waterframe %= 3;
-               if (this.waterframe == 1) {
+               this.waterframe = GameTime.advance(this, "waterframe", this.waterframe, 1);
+               this.waterframe = GameTime.wrap(this, "waterframe", this.waterframe, 3);
+               if (GameTime.event(this, "waterframe", "inputLogicClimb:197", GameTime.crosses(this, "waterframe", this.waterframe, 1))) {
                   var7 = soundInstance;
                   var8 = soundInstance;
                   var7.playSequenceSe(18);
                }
             } else {
-               ++this.waterframe;
-               this.waterframe %= 6;
-               if (this.waterframe == 1) {
+               this.waterframe = GameTime.advance(this, "waterframe", this.waterframe, 1);
+               this.waterframe = GameTime.wrap(this, "waterframe", this.waterframe, 6);
+               if (GameTime.event(this, "waterframe", "inputLogicClimb:205", GameTime.crosses(this, "waterframe", this.waterframe, 1))) {
                   var7 = soundInstance;
                   var8 = soundInstance;
                   var7.playSequenceSe(18);
@@ -471,7 +473,7 @@ public class PlayerKnuckles extends PlayerObject {
    public void doJump() {
       this.attackLevel = 0;
       this.attackLevelNext = 0;
-      this.attackCount = 0;
+      this.attackCount = GameTime.set(this, "attackCount", 0);
       super.doJump();
    }
 
@@ -848,7 +850,7 @@ public class PlayerKnuckles extends PlayerObject {
             var5 = 1;
          }
 
-         this.attackCount = var5 * 6;
+         this.attackCount = GameTime.set(this, "attackCount", var5 * 6);
          var11 = soundInstance;
          var12 = soundInstance;
          var11.playSe(20);
@@ -860,9 +862,9 @@ public class PlayerKnuckles extends PlayerObject {
             this.velX >>= 2;
          } else {
             if (this.flySpeed < 768) {
-               this.flySpeed += 22;
+               this.flySpeed = GameTime.advance(this, "flySpeed", this.flySpeed, 22);
             } else if (this.flySpeed < 4608 && (this.flyDegree == 90 || this.flyDegree == -90)) {
-               this.flySpeed += 11;
+               this.flySpeed = GameTime.advance(this, "flySpeed", this.flySpeed, 11);
             }
 
             if (this.isAntiGravity ^ this.faceDirection) {
@@ -874,24 +876,24 @@ public class PlayerKnuckles extends PlayerObject {
             this.flyDegreeStable = var5;
             double var1 = (double)this.flyDegree;
             double var3 = (double)this.flyDegreeStable;
-            this.flyDegree = MyAPI.calNextPosition(var1, var3, 1, 100, 20.0D);
+            this.flyDegree = MyAPI.calNextPosition(this, "flyDegree", var1, var3, 1, 100, 20.0D);
             this.velX = this.flySpeed * MyAPI.dSin(this.flyDegree) / 100;
             if (this.isAntiGravity) {
                if (this.velY > -128) {
-                  this.velY -= 90;
+                  this.velY = GameTime.advance(this, "velY", this.velY, -(90));
                } else {
-                  this.velY += 90;
+                  this.velY = GameTime.advance(this, "velY", this.velY, 90);
                }
 
-               this.velY += this.getGravity();
+               this.velY = GameTime.advance(this, "velY", this.velY, this.getGravity());
             } else {
                if (this.velY < 128) {
-                  this.velY += 90;
+                  this.velY = GameTime.advance(this, "velY", this.velY, 90);
                } else {
-                  this.velY -= 90;
+                  this.velY = GameTime.advance(this, "velY", this.velY, -(90));
                }
 
-               this.velY -= this.getGravity();
+               this.velY = GameTime.advance(this, "velY", this.velY, -(this.getGravity()));
             }
 
             if (Math.abs(this.flyDegree) >= 75) {
@@ -922,12 +924,12 @@ public class PlayerKnuckles extends PlayerObject {
          this.velY = 0;
          this.flyDegree = this.flyDegreeStable;
          this.flying = true;
-         this.velY += 384;
+         this.velY = this.velY + (384);
          if (this.velY < 0) {
             this.velY = 0;
          }
 
-         this.velY -= this.getGravity();
+         this.velY = GameTime.advance(this, "velY", this.velY, -this.getGravity());
          this.flySpeed = 768;
          var10 = this.footPointY - 512;
          this.footPointY = var10;
@@ -962,8 +964,8 @@ public class PlayerKnuckles extends PlayerObject {
             }
 
             if (this.floating) {
-               this.velY -= this.getGravity();
-               this.velY -= 337;
+               this.velY = GameTime.advance(this, "velY", this.velY, -(this.getGravity()));
+               this.velY = GameTime.advance(this, "velY", this.velY, -(337));
                this.velY = Math.max(-1920, this.velY);
                this.velY = Math.max(var10 - var6, this.velY);
             }
@@ -996,7 +998,7 @@ public class PlayerKnuckles extends PlayerObject {
                var1 = -1;
             }
 
-            this.velX = var3 - var1 * 64;
+            this.velX = GameTime.advance(this, "velX", var3, -(var1 * 64));
             if (this.velX * var2 <= 0) {
                this.velX = 0;
             }
@@ -1011,7 +1013,7 @@ public class PlayerKnuckles extends PlayerObject {
       }
 
       if (this.attackCount > 0) {
-         --this.attackCount;
+         this.attackCount = Math.max(0, GameTime.advance(this, "attackCount", this.attackCount, -(1)));
       }
 
       SoundSystem var4;
@@ -1036,7 +1038,7 @@ public class PlayerKnuckles extends PlayerObject {
                var8 = 1;
             }
 
-            this.attackCount = var8 * 4;
+            this.attackCount = GameTime.set(this, "attackCount", var8 * 4);
             this.attackLevelNext = 0;
             var5 = soundInstance;
             var4 = soundInstance;
@@ -1069,7 +1071,7 @@ public class PlayerKnuckles extends PlayerObject {
                   var8 = 1;
                }
 
-               this.attackCount = var8 * 4;
+               this.attackCount = GameTime.set(this, "attackCount", var8 * 4);
                var4 = soundInstance;
                var5 = soundInstance;
                var4.playSe(19);
@@ -1124,7 +1126,7 @@ public class PlayerKnuckles extends PlayerObject {
                   var8 = 1;
                }
 
-               this.attackCount = var8 * 6;
+               this.attackCount = GameTime.set(this, "attackCount", var8 * 6);
                var4 = soundInstance;
                var5 = soundInstance;
                var4.playSe(20);
@@ -1173,7 +1175,7 @@ public class PlayerKnuckles extends PlayerObject {
                var1 = -1;
             }
 
-            this.totalVelocity = var2 - var1 * 64;
+            this.totalVelocity = GameTime.advance(this, "totalVelocity", var2, -(var1 * 64));
             if (this.totalVelocity * var3 <= 0) {
                this.totalVelocity = 0;
             }
@@ -1188,7 +1190,7 @@ public class PlayerKnuckles extends PlayerObject {
       }
 
       if (this.attackCount > 0) {
-         --this.attackCount;
+         this.attackCount = Math.max(0, GameTime.advance(this, "attackCount", this.attackCount, -(1)));
       }
 
       SoundSystem var4;
@@ -1215,7 +1217,7 @@ public class PlayerKnuckles extends PlayerObject {
                var8 = 1;
             }
 
-            this.attackCount = var8 * 4;
+            this.attackCount = GameTime.set(this, "attackCount", var8 * 4);
             this.attackLevelNext = 0;
             var5 = soundInstance;
             var4 = soundInstance;
@@ -1250,7 +1252,7 @@ public class PlayerKnuckles extends PlayerObject {
                   var8 = 1;
                }
 
-               this.attackCount = var8 * 4;
+               this.attackCount = GameTime.set(this, "attackCount", var8 * 4);
                var5 = soundInstance;
                var4 = soundInstance;
                var5.playSe(19);
@@ -1305,7 +1307,7 @@ public class PlayerKnuckles extends PlayerObject {
                   var8 = 1;
                }
 
-               this.attackCount = var8 * 6;
+               this.attackCount = GameTime.set(this, "attackCount", var8 * 6);
                var5 = soundInstance;
                var4 = soundInstance;
                var5.playSe(20);

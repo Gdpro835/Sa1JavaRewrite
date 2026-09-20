@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -49,8 +51,8 @@ class Furiko extends GimmickObject {
    }
 
    public static void staticLogic() {
-      lineVelocity += (GRAVITY - 60) * MyAPI.dSin((degree >> 6) - 90) / 100;
-      degree -= ((lineVelocity << 6) / 4928 << 6) * 180 / 201;
+      lineVelocity = GameTime.advance(Furiko.class, "lineVelocity", lineVelocity, (GRAVITY - 60) * MyAPI.dSin((degree >> 6) - 90) / 100);
+      degree = GameTime.advance(Furiko.class, "degree", degree, -(((lineVelocity << 6) / 4928 << 6) * 180 / 201));
    }
 
    public void close() {
@@ -94,7 +96,7 @@ class Furiko extends GimmickObject {
 
    public void logic() {
       if (this.leaveCount > 0) {
-         --this.leaveCount;
+         this.leaveCount = Math.max(0, GameTime.advance(this, "leaveCount", this.leaveCount, -(1)));
       }
 
       this.thisDegree = degree >> 6;
@@ -112,7 +114,7 @@ class Furiko extends GimmickObject {
             this.touching = false;
             player.doJump();
             player.setFurikoOutVelX(this.thisDegree);
-            this.leaveCount = 10;
+            this.leaveCount = GameTime.set(this, "leaveCount", 10);
          }
       }
 

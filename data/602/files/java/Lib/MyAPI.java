@@ -3,6 +3,8 @@
 //
 package Lib;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.android.Graphics;
 import com.sega.mobile.framework.device.MFDevice;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -93,75 +95,32 @@ public class MyAPI implements Def {
     public static void SystemOut(String var0) {
     }
 
-    public static int calNextPosition(double var0, double var2, int var4, int var5) {
-        return calNextPosition(var0, var2, var4, var5, 1.0);
+    public static int calNextPosition(Object owner, String channel, double current, double target, int numerator, int denominator) {
+        return calNextPosition(owner, channel, current, target, numerator, denominator, 1.0);
     }
 
-    public static int calNextPosition(double var0, double var2, int var4, int var5, double var6) {
-        return (int)calNextPositionD(var0, var2, var4, var5, var6);
+    public static int calNextPosition(Object owner, String channel, double current, double target, int numerator, int denominator, double minimum) {
+        return GameTime.approach(owner, channel, (int) current, target, numerator, denominator, minimum);
     }
 
-    public static double calNextPositionD(double var0, double var2, int var4, int var5) {
-        return (double)calNextPosition(var0, var2, var4, var5, 1.0);
+    public static double calNextPositionD(double current, double target, int numerator, int denominator) {
+        return calNextPositionD(current, target, numerator, denominator, 1.0);
     }
 
-    public static double calNextPositionD(double var0, double var2, int var4, int var5, double var6) {
-        if (var5 > var4) {
-            double var10 = (var2 - var0) * 100.0 * (double)var4 / (double)var5;
-            double var12 = var10 / 100.0;
-            double var8;
-            if (var10 == 0.0) {
-                var8 = 0.0;
-            } else {
-                var8 = var6;
-                if (!(var10 > 0.0)) {
-                    var8 = -var6;
-                }
-            }
-
-            var6 = var0 + var12 + var8;
-            var0 = var6;
-            if ((long)var10 * ((long)var2 * 100L - (long)var6 * 100L) <= 0L) {
-                var0 = var2;
-            }
-        }
-
-        return var0;
+    public static double calNextPositionD(double current, double target, int numerator, int denominator, double minimum) {
+        return GameTime.approachValue(current, target, numerator, denominator, minimum);
     }
 
-    public static float calNextPositionF(double var0, double var2, int var4, int var5, double var6) {
-        return (float)calNextPositionD(var0, var2, var4, var5, var6);
+    public static float calNextPositionF(double current, double target, int numerator, int denominator, double minimum) {
+        return (float) calNextPositionD(current, target, numerator, denominator, minimum);
     }
 
-    public static int calNextPositionReverse(int var0, int var1, int var2, int var3, int var4) {
-        return calNextPositionReverse(var0, var1, var2, var3, var4, 1);
+    public static int calNextPositionReverse(Object owner, String channel, int current, int origin, int target, int numerator, int denominator) {
+        return calNextPositionReverse(owner, channel, current, origin, target, numerator, denominator, 1);
     }
 
-    public static int calNextPositionReverse(int var0, int var1, int var2, int var3, int var4, int var5) {
-        if (var4 > var3 && var0 != var2) {
-            var1 = Math.abs(var0 - var1);
-            var3 = var1 * var4 / (var4 - var3) >> 1;
-            var1 = var3;
-            if (var3 == 0) {
-                var1 = var5;
-            }
-
-            if (var0 < var2) {
-                var1 += var0;
-                var0 = var1;
-                if (var1 > var2) {
-                    var0 = var2;
-                }
-            } else {
-                var1 = var0 - var1;
-                var0 = var1;
-                if (var1 < var2) {
-                    var0 = var2;
-                }
-            }
-        }
-
-        return var0;
+    public static int calNextPositionReverse(Object owner, String channel, int current, int origin, int target, int numerator, int denominator, int minimum) {
+        return GameTime.reverseApproach(owner, channel, current, origin, target, numerator, denominator, minimum);
     }
 
     public static int dCos(int var0) {

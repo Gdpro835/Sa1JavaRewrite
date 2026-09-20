@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -164,7 +166,7 @@ class BossF2 extends BossObject {
          if (this.HP > 0) {
             this.machine_state = 2;
             this.face_state = 2;
-            this.face_cnt = 0;
+            this.face_cnt = GameTime.set(this, "face_cnt", 0);
             if (this.HP == 1) {
                this.isFight = true;
                this.isShoot = false;
@@ -223,7 +225,7 @@ class BossF2 extends BossObject {
                if (this.HP > 0) {
                   this.machine_state = 2;
                   this.face_state = 2;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                   if (this.HP == 1) {
                      this.isFight = true;
                      this.isShoot = false;
@@ -363,23 +365,23 @@ class BossF2 extends BossObject {
             switch(this.show_step) {
             case 0:
                if (this.posX - 360 > 104448) {
-                  this.posX -= 360;
+                  this.posX = GameTime.advance(this, "posX", this.posX, -(360));
                } else {
                   this.posX = 104448;
                   this.show_step = 1;
-                  this.enter_screen_frame_cn = 0;
-                  this.laugh_cn = 0;
+                  this.enter_screen_frame_cn = GameTime.set(this, "enter_screen_frame_cn", 0);
+                  this.laugh_cn = GameTime.set(this, "laugh_cn", 0);
                }
                break label168;
             case 1:
                if (this.enter_screen_frame_cn < 3) {
-                  ++this.enter_screen_frame_cn;
+                  this.enter_screen_frame_cn = Math.min(3, GameTime.advance(this, "enter_screen_frame_cn", this.enter_screen_frame_cn, 1));
                } else {
                   this.face_state = 1;
                }
 
                if (this.laugh_cn < 14) {
-                  ++this.laugh_cn;
+                  this.laugh_cn = Math.min(14, GameTime.advance(this, "laugh_cn", this.laugh_cn, 1));
                } else {
                   this.show_step = 2;
                   this.face_state = 0;
@@ -396,11 +398,11 @@ class BossF2 extends BossObject {
          case 2:
             if (this.face_state != 0) {
                if (this.face_cnt < 8) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                } else {
                   this.machine_state = 0;
                   this.face_state = 0;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
@@ -435,13 +437,13 @@ class BossF2 extends BossObject {
 
             if (this.velocity > 0) {
                if (this.posX < 117376) {
-                  this.posX += this.velocity;
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                } else {
                   this.posX = 117376;
                   this.velocity = -this.velocity;
                }
             } else if (this.posX > 91520) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
             } else {
                this.posX = 91520;
                this.velocity = -this.velocity;
@@ -463,9 +465,9 @@ class BossF2 extends BossObject {
 
             if (this.isShoot) {
                if (this.velocity > 0) {
-                  this.drill_offsetx += 400;
+                  this.drill_offsetx = GameTime.advance(this, "drill_offsetx", this.drill_offsetx, 400);
                } else {
-                  this.drill_offsetx -= 400;
+                  this.drill_offsetx = GameTime.advance(this, "drill_offsetx", this.drill_offsetx, -(400));
                }
 
                this.machine_state = 1;
@@ -476,18 +478,18 @@ class BossF2 extends BossObject {
             if (this.posY + this.drop_velY > this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
             } else {
-               this.drop_velY += GRAVITY >> 1;
-               this.posY += this.drop_velY;
+               this.drop_velY = GameTime.advance(this, "drop_velY", this.drop_velY, GRAVITY >> 1);
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "drop_velY", this.drop_velY);
             }
 
             int[] var6 = this.wheelpos[0];
-            var6[0] += this.wheel_velx;
+            var6[0] = GameTime.advance(var6, String.valueOf(0), var6[0], this.wheel_velx);
             var6 = this.wheelpos[1];
-            var6[0] += this.wheel_velx;
+            var6[0] = GameTime.advance(var6, String.valueOf(0), var6[0], this.wheel_velx);
             var6 = this.wheelpos[2];
-            var6[0] -= this.wheel_velx;
+            var6[0] = GameTime.advance(var6, String.valueOf(0), var6[0], -(this.wheel_velx));
             var6 = this.wheelpos[3];
-            var6[0] -= this.wheel_velx;
+            var6[0] = GameTime.advance(var6, String.valueOf(0), var6[0], -(this.wheel_velx));
             if (this.wheelpos[0][1] + this.wheel_vely > this.getGroundY(this.wheelpos[0][0], this.wheelpos[0][1]) && this.drop_cnt == 0) {
                this.wheelpos[0][1] = this.getGroundY(this.wheelpos[0][0], this.wheelpos[0][1]);
                this.wheel_vely = -384;
@@ -499,9 +501,9 @@ class BossF2 extends BossObject {
             } else if (this.wheelpos[0][1] + this.wheel_vely > this.getGroundY(this.wheelpos[0][0], this.wheelpos[0][1]) && this.drop_cnt == 2) {
                this.wheelpos[0][1] = this.getGroundY(this.wheelpos[0][0], this.wheelpos[0][1]);
             } else {
-               this.wheel_vely += GRAVITY;
+               this.wheel_vely = GameTime.advance(this, "wheel_vely", this.wheel_vely, GRAVITY);
                var6 = this.wheelpos[0];
-               var6[1] += this.wheel_vely;
+               var6[1] = GameTime.advance(var6, String.valueOf(1), var6[1], this.wheel_vely);
             }
 
             this.wheelpos[1][1] = this.wheelpos[0][1];
@@ -515,13 +517,13 @@ class BossF2 extends BossObject {
                this.fly_top = this.posY;
                this.fly_end = 114176;
                player.getBossScore();
-               this.wait_cnt = 0;
+               this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
             }
             break;
          case 4:
-            ++this.wait_cnt;
+            this.wait_cnt = GameTime.advance(this, "wait_cnt", this.wait_cnt, 1);
             if (this.wait_cnt >= this.wait_cnt_max && this.posY >= this.fly_top - this.fly_top_range) {
-               this.posY -= this.escape_v;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(this.escape_v));
             }
 
             if (this.posY <= this.fly_top - this.fly_top_range && this.WaitCnt == 0) {
@@ -550,7 +552,7 @@ class BossF2 extends BossObject {
             }
 
             if (this.WaitCnt == 3 || this.WaitCnt == 4) {
-               this.posX += this.escape_v;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.escape_v);
             }
 
             if (this.posX - this.fly_end > this.fly_top_range && this.WaitCnt == 3) {

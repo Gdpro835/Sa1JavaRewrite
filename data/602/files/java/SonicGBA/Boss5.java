@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -251,8 +253,8 @@ class Boss5 extends BossObject {
 
    private void hurt_air_control() {
       this.hurt_side_cotrol();
-      this.velY += GRAVITY;
-      this.posY += this.velY;
+      this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+      this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
    }
 
    private void hurt_side_cotrol() {
@@ -261,10 +263,10 @@ class Boss5 extends BossObject {
       int var1 = this.BOSS5_WIDTH;
       if (var3 + var2 + var1 >= MapManager.getCamera().x + MapManager.CAMERA_WIDTH << 6) {
          this.posX += 0;
-      } else if (this.posX + this.velX - this.BOSS5_WIDTH <= MapManager.getCamera().x << 6) {
+      } else if (this.posX + GameTime.displacement(GameTime.integratedVelocity(this, "velX", this.velX)) - this.BOSS5_WIDTH <= MapManager.getCamera().x << 6) {
          this.posX += 0;
       } else {
-         this.posX += this.velX;
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
       }
 
    }
@@ -352,7 +354,7 @@ class Boss5 extends BossObject {
 
       player.setAnimationId(var4);
       if (this.defence_cnt < 15) {
-         ++this.defence_cnt;
+         this.defence_cnt = GameTime.advanceOnce(this, "defence_cnt", this.defence_cnt, 1);
       } else {
          this.IsPlayerRunaway = true;
       }
@@ -689,12 +691,12 @@ class Boss5 extends BossObject {
                this.changeAniState(this.knuckdrawer, 1, true);
                this.COLLISION_WIDTH = 1024;
                this.COLLISION_HEIGHT = 1664;
-               this.talk_cnt = 1;
+               this.talk_cnt = GameTime.set(this, "talk_cnt", 1);
             }
 
             if (this.talk_cnt >= 1) {
-               ++this.talk_cnt;
-               if (this.talk_cnt == 9) {
+               this.talk_cnt = GameTime.advance(this, "talk_cnt", this.talk_cnt, 1);
+               if (GameTime.event(this, "talk_cnt", "logic:699", GameTime.crosses(this, "talk_cnt", this.talk_cnt, 9))) {
                   player.setMeetingBoss(true);
                   player.setOutOfControl(this);
                   PlayerObject var10 = player;
@@ -721,18 +723,18 @@ class Boss5 extends BossObject {
                this.state = 16;
                soundInstance.playSe(24);
                this.IsPlayerRunaway = false;
-               this.defence_cnt = 0;
+               this.defence_cnt = GameTime.set(this, "defence_cnt", 0);
             } else if (this.ready_cnt < 24) {
-               ++this.ready_cnt;
+               this.ready_cnt = GameTime.advance(this, "ready_cnt", this.ready_cnt, 1);
             } else {
-               this.ready_cnt = 0;
+               this.ready_cnt = GameTime.set(this, "ready_cnt", 0);
                this.state = 3;
                this.prestate = 4;
             }
             break;
          case 5:
             if (this.horizonAttackReady_cnt < this.horizonAttackReady_cnt_max) {
-               ++this.horizonAttackReady_cnt;
+               this.horizonAttackReady_cnt = Math.min(this.horizonAttackReady_cnt_max, GameTime.advance(this, "horizonAttackReady_cnt", this.horizonAttackReady_cnt, 1));
             } else {
                if (this.IsHurt) {
                   var8 = 8;
@@ -743,7 +745,7 @@ class Boss5 extends BossObject {
                this.changeAniState(this.knuckdrawer, var8, true);
                this.COLLISION_WIDTH = 1536;
                this.COLLISION_HEIGHT = 1536;
-               this.horizonAttackReady_cnt = 0;
+               this.horizonAttackReady_cnt = GameTime.set(this, "horizonAttackReady_cnt", 0);
                this.state = 6;
                soundInstance.playSe(5);
             }
@@ -755,17 +757,17 @@ class Boss5 extends BossObject {
                   this.posX = this.limitLeftX;
                   this.IsConner = true;
                } else {
-                  this.posX += this.horizon_move_speed;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.horizon_move_speed);
                }
             } else if (this.posX >= this.limitRightX) {
                this.posX = this.limitRightX;
                this.IsConner = true;
             } else {
-               this.posX += this.horizon_move_speed;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.horizon_move_speed);
             }
 
             if (this.IsConner) {
-               this.horizonAttackReady_cnt = 0;
+               this.horizonAttackReady_cnt = GameTime.set(this, "horizonAttackReady_cnt", 0);
                this.IsConner = false;
                this.state = 3;
                this.prestate = 6;
@@ -780,7 +782,7 @@ class Boss5 extends BossObject {
                this.COLLISION_HEIGHT = 1472;
                this.state = 8;
             } else {
-               this.posY -= this.fly_up_speed1;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(this.fly_up_speed1));
             }
             break;
          case 8:
@@ -799,8 +801,8 @@ class Boss5 extends BossObject {
                   this.COLLISION_HEIGHT = 2432;
                   this.state = 9;
                } else {
-                  this.posX += this.fly_move_x_speed1;
-                  this.posY += this.fly_move_y_speed1;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.fly_move_x_speed1);
+                  this.posY = GameTime.advance(this, "posY", this.posY, this.fly_move_y_speed1);
                }
             } else {
                if (player.getFootPositionX() + this.fly_drip_offset < this.limitRightX) {
@@ -816,8 +818,8 @@ class Boss5 extends BossObject {
                   this.COLLISION_HEIGHT = 2432;
                   this.state = 9;
                } else {
-                  this.posX += this.fly_move_x_speed1;
-                  this.posY += this.fly_move_y_speed1;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.fly_move_x_speed1);
+                  this.posY = GameTime.advance(this, "posY", this.posY, this.fly_move_y_speed1);
                }
             }
             break;
@@ -831,15 +833,15 @@ class Boss5 extends BossObject {
             }
             break;
          case 10:
-            if (this.posY + this.velY >= this.getGroundY(this.posX, this.posY)) {
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) >= this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
                this.changeAniStateNoTrans(this.knuckdrawer, 12, false);
                this.COLLISION_WIDTH = 1408;
                this.COLLISION_HEIGHT = 1920;
                this.state = 11;
             } else {
-               this.velY += GRAVITY;
-               this.posY += this.velY;
+               this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
             }
             break;
          case 11:
@@ -874,9 +876,9 @@ class Boss5 extends BossObject {
             } else {
                this.hurt_air_control();
                if (isBossHalf) {
-                  ++damageframe;
-                  damageframe %= 11;
-                  if (damageframe % 2 == 0) {
+                  damageframe = GameTime.advance(Boss5.class, "damageframe", damageframe, 1);
+                  damageframe = GameTime.wrap(Boss5.class, "damageframe", damageframe, 11);
+                  if (GameTime.periodic(Boss5.class, "damageframe", "logic:881", damageframe, 2, 0)) {
                      SoundSystem.getInstance().playSe(35);
                   }
                }
@@ -884,16 +886,16 @@ class Boss5 extends BossObject {
             break;
          case 14:
             this.flydefence.setHurtState(false);
-            if (this.posY + this.velY >= this.getGroundY(this.posX, this.posY)) {
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) >= this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
                this.changeAniStateNoTrans(this.knuckdrawer, 7, false);
                this.state = 15;
             } else {
                this.hurt_air_control();
                if (isBossHalf) {
-                  ++damageframe;
-                  damageframe %= 11;
-                  if (damageframe % 2 == 0) {
+                  damageframe = GameTime.advance(Boss5.class, "damageframe", damageframe, 1);
+                  damageframe = GameTime.wrap(Boss5.class, "damageframe", damageframe, 11);
+                  if (GameTime.periodic(Boss5.class, "damageframe", "logic:898", damageframe, 2, 0)) {
                      SoundSystem.getInstance().playSe(35);
                   }
                }
@@ -945,11 +947,11 @@ class Boss5 extends BossObject {
                this.COLLISION_HEIGHT = 1024;
                this.state = 33;
                this.IsPlayerRunaway = false;
-               this.defence_cnt = 0;
+               this.defence_cnt = GameTime.set(this, "defence_cnt", 0);
             } else if (this.ready_cnt < 24) {
-               ++this.ready_cnt;
+               this.ready_cnt = GameTime.advance(this, "ready_cnt", this.ready_cnt, 1);
             } else {
-               this.ready_cnt = 0;
+               this.ready_cnt = GameTime.set(this, "ready_cnt", 0);
                this.state = 20;
                this.prestate = 19;
             }
@@ -959,7 +961,7 @@ class Boss5 extends BossObject {
             break;
          case 21:
             if (this.horizonAttackReady_cnt < this.horizonAttackReady_cnt_max) {
-               ++this.horizonAttackReady_cnt;
+               this.horizonAttackReady_cnt = Math.min(this.horizonAttackReady_cnt_max, GameTime.advance(this, "horizonAttackReady_cnt", this.horizonAttackReady_cnt, 1));
             } else {
                if (this.IsHurt) {
                   var8 = 26;
@@ -970,7 +972,7 @@ class Boss5 extends BossObject {
                this.changeAniState(this.knuckdrawer, var8, true);
                this.COLLISION_WIDTH = 1536;
                this.COLLISION_HEIGHT = 1536;
-               this.horizonAttackReady_cnt = 0;
+               this.horizonAttackReady_cnt = GameTime.set(this, "horizonAttackReady_cnt", 0);
                this.state = 22;
                soundInstance.playSe(5);
             }
@@ -982,17 +984,17 @@ class Boss5 extends BossObject {
                   this.posX = this.limitLeftX;
                   this.IsConner = true;
                } else {
-                  this.posX += this.horizon_move_speed;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.horizon_move_speed);
                }
             } else if (this.posX >= this.limitRightX) {
                this.posX = this.limitRightX;
                this.IsConner = true;
             } else {
-               this.posX += this.horizon_move_speed;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.horizon_move_speed);
             }
 
             if (this.IsConner) {
-               this.horizonAttackReady_cnt = 0;
+               this.horizonAttackReady_cnt = GameTime.set(this, "horizonAttackReady_cnt", 0);
                this.IsConner = false;
                this.state = 20;
                this.prestate = 22;
@@ -1007,7 +1009,7 @@ class Boss5 extends BossObject {
                this.COLLISION_HEIGHT = 1472;
                this.state = 24;
             } else {
-               this.posY -= Math.abs(this.velocity);
+               this.posY = GameTime.advance(this, "posY", this.posY, -(Math.abs(this.velocity)));
             }
             break;
          case 24:
@@ -1026,8 +1028,8 @@ class Boss5 extends BossObject {
                   this.COLLISION_HEIGHT = 2432;
                   this.state = 25;
                } else {
-                  this.posX += this.fly_move_x_speed1;
-                  this.posY += this.fly_move_y_speed1;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.fly_move_x_speed1);
+                  this.posY = GameTime.advance(this, "posY", this.posY, this.fly_move_y_speed1);
                }
             } else {
                if (player.getFootPositionX() + this.fly_drip_offset < this.limitRightX) {
@@ -1043,8 +1045,8 @@ class Boss5 extends BossObject {
                   this.COLLISION_HEIGHT = 2432;
                   this.state = 25;
                } else {
-                  this.posX += this.fly_move_x_speed1;
-                  this.posY += this.fly_move_y_speed1;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.fly_move_x_speed1);
+                  this.posY = GameTime.advance(this, "posY", this.posY, this.fly_move_y_speed1);
                }
             }
             break;
@@ -1058,15 +1060,15 @@ class Boss5 extends BossObject {
             }
             break;
          case 26:
-            if (this.posY + this.velY >= this.getGroundY(this.posX, this.posY)) {
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) >= this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
                this.changeAniStateNoTrans(this.knuckdrawer, 30, false);
                this.COLLISION_WIDTH = 1408;
                this.COLLISION_HEIGHT = 1920;
                this.state = 27;
             } else {
-               this.velY += GRAVITY;
-               this.posY += this.velY;
+               this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
             }
             break;
          case 27:
@@ -1112,7 +1114,7 @@ class Boss5 extends BossObject {
             break;
          case 31:
             this.flydefence.setHurtState(false);
-            if (this.posY + this.velY >= this.getGroundY(this.posX, this.posY)) {
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) >= this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
                this.changeAniStateNoTrans(this.knuckdrawer, 25, false);
                this.state = 32;
@@ -1154,7 +1156,7 @@ class Boss5 extends BossObject {
             }
             break;
          case 36:
-            if (this.posY + this.velY >= this.getGroundY(this.posX, this.posY)) {
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) >= this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
                this.changeAniState(this.knuckdrawer, 40, true);
                this.state = 37;
@@ -1164,7 +1166,7 @@ class Boss5 extends BossObject {
             break;
          case 37:
             if (this.KOWaitCnt < this.KOWaitCntMax) {
-               ++this.KOWaitCnt;
+               this.KOWaitCnt = Math.min(this.KOWaitCntMax, GameTime.advance(this, "KOWaitCnt", this.KOWaitCnt, 1));
             } else {
                this.state = 38;
                this.bossbroken = new BossBroken(26, this.posX >> 6, this.posY >> 6, 0, 0, 0, 0);
@@ -1197,13 +1199,13 @@ class Boss5 extends BossObject {
          case 39:
             for(var1 = 0; var1 < this.pos.length; ++var1) {
                int[] var9 = this.pos[var1];
-               var9[0] += this.pos[var1][2];
+               var9[0] = GameTime.advance(var9, String.valueOf(0), var9[0], this.pos[var1][2]);
                var9 = this.pos[var1];
-               var9[3] += GRAVITY >> 1;
+               var9[3] = GameTime.advance(var9, String.valueOf(3), var9[3], GRAVITY >> 1);
                var9 = this.pos[var1];
-               var9[1] += this.pos[var1][3];
+               var9[1] = GameTime.advance(var9, String.valueOf(1), var9[1], this.pos[var1][3]);
                if (this.pos[var1][1] >= this.posY) {
-                  ++this.pieces_drip_cnt;
+                  this.pieces_drip_cnt = GameTime.advance(this, "pieces_drip_cnt", this.pieces_drip_cnt, 1);
                }
             }
 
@@ -1260,7 +1262,7 @@ class Boss5 extends BossObject {
             }
 
             if (this.WaitCnt == 4 || this.WaitCnt == 5) {
-               this.posX += this.escape_v;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.escape_v);
             }
 
             if (this.posX - this.fly_end > this.fly_range && this.WaitCnt == 4) {
@@ -1269,7 +1271,7 @@ class Boss5 extends BossObject {
 
             if (this.WaitCnt == 5) {
                if (this.escape_cnt < this.escape_cnt_max) {
-                  ++this.escape_cnt;
+                  this.escape_cnt = Math.min(this.escape_cnt_max, GameTime.advance(this, "escape_cnt", this.escape_cnt, 1));
                } else {
                   this.WaitCnt = 6;
                }

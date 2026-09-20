@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -78,13 +80,13 @@ class Monkey extends EnemyObject {
             }
 
             if (this.velocity > 0) {
-               this.posY += this.velocity;
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velocity", this.velocity);
                if (this.posY >= this.limitBottomY) {
                   this.posY = this.limitBottomY;
                   this.velocity = -this.velocity;
                }
             } else {
-               this.posY += this.velocity;
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velocity", this.velocity);
                if (this.posY <= this.limitTopY) {
                   this.posY = this.limitTopY;
                   this.velocity = -this.velocity;
@@ -93,9 +95,9 @@ class Monkey extends EnemyObject {
 
             if (this.posY == this.limitTopY && this.alert_state == 0) {
                ++this.attack_cnt;
-               if (this.attack_cnt == 2) {
+               if (this.attack_cnt >= 2) {
                   this.state = 1;
-                  this.attack_cnt = 0;
+                  this.attack_cnt = GameTime.set(this, "attack_cnt", 0);
                }
             }
 

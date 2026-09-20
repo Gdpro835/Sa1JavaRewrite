@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Def;
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -36,8 +38,8 @@ class BackManagerStage5 extends BackGroundManager {
       }
 
       if (!GameObject.IsGamePause) {
-         ++this.cloudPosX;
-         this.cloudPosX %= IMAGE_WIDTH;
+         this.cloudPosX = GameTime.advance(this, "cloudPosX", this.cloudPosX, 1);
+         this.cloudPosX = GameTime.wrap(this, "cloudPosX", this.cloudPosX, IMAGE_WIDTH);
       }
 
       for(int var2 = -IMAGE_WIDTH; var2 < MapManager.CAMERA_WIDTH + this.cloudPosX; var2 += IMAGE_WIDTH) {

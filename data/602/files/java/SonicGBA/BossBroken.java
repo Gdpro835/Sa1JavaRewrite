@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -63,7 +65,7 @@ class BossBroken extends EnemyObject {
       }
 
       this.boomPos = new int[8][2];
-      this.boomCount = 0;
+      this.boomCount = GameTime.set(this, "boomCount", 0);
       this.totalBoom = 0;
       if (var1 != 26) {
          if (var1 == 27) {
@@ -89,7 +91,7 @@ class BossBroken extends EnemyObject {
 
       this.total_cnt_max = 8;
       this.jump_time = 10;
-      frame = 1;
+      frame = GameTime.set(BossBroken.class, "frame", 1);
    }
 
    public static void releaseAllResource() {
@@ -119,8 +121,8 @@ class BossBroken extends EnemyObject {
       if (this.total_cnt < this.total_cnt_max) {
          int var2;
          if (!IsGamePause) {
-            ++this.time_cnt;
-            if (this.time_cnt % this.jump_time == 0 || this.time_cnt == 0) {
+            this.time_cnt = GameTime.advance(this, "time_cnt", this.time_cnt, 1);
+            if (GameTime.periodic(this, "time_cnt", "draw:125", this.time_cnt, this.jump_time, 0)) {
                ++this.total_cnt;
 
                for(var2 = 0; var2 < this.pos.length; ++var2) {
@@ -134,20 +136,20 @@ class BossBroken extends EnemyObject {
 
             for(var2 = 0; var2 < this.pos.length; ++var2) {
                int[] var3 = this.pos[var2];
-               var3[0] += this.pos[var2][2];
+               var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.pos[var2][2]);
                var3 = this.pos[var2];
-               var3[3] += GRAVITY >> 1;
+               var3[3] = GameTime.advance(var3, String.valueOf(3), var3[3], GRAVITY >> 1);
                var3 = this.pos[var2];
-               var3[1] += this.pos[var2][3];
+               var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.pos[var2][3]);
             }
 
             if (this.total_cnt >= this.total_cnt_max) {
                this.IsEnd = true;
             }
 
-            ++this.boomCount;
-            this.boomCount %= 2;
-            if (this.boomCount == 1) {
+            this.boomCount = GameTime.advance(this, "boomCount", this.boomCount, 1);
+            this.boomCount = GameTime.wrap(this, "boomCount", this.boomCount, 2);
+            if (GameTime.event(this, "boomCount", "draw:152", GameTime.crosses(this, "boomCount", this.boomCount, 1))) {
                this.boomPos[this.totalBoom][0] = this.startx + (MyRandom.nextInt(60) - 30 << 6);
                this.boomPos[this.totalBoom][1] = this.starty + (MyRandom.nextInt(60) - 30 << 6);
                this.boomdrawers[this.totalBoom].restart();
@@ -194,9 +196,9 @@ class BossBroken extends EnemyObject {
             this.starty = var2 - 1344 + (var3 << 6) - var1;
          }
 
-         ++frame;
-         frame %= 11;
-         if (frame % 2 == 0) {
+         frame = GameTime.advance(BossBroken.class, "frame", frame, 1);
+         frame = GameTime.wrap(BossBroken.class, "frame", frame, 11);
+         if (GameTime.periodic(BossBroken.class, "frame", "logicBoom:201", frame, 2, 0)) {
             soundInstance.playSe(35);
          }
       }

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -59,13 +61,13 @@ class DownIsland extends GimmickObject {
             ((PlayerKnuckles)player).setFloating(false);
          }
 
-         this.posY += 400;
+         this.posY = GameTime.advance(this, "posY", this.posY, 400);
          this.checkWithMap(this.posX, var1, this.posX, this.posY);
          if (this.posY + (COLLISION_HEIGHT >> 1) >= this.getGroundY(this.posX, this.posY)) {
             this.posY = this.getGroundY(this.posX, this.posY) - (COLLISION_HEIGHT >> 1);
          }
       } else {
-         this.posY -= 400;
+         this.posY = GameTime.advance(this, "posY", this.posY, -(400));
          if (this.posY <= this.posYOriginal) {
             this.posY = this.posYOriginal;
          }

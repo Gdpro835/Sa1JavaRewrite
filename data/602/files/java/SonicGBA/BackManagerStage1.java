@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -132,7 +134,7 @@ class BackManagerStage1 extends BackGroundManager {
       for(int var2 = 0; var2 < BG_CUT_HEIGHT.length; ++var2) {
          if (!GameObject.IsGamePause) {
             int[] var10 = this.posX;
-            var10[var2] += POS_X_SPEED[var2];
+            var10[var2] = GameTime.advance(var10, String.valueOf(var2), var10[var2], POS_X_SPEED[var2]);
          }
 
          int var4 = CAMERA_POS_X_SPEED[var2] * var6 / 64;

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import Lib.MyRandom;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -130,14 +132,14 @@ class PatrolAnimal extends SmallAnimal {
             var1 = 1;
          }
 
-         this.posX = var2 + var1 * -250;
-         this.posY -= 300;
+         this.posX = GameTime.advance(this, "posX", var2, var1 * -250);
+         this.posY = GameTime.advance(this, "posY", this.posY, -(300));
          if (this.posY < this.flyLimit) {
             this.posY = this.flyLimit;
          }
 
-         this.flyDegree += 30;
-         this.flyDegree %= 360;
+         this.flyDegree = GameTime.advance(this, "flyDegree", this.flyDegree, 30);
+         this.flyDegree = GameTime.wrap(this, "flyDegree", this.flyDegree, 360);
       }
 
       this.refreshCollisionRect(this.posX, this.posY);

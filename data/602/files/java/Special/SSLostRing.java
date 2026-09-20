@@ -1,5 +1,7 @@
 package Special;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 
 /* compiled from: SpecialObject */
@@ -28,9 +30,9 @@ class SSLostRing extends SSRing {
     }
 
     public void logic() {
-        this.posZ += this.velZ;
-        this.posX += this.velX;
-        this.posY += this.velY;
+        this.posZ = GameTime.advancePosition(this, "posZ", this.posZ, "velZ", this.velZ);
+        this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+        this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
     }
 
     public void refreshCollision(int x, int y) {

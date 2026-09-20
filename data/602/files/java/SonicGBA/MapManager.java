@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.Coordinate;
@@ -141,42 +143,25 @@ public class MapManager implements SonicDef {
       switch(cameraActionX) {
       case 0:
          int var10 = camera.x;
+         int maxStep = GameTime.distance(camera, "cameraXLimit", 48);
          var9 = camera;
          double var2 = (double)camera.x;
          double var0 = (double)var5;
-         var9.x = MyAPI.calNextPosition(var2, var0, 3, 6, 4.0D);
-         if (Math.abs(var10 - camera.x) > 48) {
+         var9.x = MyAPI.calNextPosition(var9, "cameraX", var2, var0, 3, 6, 4.0D);
+         if (Math.abs(var10 - camera.x) > maxStep) {
             if (camera.x > var10) {
-               camera.x = var10 + 48;
+               camera.x = var10 + maxStep;
             }
 
             if (camera.x < var10) {
-               camera.x = var10 - 48;
+               camera.x = var10 - maxStep;
             }
          }
          break;
       case 1:
-         if (var5 < 0) {
-            var5 = 0;
-         }
-
-         int var6 = (var5 - camera.x) * 100 / 5;
-         var9 = camera;
-         int var8 = var9.x;
-         int var7 = var6 / 100;
-         byte var4;
-         if (var6 == 0) {
-            var4 = 0;
-         } else if (var6 > 0) {
-            var4 = 5;
-         } else {
-            var4 = -5;
-         }
-
-         var9.x = var8 + var7 + var4;
-         if ((var5 * 100 - camera.x * 100) * var6 <= 0) {
-            cameraActionX = 0;
-         }
+         var5 = Math.max(0, var5);
+         camera.x = GameTime.approach(camera, "cameraX", camera.x, var5, 1, 5, 5.0);
+         if (camera.x == var5) cameraActionX = 0;
          break;
       case 2:
          camera.x = var5;
@@ -191,44 +176,25 @@ public class MapManager implements SonicDef {
       switch(cameraActionY) {
       case 0:
          int var10 = camera.y;
+         int maxStep = GameTime.distance(camera, "cameraYLimit", 48);
          var9 = camera;
          double var2 = (double)camera.y;
          double var0 = (double)var5;
-         var9.y = MyAPI.calNextPosition(var2, var0, 3, 6, 4.0D);
-         if (Math.abs(var10 - camera.y) > 48) {
+         var9.y = MyAPI.calNextPosition(var9, "cameraY", var2, var0, 3, 6, 4.0D);
+         if (Math.abs(var10 - camera.y) > maxStep) {
             if (camera.y > var10) {
-               camera.y = var10 + 48;
+               camera.y = var10 + maxStep;
             }
 
             if (camera.y < var10) {
-               camera.y = var10 - 48;
+               camera.y = var10 - maxStep;
             }
          }
          break;
       case 1:
-         if (focusObj.getFocusY() - (CAMERA_HEIGHT >> 1) < 0) {
-            var5 = 0;
-         } else {
-            var5 = focusObj.getFocusY() - (CAMERA_HEIGHT >> 1);
-         }
-
-         int var6 = (var5 - camera.y) * 100 / 5;
-         var9 = camera;
-         int var7 = var9.y;
-         int var8 = var6 / 100;
-         byte var4;
-         if (var6 == 0) {
-            var4 = 0;
-         } else if (var6 > 0) {
-            var4 = 5;
-         } else {
-            var4 = -5;
-         }
-
-         var9.y = var7 + var8 + var4;
-         if ((var5 * 100 - camera.y * 100) * var6 <= 0) {
-            cameraActionY = 0;
-         }
+         var5 = Math.max(0, focusObj.getFocusY() - (CAMERA_HEIGHT >> 1));
+         camera.y = GameTime.approach(camera, "cameraY", camera.y, var5, 1, 5, 5.0);
+         if (camera.y == var5) cameraActionY = 0;
          break;
       case 2:
          camera.y = var5;
@@ -244,24 +210,24 @@ public class MapManager implements SonicDef {
          } else {
             cameraActionX();
             if (actualLeftCameraLimit > proposeLeftCameraLimit) {
-               actualLeftCameraLimit -= 5;
+               actualLeftCameraLimit = GameTime.advance(MapManager.class, "actualLeftCameraLimit", actualLeftCameraLimit, -(5));
                if (actualLeftCameraLimit < proposeLeftCameraLimit) {
                   actualLeftCameraLimit = proposeLeftCameraLimit;
                }
             } else if (actualLeftCameraLimit < proposeLeftCameraLimit) {
-               actualLeftCameraLimit += 5;
+               actualLeftCameraLimit = GameTime.advance(MapManager.class, "actualLeftCameraLimit", actualLeftCameraLimit, 5);
                if (actualLeftCameraLimit > proposeLeftCameraLimit) {
                   actualLeftCameraLimit = proposeLeftCameraLimit;
                }
             }
 
             if (actualRightCameraLimit < proposeRightCameraLimit) {
-               actualRightCameraLimit += 5;
+               actualRightCameraLimit = GameTime.advance(MapManager.class, "actualRightCameraLimit", actualRightCameraLimit, 5);
                if (actualRightCameraLimit > proposeRightCameraLimit) {
                   actualRightCameraLimit = proposeRightCameraLimit;
                }
             } else if (actualRightCameraLimit > proposeRightCameraLimit) {
-               actualRightCameraLimit -= 5;
+               actualRightCameraLimit = GameTime.advance(MapManager.class, "actualRightCameraLimit", actualRightCameraLimit, -(5));
                if (actualRightCameraLimit < proposeRightCameraLimit) {
                   actualRightCameraLimit = proposeRightCameraLimit;
                }
@@ -289,24 +255,24 @@ public class MapManager implements SonicDef {
             } else {
                cameraActionY();
                if (actualDownCameraLimit > proposeDownCameraLimit) {
-                  actualDownCameraLimit -= 5;
+                  actualDownCameraLimit = GameTime.advance(MapManager.class, "actualDownCameraLimit", actualDownCameraLimit, -(5));
                   if (actualDownCameraLimit < proposeDownCameraLimit) {
                      actualDownCameraLimit = proposeDownCameraLimit;
                   }
                } else if (actualDownCameraLimit < proposeDownCameraLimit) {
-                  actualDownCameraLimit += 5;
+                  actualDownCameraLimit = GameTime.advance(MapManager.class, "actualDownCameraLimit", actualDownCameraLimit, 5);
                   if (actualDownCameraLimit > proposeDownCameraLimit) {
                      actualDownCameraLimit = proposeDownCameraLimit;
                   }
                }
 
                if (actualUpCameraLimit < proposeUpCameraLimit) {
-                  actualUpCameraLimit += 5;
+                  actualUpCameraLimit = GameTime.advance(MapManager.class, "actualUpCameraLimit", actualUpCameraLimit, 5);
                   if (actualUpCameraLimit > proposeUpCameraLimit) {
                      actualUpCameraLimit = proposeUpCameraLimit;
                   }
                } else if (actualUpCameraLimit > proposeUpCameraLimit) {
-                  actualUpCameraLimit -= 5;
+                  actualUpCameraLimit = GameTime.advance(MapManager.class, "actualUpCameraLimit", actualUpCameraLimit, -(5));
                   if (actualUpCameraLimit < proposeUpCameraLimit) {
                      actualUpCameraLimit = proposeUpCameraLimit;
                   }
@@ -326,7 +292,7 @@ public class MapManager implements SonicDef {
          var3.x += shakePowerX;
          shakePowerX = 0;
          if (shakeCount > 0) {
-            --shakeCount;
+            shakeCount = Math.max(0, GameTime.advance(MapManager.class, "shakeCount", shakeCount, -(1)));
             int var0 = shakeCount * shakePowerY / shakeMaxCount;
             var3 = camera;
             int var1 = var3.y;
@@ -342,7 +308,7 @@ public class MapManager implements SonicDef {
                var2 = true;
             }
 
-            shakingUp = var2;
+            shakingUp = (shakeCount & 1) == 0;
             if (camera.x < 0) {
                camera.x = 0;
             }
@@ -361,7 +327,7 @@ public class MapManager implements SonicDef {
          }
 
          if (StageManager.getCurrentZoneId() == 8) {
-            mapOffsetX += mapVelX;
+            mapOffsetX = GameTime.advance(MapManager.class, "mapOffsetX", mapOffsetX, mapVelX);
             if (-mapOffsetX + camera.x > getPixelWidth() - CAMERA_WIDTH && Math.abs(mapOffsetX) < 0) {
                mapOffsetX += 448;
             }
@@ -1124,7 +1090,7 @@ public class MapManager implements SonicDef {
          actualDownCameraLimit = getPixelHeight();
          loadStep = 0;
          mapOffsetX = 0;
-         shakeCount = 0;
+         shakeCount = GameTime.set(MapManager.class, "shakeCount", 0);
          brokePointY = 0;
          brokeOffsetY = 0;
          setMapLoop(mapWidth - 4, mapWidth);
@@ -1263,7 +1229,7 @@ public class MapManager implements SonicDef {
 
    public static void setShake(int var0, int var1) {
       if (var0 > 0) {
-         shakeCount = var0;
+         shakeCount = GameTime.set(MapManager.class, "shakeCount", var0);
          shakeMaxCount = var0;
          shakePowerY = var1;
       }

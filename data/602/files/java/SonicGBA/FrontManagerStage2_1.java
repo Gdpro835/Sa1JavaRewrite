@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -37,10 +39,10 @@ class FrontManagerStage2_1 extends BackGroundManager {
       int var2 = MapManager.getCamera().x;
       if (var2 <= 1456) {
          if (!GameObject.IsGamePause) {
-            this.degree1 += 11;
-            this.degree1 %= 360;
-            this.degree2 += 3;
-            this.degree2 %= 360;
+            this.degree1 = GameTime.advance(this, "degree1", this.degree1, 11);
+            this.degree1 = GameTime.wrap(this, "degree1", this.degree1, 360);
+            this.degree2 = GameTime.advance(this, "degree2", this.degree2, 3);
+            this.degree2 = GameTime.wrap(this, "degree2", this.degree2, 360);
          }
 
          MFGraphics var3 = this.screenMask.getGraphics();

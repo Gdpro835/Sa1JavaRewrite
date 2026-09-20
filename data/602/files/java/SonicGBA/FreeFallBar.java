@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Coordinate;
 import Lib.SoundSystem;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -27,7 +29,7 @@ class FreeFallBar extends GimmickObject {
          }
       }
 
-      frameCnt = 1;
+      frameCnt = GameTime.set(FreeFallBar.class, "frameCnt", 1);
       this.isLeftEnter = false;
       Coordinate var6 = var1.getBarPosition();
       this.posXorg = var6.x;
@@ -58,7 +60,7 @@ class FreeFallBar extends GimmickObject {
 
    public void doInitInCamera() {
       this.used = false;
-      frameCnt = 0;
+      frameCnt = GameTime.set(FreeFallBar.class, "frameCnt", 0);
    }
 
    public void doWhileCollision(PlayerObject var1, int var2) {
@@ -98,7 +100,7 @@ class FreeFallBar extends GimmickObject {
    public void draw(MFGraphics var1) {
       if (!this.system.initFlag) {
          if (this.system.moving) {
-            ++frameCnt;
+            frameCnt = GameTime.advance(FreeFallBar.class, "frameCnt", frameCnt, 1);
             if (player.getAnimationId() == 22) {
                this.drawInMap(var1, barImage, 33);
                player.draw(var1, true);
@@ -123,7 +125,7 @@ class FreeFallBar extends GimmickObject {
 
    public void init() {
       this.used = false;
-      frameCnt = 0;
+      frameCnt = GameTime.set(FreeFallBar.class, "frameCnt", 0);
       this.posX = this.posXorg;
       this.posY = this.posYorg;
       this.refreshCollisionRect(this.posX, this.posY);

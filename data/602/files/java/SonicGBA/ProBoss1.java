@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -137,7 +139,7 @@ class ProBoss1 extends EnemyObject {
             }
             break;
          case 5:
-            this.posX += this.velocity;
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
             if (this.posX - this.StartX >> 6 >= 200) {
                player.setMeetingBoss(true);
                MapManager.lockCamera(false);

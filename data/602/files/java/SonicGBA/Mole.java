@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -24,7 +26,7 @@ class Mole extends EnemyObject {
       }
 
       this.drawer = moleAnimation.getDrawer(0, true, 0);
-      this.wait_cnt = 0;
+      this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
    }
 
    public static void releaseAllResource() {
@@ -68,7 +70,7 @@ class Mole extends EnemyObject {
          switch(this.state) {
          case 0:
             if (this.wait_cnt < this.wait_cnt_max) {
-               ++this.wait_cnt;
+               this.wait_cnt = Math.min(this.wait_cnt_max, GameTime.advance(this, "wait_cnt", this.wait_cnt, 1));
             } else if (this.posX < player.getCheckPositionX()) {
                this.drawer.setActionId(1);
                this.drawer.setTrans(2);
@@ -88,7 +90,7 @@ class Mole extends EnemyObject {
                this.drawer.setActionId(0);
                this.drawer.setLoop(true);
                this.state = 0;
-               this.wait_cnt = 0;
+               this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
             }
 
             this.checkWithPlayer(var2, var1, this.posX, this.posY);

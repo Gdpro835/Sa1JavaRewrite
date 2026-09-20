@@ -1,5 +1,7 @@
 package Common;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Def;
 import Lib.MyAPI;
 import SonicGBA.MapManager;
@@ -41,7 +43,7 @@ public class WhiteBarDrawer implements Def {
         this.whiteBarX = SCREEN_WIDTH - 26;
         this.whiteBarY = (SCREEN_HEIGHT >> 1) + 48;
         this.tipsState = 0;
-        this.tipsCount = 0;
+        this.tipsCount = GameTime.set(this, "tipsCount", 0);
         this.wordX = 14;
         this.wordDrawer = wordDrawer2;
         this.pauseFlag = false;
@@ -52,43 +54,43 @@ public class WhiteBarDrawer implements Def {
         if (!this.isPause) {
             switch (this.tipsState) {
                 case 0:
-                    this.whiteBarX -= 96;
+                    this.whiteBarX = GameTime.advance(this, "whiteBarX", this.whiteBarX, -(96));
                     if (this.whiteBarX <= 0) {
                         this.whiteBarX = 0;
-                        this.tipsCount++;
+                        this.tipsCount = GameTime.advance(this, "tipsCount", this.tipsCount, 1);
                     }
-                    if (this.tipsCount == 2) {
-                        this.tipsCount = 0;
+                    if (GameTime.event(this, "tipsCount", "drawBar:62", GameTime.crosses(this, "tipsCount", this.tipsCount, 2))) {
+                        this.tipsCount = GameTime.set(this, "tipsCount", 0);
                         this.tipsState = 1;
                         break;
                     }
                     break;
                 case 1:
-                    this.whiteBarY -= 36;
+                    this.whiteBarY = GameTime.advance(this, "whiteBarY", this.whiteBarY, -(36));
                     if (this.whiteBarY <= WHITE_BAR_Y_DES) {
                         this.whiteBarY = WHITE_BAR_Y_DES;
-                        this.tipsCount++;
+                        this.tipsCount = GameTime.advance(this, "tipsCount", this.tipsCount, 1);
                         this.tipsState = 2;
-                        this.tipsCount = 0;
+                        this.tipsCount = GameTime.set(this, "tipsCount", 0);
                         break;
                     }
                     break;
                 case 2:
                     if (!this.pauseFlag) {
-                        this.tipsCount++;
+                        this.tipsCount = GameTime.advance(this, "tipsCount", this.tipsCount, 1);
                     }
                     if (this.tipsCount > 60) {
                         this.tipsState = 3;
-                        this.tipsCount = 0;
+                        this.tipsCount = GameTime.set(this, "tipsCount", 0);
                         break;
                     }
                     break;
                 case 3:
-                    this.whiteBarX -= 96;
+                    this.whiteBarX = GameTime.advance(this, "whiteBarX", this.whiteBarX, -(96));
                     if (this.whiteBarX <= (-WHITE_BAR_WIDTH)) {
                         this.whiteBarX = -WHITE_BAR_WIDTH;
                         this.tipsState = 4;
-                        this.tipsCount++;
+                        this.tipsCount = GameTime.advance(this, "tipsCount", this.tipsCount, 1);
                         break;
                     }
                     break;
@@ -97,7 +99,7 @@ public class WhiteBarDrawer implements Def {
         g.setColor(MapManager.END_COLOR);
         MyAPI.fillRect(g, this.whiteBarX, this.whiteBarY - 2, WHITE_BAR_WIDTH, 20);
         if (!this.isPause) {
-            this.wordX += WORDS_VEL_X;
+            this.wordX = GameTime.advance(this, "wordX", this.wordX, WORDS_VEL_X);
         }
         int wordDistance = this.wordDrawer.getWordLength(this.wordID);
         if (wordDistance > 0) {
@@ -127,7 +129,7 @@ public class WhiteBarDrawer implements Def {
     public void setPause(boolean flag) {
         this.pauseFlag = flag;
         if (this.tipsState == 2 && !this.pauseFlag) {
-            this.tipsCount = 60;
+            this.tipsCount = GameTime.set(this, "tipsCount", 60);
         }
     }
 

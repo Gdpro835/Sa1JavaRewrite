@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.Coordinate;
@@ -96,7 +98,7 @@ class StoneBall extends GimmickObject {
       int var1 = this.posX;
       int var2 = this.posY;
       if (this.waitCount > 0) {
-         --this.waitCount;
+         this.waitCount = Math.max(0, GameTime.advance(this, "waitCount", this.waitCount, -(1)));
       }
 
       switch(this.state) {
@@ -109,7 +111,7 @@ class StoneBall extends GimmickObject {
          }
          break;
       case 1:
-         this.posX += 300;
+         this.posX = GameTime.advance(this, "posX", this.posX, 300);
          if (this.posX > this.originalX + 2048) {
             this.state = 2;
             this.mapObj.setPosition(this.posX, this.posY, 300, 0, this);
@@ -125,7 +127,7 @@ class StoneBall extends GimmickObject {
          this.posY = this.mapObj.getPosY();
          if (this.mapObj.chkCrash()) {
             this.state = 0;
-            this.waitCount = 20;
+            this.waitCount = GameTime.set(this, "waitCount", 20);
             Effect.showEffect(rockBreakAnimation, 0, this.posX >> 6, this.posY >> 6, 0);
             if (this.inScreen()) {
                SoundSystem.getInstance().playSe(35);

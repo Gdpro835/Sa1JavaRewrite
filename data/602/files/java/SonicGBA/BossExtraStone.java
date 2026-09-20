@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -109,8 +111,8 @@ class BossExtraStone extends BulletObject implements ACMoveCalUser {
    }
 
    public void bulletLogic() {
-      this.velY += GRAVITY >> 4;
-      this.moveCal.actionLogic(this.velX, this.velY);
+      this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY >> 4);
+      this.moveCal.moveVelocity(this.velX, this.velY);
 
       for(this.degree += this.degreeSpeed; this.degree < 0; this.degree += 360) {
       }
@@ -202,9 +204,9 @@ class BossExtraStone extends BulletObject implements ACMoveCalUser {
       }
 
       public void logic() {
-         this.velY += GRAVITY >> 2;
-         this.posX += this.velX;
-         this.posY += this.velY;
+         this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY >> 2);
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
          this.degree += 20;
          this.degree %= 360;
       }

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.Coordinate;
@@ -143,7 +145,7 @@ class BossExtra extends BossObject {
                               ((PlayerSuperSonic)player).setBossDieFlag(true);
                            }
                         } else {
-                           this.damageCount = 10;
+                           this.damageCount = GameTime.set(this, "damageCount", 10);
                         }
 
                         player.doBossAttackPose(this, 2);
@@ -196,7 +198,7 @@ class BossExtra extends BossObject {
                                  ((PlayerSuperSonic)player).setBossDieFlag(true);
                               }
                            } else {
-                              this.damageCount = 10;
+                              this.damageCount = GameTime.set(this, "damageCount", 10);
                            }
 
                            player.doBossAttackPose(this, 2);
@@ -242,7 +244,7 @@ class BossExtra extends BossObject {
                var10.rotate((float)(this.laserDegree >> 6));
                var1.setColor(16777215);
                var1.fillRect(0, -this.laserHeight >> 1, 500, this.laserHeight);
-               ++this.laserHeight;
+               this.laserHeight = GameTime.advance(this, "laserHeight", this.laserHeight, 1);
                if (this.laserHeight > 4) {
                   this.laserHeight = 4;
                }
@@ -251,11 +253,11 @@ class BossExtra extends BossObject {
             }
 
             if (!IsGamePause) {
-               --this.damageCount;
+               this.damageCount = GameTime.advance(this, "damageCount", this.damageCount, -(1));
             }
 
             if (this.damageCount < 0) {
-               this.damageCount = 0;
+               this.damageCount = GameTime.set(this, "damageCount", 0);
             }
 
             if (this.damageCount / 1 % 2 == 1) {
@@ -287,10 +289,10 @@ class BossExtra extends BossObject {
          this.posY = 8192;
          this.isOnLand = false;
          if (PlayerObject.getTimeCount() > 0) {
-            ++this.count;
-            if (this.count == 48) {
+            this.count = GameTime.advance(this, "count", this.count, 1);
+            if (GameTime.event(this, "count", "logic:293", GameTime.crosses(this, "count", this.count, 48))) {
                this.state = 1;
-               this.count = 0;
+               this.count = GameTime.set(this, "count", 0);
                this.pyxAnimation.setAction(8);
                this.velX = 1920;
                this.velY = 0;
@@ -298,20 +300,20 @@ class BossExtra extends BossObject {
          }
          break;
       case 1:
-         this.posX += this.velX;
-         this.posY += this.velY;
-         ++this.count;
-         if (this.count == 32) {
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
+         this.count = GameTime.advance(this, "count", this.count, 1);
+         if (GameTime.event(this, "count", "logic:306", GameTime.crosses(this, "count", this.count, 32))) {
             this.pyxAnimation.changeToAction(0, 14);
             this.velY = 128;
             this.state = 2;
-            this.count = 0;
+            this.count = GameTime.set(this, "count", 0);
          }
          break;
       case 2:
-         this.posX += this.velX;
-         this.posY += this.velY;
-         ++this.count;
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
+         this.count = GameTime.advance(this, "count", this.count, 1);
          if (this.count > 14) {
             this.velX = -960;
             var1 = this.getGroundY(this.posX, this.posY + this.distanceToGround);
@@ -323,7 +325,7 @@ class BossExtra extends BossObject {
                this.actionID = 0;
                this.isOnLand = true;
                this.pacmanFlag = true;
-               this.pacmanCount = 0;
+               this.pacmanCount = GameTime.set(this, "pacmanCount", 0);
             }
          }
          break;
@@ -343,13 +345,13 @@ class BossExtra extends BossObject {
                this.state = 5;
                this.pyxAnimation.setAction(5);
                this.pyxAnimation.setLoop(true);
-               this.count = 0;
+               this.count = GameTime.set(this, "count", 0);
             }
          }
          break;
       case 5:
-         ++this.count;
-         if (this.count % 15 == 0) {
+         this.count = GameTime.advance(this, "count", this.count, 1);
+         if (GameTime.periodic(this, "count", "logic:354", this.count, 15, 0)) {
             var3 = this.posX;
             var2 = MyRandom.nextInt(-256, 256);
             var1 = this.posY;
@@ -366,7 +368,7 @@ class BossExtra extends BossObject {
             this.state = 6;
             this.pyxAnimation.setAction(6);
             this.pyxAnimation.setLoop(false);
-            this.count = 0;
+            this.count = GameTime.set(this, "count", 0);
             this.laserNumCount = 0;
          }
          break;
@@ -377,7 +379,7 @@ class BossExtra extends BossObject {
             this.laserDegreeVelocity = 0;
             this.laserCount = 0;
             this.isShotting = true;
-            this.afterLaserCount = 0;
+            this.afterLaserCount = GameTime.set(this, "afterLaserCount", 0);
             this.laserHeight = 1;
             ++this.laserNumCount;
             this.pyxAnimation.changeAnimation("head", 0, 3);
@@ -388,7 +390,7 @@ class BossExtra extends BossObject {
             this.pyxAnimation.setAction(7);
          }
 
-         ++this.count;
+         this.count = GameTime.advance(this, "count", this.count, 1);
          break;
       case 7:
          if (this.pyxAnimation.chkEnd()) {
@@ -399,15 +401,15 @@ class BossExtra extends BossObject {
          }
          break;
       case 8:
-         ++damageframe;
-         damageframe %= 11;
-         if (damageframe % 2 == 0) {
+         damageframe = GameTime.advance(BossExtra.class, "damageframe", damageframe, 1);
+         damageframe = GameTime.wrap(BossExtra.class, "damageframe", damageframe, 11);
+         if (GameTime.periodic(BossExtra.class, "damageframe", "logic:406", damageframe, 2, 0)) {
             SoundSystem.getInstance().playSe(35);
          }
 
          var1 = MapManager.getCamera().x;
          var1 = MapManager.getCamera().y;
-         if (damageframe % 3 == 0) {
+         if (GameTime.periodic(BossExtra.class, "damageframe", "logic:412", damageframe, 3, 0)) {
             var2 = this.posX;
             var3 = MyRandom.nextInt(0, 100);
             var4 = this.posY;
@@ -415,13 +417,13 @@ class BossExtra extends BossObject {
             addGameObject(new Boom(37, (var2 >> 6) - 50 + var3 << 6, (var4 >> 6) - 50 + var1 << 6, 0, 0, 0, 0));
          }
 
-         this.distanceToGround -= 120;
+         this.distanceToGround = GameTime.advance(this, "distanceToGround", this.distanceToGround, -(120));
          if (this.distanceToGround < 1200) {
             this.distanceToGround = 1200;
          }
 
          if (this.distanceToGround == 1200) {
-            this.posX -= 640;
+            this.posX = GameTime.advance(this, "posX", this.posX, -(640));
          }
 
          if (this.posX < -12800) {
@@ -440,16 +442,16 @@ class BossExtra extends BossObject {
             this.bulletShowing = true;
             this.pyxAnimation.changeAnimation("head", 0, 2);
          } else {
-            this.laserDegree += this.laserDegreeVelocity;
-            this.laserDegreeVelocity += 80;
+            this.laserDegree = GameTime.advance(this, "laserDegree", this.laserDegree, this.laserDegreeVelocity);
+            this.laserDegreeVelocity = GameTime.advance(this, "laserDegreeVelocity", this.laserDegreeVelocity, 80);
          }
       }
 
       if (this.state != 8) {
          if (this.pacmanFlag) {
-            ++this.pacmanCount;
+            this.pacmanCount = GameTime.advance(this, "pacmanCount", this.pacmanCount, 1);
             if (this.pacmanCount >= 64) {
-               this.pacmanCount = 0;
+               this.pacmanCount = GameTime.set(this, "pacmanCount", 0);
                var2 = this.posX;
                var1 = this.posY;
                BulletObject.addBullet(22, var2 - 1152, var1 - 896, 0, 0);
@@ -457,7 +459,7 @@ class BossExtra extends BossObject {
          }
 
          if (this.bulletShowing) {
-            ++this.afterLaserCount;
+            this.afterLaserCount = GameTime.advance(this, "afterLaserCount", this.afterLaserCount, 1);
             if (this.afterLaserCount >= 5 && (this.afterLaserCount - 5) % 4 == 0) {
                var1 = 320 - (this.afterLaserCount - 5) * 32 / 4;
                if (var1 > 0) {

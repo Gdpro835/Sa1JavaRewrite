@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -54,11 +56,11 @@ class UpPlatform extends Platform {
       } else {
          if (player.isFootOnObject(this)) {
             this.checkWithPlayer(this.posX, this.posY, this.posX, this.posY + this.velocity);
-            this.posY -= this.velocity;
+            this.posY = GameTime.advance(this, "posY", this.posY, -(this.velocity));
          } else {
             this.checkWithPlayer(this.posX, this.posY, this.posX, this.posY + this.velocity);
             if (this.posY < this.posOriginalY) {
-               this.posY += this.velocity;
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velocity", this.velocity);
             } else {
                this.posY = this.posOriginalY;
             }

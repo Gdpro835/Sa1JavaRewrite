@@ -33,32 +33,23 @@ public class Main extends MFMain {
         super.onResume();
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == 25) {
-            if (GlobalResource.soundSwitchConfig == 0) {
-                return true;
-            }
-            if (!State.IsInInterrupt) {
-                State.setSoundVolumnDown();
-            }
-            return super.onKeyDown(keyCode, event);
-        } else if (keyCode == 24) {
-            if (GlobalResource.soundSwitchConfig == 0) {
-                return true;
-            }
-            if (!State.IsInInterrupt) {
-                State.setSoundVolumnUp();
-            }
-            return super.onKeyDown(keyCode, event);
-        } else if (keyCode == 82) {
-            return true;
-        } else {
-            return super.onKeyDown(keyCode, event);
-        }
+    public boolean onKeyDown(final int keyCode, KeyEvent event) {
+        if (keyCode == 24 || keyCode == 25) {
+            if (GlobalResource.soundSwitchConfig == 0) return true;
+            if (mCanvas != null) mCanvas.queueEvent(new Runnable() {
+                public void run() {
+                    if (!State.IsInInterrupt) {
+                        if (keyCode == 25) State.setSoundVolumnDown(); else State.setSoundVolumnUp();
+                    }
+                }
+            });
+        } else if (keyCode == 82) return true;
+        return super.onKeyDown(keyCode, event);
     }
 
     public void showExitConfirm() {
         setExitConfirmStr("Sonic Advance", "Do you want to exit the game?", "yes", "cancel");
+        super.showExitConfirm();
     }
 
     public MFGameState getEntryGameState() {

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -36,7 +38,7 @@ class Boss6BlockArray extends GimmickObject {
       }
 
       this.collisionFlag = false;
-      this.deep_cn = 0;
+      this.deep_cn = GameTime.set(this, "deep_cn", 0);
       this.normal_cn = 0;
       this.preblockID = -1;
    }
@@ -125,7 +127,7 @@ class Boss6BlockArray extends GimmickObject {
                this.blockOffsetY[8] = 256;
             }
 
-            ++this.deep_cn;
+            this.deep_cn = Math.min(5, GameTime.advance(this, "deep_cn", this.deep_cn, 1));
             break;
          case 1:
             if (var2 == 1) {
@@ -204,14 +206,14 @@ class Boss6BlockArray extends GimmickObject {
                this.blockOffsetY[8] = 256;
             }
 
-            ++this.deep_cn;
+            this.deep_cn = Math.min(5, GameTime.advance(this, "deep_cn", this.deep_cn, 1));
             break;
          case 2:
             for(var1 = 0; var1 < 9; ++var1) {
                this.blockOffsetY[var1] = 0;
             }
 
-            ++this.deep_cn;
+            this.deep_cn = Math.min(5, GameTime.advance(this, "deep_cn", this.deep_cn, 1));
             break;
          case 3:
             if (var2 == 1) {
@@ -290,14 +292,14 @@ class Boss6BlockArray extends GimmickObject {
                this.blockOffsetY[8] = 0;
             }
 
-            ++this.deep_cn;
+            this.deep_cn = Math.min(5, GameTime.advance(this, "deep_cn", this.deep_cn, 1));
             break;
          case 4:
             for(var1 = 0; var1 < 9; ++var1) {
                this.blockOffsetY[var1] = 0;
             }
 
-            ++this.deep_cn;
+            this.deep_cn = Math.min(5, GameTime.advance(this, "deep_cn", this.deep_cn, 1));
             break;
          case 5:
             this.type = 0;
@@ -311,7 +313,7 @@ class Boss6BlockArray extends GimmickObject {
          }
 
          this.preblockID = var2;
-         this.deep_cn = 0;
+         this.deep_cn = GameTime.set(this, "deep_cn", 0);
          if (var2 == 1) {
             this.blockOffsetY[0] = 256;
 
@@ -395,17 +397,17 @@ class Boss6BlockArray extends GimmickObject {
       this.collisionFlag = true;
       if (player.getVelY() > 1000) {
          this.type = 1;
-         this.deep_cn = 0;
+         this.deep_cn = GameTime.set(this, "deep_cn", 0);
       } else if (player.getVelY() >= 0 && this.deep_cn == 5) {
          this.type = 0;
-         this.deep_cn = 0;
+         this.deep_cn = GameTime.set(this, "deep_cn", 0);
       }
 
    }
 
    public void doWhileNoCollision() {
       this.collisionFlag = false;
-      this.deep_cn = 0;
+      this.deep_cn = GameTime.set(this, "deep_cn", 0);
    }
 
    public void draw(MFGraphics var1) {

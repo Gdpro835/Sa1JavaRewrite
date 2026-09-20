@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -155,7 +157,7 @@ class Boss1Arm extends EnemyObject {
          switch(var3) {
          case 1:
             if (this.plus > 0) {
-               this.degree += this.plus * this.dg_plus;
+               this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                if (this.degree >= 23680) {
                   this.degree = 23680;
                   this.plus = -this.plus;
@@ -163,7 +165,7 @@ class Boss1Arm extends EnemyObject {
                   SoundSystem.getInstance().playSe(36);
                }
             } else {
-               this.degree += this.plus * this.dg_plus;
+               this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                if (this.degree <= 10880) {
                   this.degree = 10880;
                   this.plus = -this.plus;
@@ -191,14 +193,14 @@ class Boss1Arm extends EnemyObject {
                      this.degree = 10880;
                      this.plus = -this.plus;
                   } else {
-                     this.degree += this.plus * this.dg_plus;
+                     this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                   }
                } else if (this.degree + this.plus * this.dg_plus <= 23680) {
                   this.degree = 23680;
                   this.state = 4;
                   this.IsTurn = false;
                } else {
-                  this.degree += this.plus * this.dg_plus;
+                  this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                }
             } else if (this.plus > 0) {
                if (this.degree + this.plus * this.dg_plus >= 10880) {
@@ -206,13 +208,13 @@ class Boss1Arm extends EnemyObject {
                   this.state = 4;
                   this.IsTurn = false;
                } else {
-                  this.degree += this.plus * this.dg_plus;
+                  this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                }
             } else if (this.degree >= 23680) {
                this.degree = 23680;
                this.plus = -this.plus;
             } else {
-               this.degree += this.plus * this.dg_plus;
+               this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
             }
 
             this.pos[5][0] = this.Step2CenterX;
@@ -233,14 +235,14 @@ class Boss1Arm extends EnemyObject {
                      this.degree = 23680;
                      this.plus = -this.plus;
                   } else {
-                     this.degree += this.plus * this.dg_plus;
+                     this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                   }
                } else if (this.degree + this.plus * this.dg_plus <= 10880) {
                   this.degree = 10880;
                   this.state = 3;
                   this.IsTurn = false;
                } else {
-                  this.degree += this.plus * this.dg_plus;
+                  this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                }
             } else if (this.plus > 0) {
                if (this.degree + this.plus * this.dg_plus >= 23680) {
@@ -248,13 +250,13 @@ class Boss1Arm extends EnemyObject {
                   this.state = 3;
                   this.IsTurn = false;
                } else {
-                  this.degree += this.plus * this.dg_plus;
+                  this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                }
             } else if (this.degree <= 10880) {
                this.degree = 10880;
                this.plus = -this.plus;
             } else {
-               this.degree += this.plus * this.dg_plus;
+               this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
             }
 
             for(var4 = 0; var4 < this.pos.length - 1; ++var4) {
@@ -268,11 +270,11 @@ class Boss1Arm extends EnemyObject {
                this.Step2CenterX = this.pos[5][0];
                this.Step2CenterY = this.pos[5][1];
                if (this.degree == 23680) {
-                  this.degree -= 23040;
+                  this.degree = GameTime.advance(this, "degree", this.degree, -(23040));
                }
 
                if (this.degree == 10880) {
-                  this.degree += 23040;
+                  this.degree = GameTime.advance(this, "degree", this.degree, 23040);
                }
 
                MapManager.setShake(8);
@@ -316,10 +318,10 @@ class Boss1Arm extends EnemyObject {
                   this.prepos[var1][0] = this.pos[var1][0];
                   this.prepos[var1][1] = this.pos[var1][1];
                   var7 = this.pos[var1];
-                  var7[0] += this.velX[var1];
-                  this.velY += GRAVITY >> 3;
+                  var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], this.velX[var1]);
+                  this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY >> 3);
                   var7 = this.pos[var1];
-                  var7[1] += this.velY;
+                  var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], this.velY);
                }
             }
 

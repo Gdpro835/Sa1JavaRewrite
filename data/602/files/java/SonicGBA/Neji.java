@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -20,7 +22,7 @@ class Neji extends GimmickObject {
 
    protected Neji(int var1, int var2, int var3, int var4, int var5, int var6, int var7) {
       super(var1, var2, var3, var4, var5, var6, var7);
-      this.frameCnt = 0;
+      this.frameCnt = GameTime.set(this, "frameCnt", 0);
    }
 
    public static void releaseAllResource() {
@@ -54,9 +56,9 @@ class Neji extends GimmickObject {
 
    public void logic() {
       if (this.touching) {
-         ++this.frameCnt;
+         this.frameCnt = GameTime.advance(this, "frameCnt", this.frameCnt, 1);
          if (this.velocity < 232) {
-            this.velocity += 48;
+            this.velocity = GameTime.advance(this, "velocity", this.velocity, 48);
          }
 
          if (this.velocity > 2304) {
@@ -65,10 +67,10 @@ class Neji extends GimmickObject {
 
          if (Key.repeat(Key.gLeft)) {
             if (this.velocity > 232) {
-               this.velocity -= 48;
+               this.velocity = GameTime.advance(this, "velocity", this.velocity, -(48));
             }
          } else if (Key.repeat(Key.gRight)) {
-            this.velocity += 48;
+            this.velocity = GameTime.advance(this, "velocity", this.velocity, 48);
          }
 
          int var2 = player.getFootPositionX() + this.velocity;

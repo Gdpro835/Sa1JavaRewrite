@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -84,13 +86,13 @@ class Cement extends EnemyObject {
          switch(this.state) {
          case 0:
             if (!this.dir) {
-               this.posX += 60;
+               this.posX = GameTime.advance(this, "posX", this.posX, 60);
                if (this.posX >= this.endPosX) {
                   this.dir = true;
                   this.posX = this.endPosX;
                }
             } else {
-               this.posX -= 60;
+               this.posX = GameTime.advance(this, "posX", this.posX, -(60));
                if (this.posX <= this.startPosX) {
                   this.dir = false;
                   this.posX = this.startPosX;
@@ -98,10 +100,10 @@ class Cement extends EnemyObject {
             }
 
             if (this.patrol_cn < 136) {
-               ++this.patrol_cn;
+               this.patrol_cn = Math.min(136, GameTime.advance(this, "patrol_cn", this.patrol_cn, 1));
             } else {
-               this.patrol_cn = 0;
-               this.wait_cn = 0;
+               this.patrol_cn = GameTime.set(this, "patrol_cn", 0);
+               this.wait_cn = GameTime.set(this, "wait_cn", 0);
                this.state = 1;
                this.drawer.setActionId(1);
                this.drawer.setLoop(true);
@@ -109,10 +111,10 @@ class Cement extends EnemyObject {
             break;
          case 1:
             if (this.wait_cn < 32) {
-               ++this.wait_cn;
+               this.wait_cn = Math.min(32, GameTime.advance(this, "wait_cn", this.wait_cn, 1));
             } else {
-               this.patrol_cn = 0;
-               this.wait_cn = 0;
+               this.patrol_cn = GameTime.set(this, "patrol_cn", 0);
+               this.wait_cn = GameTime.set(this, "wait_cn", 0);
                this.drawer.setActionId(0);
                this.drawer.setTrans(0);
                this.drawer.setLoop(true);

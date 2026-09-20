@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -16,12 +18,12 @@ class BossF3Ray extends BulletObject {
       this.directFlag = var3;
       this.posX = var1;
       this.posY = var2;
-      this.frame_cn = 0;
+      this.frame_cn = GameTime.set(this, "frame_cn", 0);
       this.fadevalue = 200;
    }
 
    public void bulletLogic() {
-      ++this.frame_cn;
+      this.frame_cn = GameTime.advance(this, "frame_cn", this.frame_cn, 1);
       this.refreshCollisionRect(this.posX, this.posY);
    }
 

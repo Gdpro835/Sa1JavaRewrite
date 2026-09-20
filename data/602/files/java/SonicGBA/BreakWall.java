@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.SoundSystem;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -65,7 +67,7 @@ class BreakWall extends GimmickObject {
    public void doInitWhileInCamera() {
       this.breaking = false;
       this.breakOver = false;
-      this.breakCount = 0;
+      this.breakCount = GameTime.set(this, "breakCount", 0);
 
       for(int var1 = 0; var1 < 4; ++var1) {
          for(int var2 = 0; var2 < 9; ++var2) {
@@ -80,7 +82,7 @@ class BreakWall extends GimmickObject {
    public void doWhileBeAttack(PlayerObject var1, int var2, int var3) {
       this.breaking = false;
       if (false) {
-         this.breakCount = 0;
+         this.breakCount = GameTime.set(this, "breakCount", 0);
       }
 
       this.breaking = true;
@@ -155,11 +157,11 @@ class BreakWall extends GimmickObject {
                      var4 = -50;
                   }
 
-                  var6[0] = var5 + var4;
+                  var6[0] = GameTime.advance(var6, "0", var5, var4);
                   var6 = this.breakPosition[var1][var3];
-                  var6[2] += GRAVITY;
+                  var6[2] = GameTime.advance(var6, String.valueOf(2), var6[2], GRAVITY);
                   var6 = this.breakPosition[var1][var3];
-                  var6[1] += this.breakPosition[var1][var3][2];
+                  var6[1] = GameTime.advance(var6, String.valueOf(1), var6[1], this.breakPosition[var1][var3][2]);
                   if (this.breakPosition[var1][var3][1] < this.breakLimitLine) {
                      this.breakOver = false;
                   }
@@ -170,7 +172,7 @@ class BreakWall extends GimmickObject {
                   }
 
                   if (var2 >= this.breakCount) {
-                     ++this.breakCount;
+                     this.breakCount = GameTime.advance(this, "breakCount", this.breakCount, 1);
                      break label59;
                   }
                }

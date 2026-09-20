@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -37,9 +39,9 @@ class Penguin extends EnemyObject {
       this.posY = this.getGroundY(this.posX, this.posY);
       this.dir = false;
       this.state = 0;
-      this.wait_cn = 0;
+      this.wait_cn = GameTime.set(this, "wait_cn", 0);
       this.IsFire = false;
-      this.release_cnt = 0;
+      this.release_cnt = GameTime.set(this, "release_cnt", 0);
    }
 
    public static void releaseAllResource() {
@@ -62,14 +64,14 @@ class Penguin extends EnemyObject {
          switch(this.state) {
          case 0:
             if (!this.dir) {
-               this.posX += 128;
+               this.posX = GameTime.advance(this, "posX", this.posX, 128);
                if (this.posX >= this.endPosX) {
                   this.dir = true;
                   this.posX = this.endPosX;
                   this.drawer.setTrans(0);
                }
             } else {
-               this.posX -= 128;
+               this.posX = GameTime.advance(this, "posX", this.posX, -(128));
                if (this.posX <= this.startPosX) {
                   this.dir = false;
                   this.posX = this.startPosX;
@@ -78,10 +80,10 @@ class Penguin extends EnemyObject {
             }
 
             if (this.release_cnt < this.release_cnt_max) {
-               ++this.release_cnt;
+               this.release_cnt = Math.min(this.release_cnt_max, GameTime.advance(this, "release_cnt", this.release_cnt, 1));
             }
 
-            if (this.alert_state == 0 && this.posX != this.startPosX && this.posX != this.endPosX && this.release_cnt == this.release_cnt_max) {
+            if (this.alert_state == 0 && this.posX != this.startPosX && this.posX != this.endPosX && this.release_cnt >= this.release_cnt_max) {
                this.state = 1;
                this.iTrans = this.drawer.getTransId();
                this.drawer.setActionId(1);
@@ -93,7 +95,7 @@ class Penguin extends EnemyObject {
             break;
          case 1:
             if (this.wait_cn < 10) {
-               ++this.wait_cn;
+               this.wait_cn = Math.min(10, GameTime.advance(this, "wait_cn", this.wait_cn, 1));
                if (this.drawer.checkEnd() && this.IsFire) {
                   this.IsFire = false;
                   int var4 = this.posX;
@@ -108,12 +110,12 @@ class Penguin extends EnemyObject {
                   BulletObject.addBullet(18, var4, var5, var1, 0);
                }
             } else {
-               this.wait_cn = 0;
+               this.wait_cn = GameTime.set(this, "wait_cn", 0);
                this.drawer.setActionId(0);
                this.drawer.setTrans(this.iTrans);
                this.drawer.setLoop(true);
                this.state = 0;
-               this.release_cnt = 0;
+               this.release_cnt = GameTime.set(this, "release_cnt", 0);
             }
 
             this.checkWithPlayer(var2, var3, this.posX, this.posY);

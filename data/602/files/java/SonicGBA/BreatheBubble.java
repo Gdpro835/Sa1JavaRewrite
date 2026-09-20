@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -37,7 +39,7 @@ class BreatheBubble extends UpBubble {
       this.initFlag = false;
       this.CanBreathe = false;
       this.isFirstUp = true;
-      this.breathCnt = 0;
+      this.breathCnt = GameTime.set(this, "breathCnt", 0);
    }
 
    protected BreatheBubble(int var1, int var2, int var3, int var4, int var5, int var6, int var7) {
@@ -109,12 +111,12 @@ class BreatheBubble extends UpBubble {
          }
 
          if (this.breathCnt >= 1) {
-            ++this.breathCnt;
+            this.breathCnt = GameTime.advance(this, "breathCnt", this.breathCnt, 1);
          }
 
          if (this.breathCnt < 8) {
-            this.posX += this.velx;
-            this.posY += this.vely;
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velx", this.velx);
+            this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
          } else {
             this.used = true;
          }

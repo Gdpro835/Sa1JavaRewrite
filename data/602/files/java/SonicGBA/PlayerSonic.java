@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -145,7 +147,7 @@ public class PlayerSonic extends PlayerObject {
       var2 = super.beAccelerate(var1, var2, var3);
       if (this.attackLevel != 0) {
          this.attackLevel = 0;
-         this.attackCount = 0;
+         this.attackCount = GameTime.set(this, "attackCount", 0);
          this.animationID = 3;
          if (Key.repeat(Key.gDown)) {
             this.animationID = 4;
@@ -159,7 +161,7 @@ public class PlayerSonic extends PlayerObject {
       super.beSpring(var1, var2);
       if (this.attackLevel != 0) {
          this.attackLevel = 0;
-         this.attackCount = 0;
+         this.attackCount = GameTime.set(this, "attackCount", 0);
          switch(var2) {
          case 2:
          case 3:
@@ -205,8 +207,8 @@ public class PlayerSonic extends PlayerObject {
             super.doJump();
          }
 
-         this.leftCount = 0;
-         this.rightCount = 0;
+         this.leftCount = GameTime.set(this, "leftCount", 0);
+         this.rightCount = GameTime.set(this, "rightCount", 0);
          this.jumpRollEnable = false;
          if (this.slipping) {
             this.currentLayer = 1;
@@ -623,23 +625,23 @@ public class PlayerSonic extends PlayerObject {
       if (!this.hurtNoControl) {
          if (!this.slipping && Key.press(Key.gLeft)) {
             if (!this.jumpRollEnable) {
-               this.leftCount = 5;
+               this.leftCount = GameTime.set(this, "leftCount", 5);
             }
 
-            this.rightCount = 0;
+            this.rightCount = GameTime.set(this, "rightCount", 0);
          }
 
          if (Key.press(Key.gRight)) {
-            this.leftCount = 0;
+            this.leftCount = GameTime.set(this, "leftCount", 0);
             if (!this.jumpRollEnable) {
-               this.rightCount = 5;
+               this.rightCount = GameTime.set(this, "rightCount", 5);
             }
          }
       }
 
       if (this.animationID == 4 && this.firstJump) {
          if (this.leftCount > 0) {
-            --this.leftCount;
+            this.leftCount = Math.max(0, GameTime.advance(this, "leftCount", this.leftCount, -(1)));
             if (!Key.repeat(Key.gLeft)) {
                this.jumpRollEnable = true;
             }
@@ -647,9 +649,9 @@ public class PlayerSonic extends PlayerObject {
             if (this.jumpRollEnable && (Key.repeat(Key.gLeft))) {
                this.animationID = -1;
                this.myAnimationID = 17;
-               this.leftCount = 0;
+               this.leftCount = GameTime.set(this, "leftCount", 0);
                this.velY = 0;
-               this.velX -= this.maxVelocity >> 2;
+               this.velX = GameTime.advance(this, "velX", this.velX, -(this.maxVelocity >> 2));
                soundInstance.playSe(7);
                this.firstJump = false;
             }
@@ -658,15 +660,15 @@ public class PlayerSonic extends PlayerObject {
          if (Key.press(1073741824)) {
             this.animationID = -1;
             this.myAnimationID = 17;
-            this.leftCount = 0;
+            this.leftCount = GameTime.set(this, "leftCount", 0);
             this.velY = 0;
-            this.velX -= this.maxVelocity >> 2;
+            this.velX = this.velX + (-(this.maxVelocity >> 2));
             soundInstance.playSe(7);
             this.firstJump = false;
          }
 
          if (this.rightCount > 0) {
-            --this.rightCount;
+            this.rightCount = Math.max(0, GameTime.advance(this, "rightCount", this.rightCount, -(1)));
             if (!Key.repeat(Key.gRight)) {
                this.jumpRollEnable = true;
             }
@@ -674,9 +676,9 @@ public class PlayerSonic extends PlayerObject {
             if (this.jumpRollEnable && (Key.repeat(Key.gRight))) {
                this.animationID = -1;
                this.myAnimationID = 17;
-               this.rightCount = 0;
+               this.rightCount = GameTime.set(this, "rightCount", 0);
                this.velY = 0;
-               this.velX += this.maxVelocity >> 2;
+               this.velX = GameTime.advance(this, "velX", this.velX, this.maxVelocity >> 2);
                soundInstance.playSe(7);
                this.firstJump = false;
             }
@@ -685,9 +687,9 @@ public class PlayerSonic extends PlayerObject {
          if (Key.press(Integer.MIN_VALUE)) {
             this.animationID = -1;
             this.myAnimationID = 17;
-            this.leftCount = 0;
+            this.leftCount = GameTime.set(this, "leftCount", 0);
             this.velY = 0;
-            this.velX += this.maxVelocity >> 2;
+            this.velX = this.velX + (this.maxVelocity >> 2);
             soundInstance.playSe(7);
             this.firstJump = false;
          }
@@ -738,7 +740,7 @@ public class PlayerSonic extends PlayerObject {
    protected void extraLogicOnObject() {
       this.firstJump = false;
       if (this.attackCount > 0) {
-         --this.attackCount;
+         this.attackCount = Math.max(0, GameTime.advance(this, "attackCount", this.attackCount, -(1)));
       }
 
       if ((this.myAnimationID == 13 || this.myAnimationID == 14 || this.myAnimationID == 15) && this.attackLevel == 0) {
@@ -820,7 +822,7 @@ public class PlayerSonic extends PlayerObject {
                this.setVelX(var8);
             }
 
-            this.attackCount = 12;
+            this.attackCount = GameTime.set(this, "attackCount", 12);
             soundInstance.playSe(6);
          } else {
             this.animationID = 0;
@@ -856,7 +858,7 @@ public class PlayerSonic extends PlayerObject {
                   var9 = 1;
                }
 
-               this.attackCount = var9 * 6;
+               this.attackCount = GameTime.set(this, "attackCount", var9 * 6);
                this.animationID = -1;
                this.myAnimationID = 13;
                this.isFirstAttack = true;
@@ -911,12 +913,12 @@ public class PlayerSonic extends PlayerObject {
    protected void extraLogicWalk() {
       if (this.slipping) {
          if (Key.repeat(Key.gLeft) && this.myAnimationID == 25) {
-            this.totalVelocity -= 30;
+            this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(30));
          } else if (Key.repeat(Key.gDown | Key.gRight) && this.faceDegree < 135) {
-            this.totalVelocity += MyAPI.dSin(this.faceDegree) * 150 / 100;
+            this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, MyAPI.dSin(this.faceDegree) * 150 / 100);
          }
 
-         this.totalVelocity -= 30;
+         this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(30));
          this.totalVelocity = Math.max(this.totalVelocity, 192);
          this.animationID = -1;
          this.faceDirection = true;
@@ -928,7 +930,7 @@ public class PlayerSonic extends PlayerObject {
             this.myAnimationID = 24;
          }
 
-         ++slidingFrame;
+         slidingFrame = GameTime.advanceOnce(PlayerObject.class, "slidingFrame", slidingFrame, 1);
          System.out.println("~~slidingFrame:" + slidingFrame);
          if (slidingFrame == 2) {
             soundInstance.playLoopSe(9);
@@ -936,7 +938,7 @@ public class PlayerSonic extends PlayerObject {
       }
 
       if (this.attackCount > 0) {
-         --this.attackCount;
+         this.attackCount = Math.max(0, GameTime.advance(this, "attackCount", this.attackCount, -(1)));
       }
 
       if ((this.myAnimationID == 13 || this.myAnimationID == 14 || this.myAnimationID == 15) && this.faceDegree != 90 && this.faceDegree != 270 && this.attackLevel == 0) {
@@ -1061,7 +1063,7 @@ public class PlayerSonic extends PlayerObject {
                this.setVelX(var8);
             }
 
-            this.attackCount = 12;
+            this.attackCount = GameTime.set(this, "attackCount", 12);
             soundInstance.playSe(6);
          }
 
@@ -1100,7 +1102,7 @@ public class PlayerSonic extends PlayerObject {
                   var10 = 1;
                }
 
-               this.attackCount = var10 * 6;
+               this.attackCount = GameTime.set(this, "attackCount", var10 * 6);
                this.animationID = -1;
                this.myAnimationID = 13;
                this.isFirstAttack = true;

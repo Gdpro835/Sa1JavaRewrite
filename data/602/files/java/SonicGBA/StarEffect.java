@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.Coordinate;
@@ -26,12 +28,12 @@ class StarEffect implements SonicDef {
 
    public boolean draw(MFGraphics var1) {
       if (!GameObject.IsGamePause) {
-         this.velX -= 360;
+         this.velX = GameTime.advance(this, "velX", this.velX, -(360));
          if (this.velX < -720) {
             this.velX = -720;
          }
 
-         this.x += this.velX;
+         this.x = GameTime.advancePosition(this, "x", this.x, "velX", this.velX);
       }
 
       Coordinate var2 = MapManager.getCamera();

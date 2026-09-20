@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 
 class MoveRingObject extends RingObject implements MapBehavior {
@@ -21,12 +23,12 @@ class MoveRingObject extends RingObject implements MapBehavior {
       this.appearTime = var6;
       this.isAntiGravity = player.isAntiGravity;
       this.mapObj.setAntiGravity(this.isAntiGravity);
-      this.unTouchCount = 0;
+      this.unTouchCount = GameTime.set(this, "unTouchCount", 0);
    }
 
    protected MoveRingObject(int var1, int var2, int var3, int var4, int var5, long var6, int var8) {
       this(var1, var2, var3, var4, var5, var6);
-      this.unTouchCount = var8;
+      this.unTouchCount = GameTime.set(this, "unTouchCount", var8);
    }
 
    public boolean canBeInit() {
@@ -114,7 +116,7 @@ class MoveRingObject extends RingObject implements MapBehavior {
       this.posX = this.mapObj.getPosX();
       this.posY = this.mapObj.getPosY();
       if (this.unTouchCount > 0) {
-         --this.unTouchCount;
+         this.unTouchCount = Math.max(0, GameTime.advance(this, "unTouchCount", this.unTouchCount, -(1)));
       }
 
    }

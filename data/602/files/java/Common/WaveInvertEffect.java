@@ -30,14 +30,7 @@ public final class WaveInvertEffect {
     public static void drawImage(MFGraphics g, MFImage img, int x_dest, int y_dest, int aX, int bX, int aY, int bY, int speed) {
         int height = img.getHeight();
         int width = img.getWidth();
-        if (!GameObject.IsGamePause) {
-            if (timeTick < ((long) speed)) {
-                timeTick++;
-            } else {
-                time++;
-                timeTick = 0;
-            }
-        }
+        time = GameObject.systemClock / Math.max(1, speed + 1);
         for (int n = 0; n < height; n++) {
             int offsetX = (sin((long) ((n * bX) >> 2)) * aX) >> 14;
             int offsetY = (sin(((((long) n) + time) * ((long) bY)) >> 2) * aY) >> 14;

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -28,7 +30,7 @@ class SeabedVolcanoAsynPlatform extends GimmickObject {
 
    public static boolean isShotting() {
       boolean var0;
-      if (moving && endCount == 3) {
+      if (GameTime.event(SeabedVolcanoAsynPlatform.class, "endCount", "isShotting:33", moving && GameTime.crosses(SeabedVolcanoAsynPlatform.class, "endCount", endCount, 3))) {
          var0 = true;
       } else {
          var0 = false;
@@ -44,16 +46,16 @@ class SeabedVolcanoAsynPlatform extends GimmickObject {
    public static void shot() {
       moving = true;
       velocity = -1400;
-      endCount = 3;
+      endCount = GameTime.set(SeabedVolcanoAsynPlatform.class, "endCount", 3);
    }
 
    public static void staticLogic() {
       if (moving) {
-         velocity += GRAVITY;
-         sPosY += velocity;
+         velocity = GameTime.advance(SeabedVolcanoAsynPlatform.class, "velocity", velocity, GRAVITY);
+         sPosY = GameTime.advance(SeabedVolcanoAsynPlatform.class, "sPosY", sPosY, velocity);
          if (sPosY >= 0) {
             sPosY = 0;
-            --endCount;
+            endCount = GameTime.advance(SeabedVolcanoAsynPlatform.class, "endCount", endCount, -(1));
             if (endCount <= 0) {
                moving = false;
             } else {

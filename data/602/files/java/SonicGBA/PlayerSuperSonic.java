@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -74,7 +76,7 @@ public class PlayerSuperSonic extends PlayerObject {
    }
 
    private void addStar() {
-      ++this.starCount;
+      this.starCount = GameTime.advance(this, "starCount", this.starCount, 1);
       if (this.starCount >= this.nextStarCount) {
          int var1 = MyRandom.nextInt(2);
          int var2 = MyRandom.nextInt(-400, 0);
@@ -90,7 +92,7 @@ public class PlayerSuperSonic extends PlayerObject {
          int var3 = this.posY;
          StarEffect var7 = new StarEffect(var5, var6, var4 + 1536, var3 + var2);
          this.starVec.addElement(var7);
-         this.starCount = 0;
+         this.starCount = GameTime.set(this, "starCount", 0);
          this.nextStarCount = MyRandom.nextInt(2, 6);
       }
 
@@ -107,8 +109,8 @@ public class PlayerSuperSonic extends PlayerObject {
    }
 
    private void drawShadow(MFGraphics var1) {
-      ++this.frameCount;
-      this.frameCount %= 3;
+      this.frameCount = GameTime.advance(this, "frameCount", this.frameCount, 1);
+      this.frameCount = GameTime.wrap(this, "frameCount", this.frameCount, 3);
       this.shadowDrawer.setActionId(this.myAnimationID);
 
       for(int var2 = 0; var2 < this.shadowPosition.length; ++var2) {
@@ -116,7 +118,7 @@ public class PlayerSuperSonic extends PlayerObject {
             this.drawDamage(var1, this.shadowDrawer, this.shadowPosition[var2][0], this.shadowPosition[var2][1]);
          } else {
             if (IsGamePause) {
-               this.frameCount = 0;
+               this.frameCount = GameTime.set(this, "frameCount", 0);
             }
 
             if (this.frameCount % 2 == 0) {
@@ -151,42 +153,42 @@ public class PlayerSuperSonic extends PlayerObject {
    private void inputJumpLogic() {
       if (Key.repeat(Key.gLeft)) {
          if (this.velX > -960) {
-            this.velX -= 240;
+            this.velX = GameTime.advance(this, "velX", this.velX, -(240));
             if (this.velX < -960) {
                this.velX = -960;
             }
          }
       } else if (Key.repeat(Key.gRight)) {
          if (this.velX < 960) {
-            this.velX += 240;
+            this.velX = GameTime.advance(this, "velX", this.velX, 240);
             if (this.velX > 960) {
                this.velX = 960;
             }
          }
       } else if (this.velX > 0) {
-         this.velX -= 240;
+         this.velX = GameTime.advance(this, "velX", this.velX, -(240));
          if (this.velX < 0) {
             this.velX = 0;
          }
       } else if (this.velX < 0) {
-         this.velX += 240;
+         this.velX = GameTime.advance(this, "velX", this.velX, 240);
          if (this.velX > 0) {
             this.velX = 0;
          }
       }
 
       if (this.smallJumpCount > 0) {
-         --this.smallJumpCount;
+         this.smallJumpCount = Math.max(0, GameTime.advance(this, "smallJumpCount", this.smallJumpCount, -(1)));
          if (!Key.repeat(16777216)) {
-            this.velY += GRAVITY >> 1;
-            this.velY += GRAVITY >> 2;
+            this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY >> 1);
+            this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY >> 2);
          }
       }
 
       if (this.attackEffectShow) {
          this.velY = 0;
       } else {
-         this.velY += GRAVITY;
+         this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
       }
 
       if (Key.press(Key.gSelect | 8388608) && !this.attackEffectShow) {
@@ -194,7 +196,7 @@ public class PlayerSuperSonic extends PlayerObject {
          this.attackEffectShow = true;
          this.attackEffectDrawer.restart();
          this.myAnimationID = 4;
-         this.attackEffectCount = 0;
+         this.attackEffectCount = GameTime.set(this, "attackEffectCount", 0);
          SoundSystem.getInstance().playSe(7);
       }
 
@@ -204,25 +206,25 @@ public class PlayerSuperSonic extends PlayerObject {
       if (this.hurtCount < 13) {
          if (Key.repeat(Key.gLeft)) {
             if (this.velX > -960) {
-               this.velX -= 240;
+               this.velX = GameTime.advance(this, "velX", this.velX, -(240));
                if (this.velX < -960) {
                   this.velX = -960;
                }
             }
          } else if (Key.repeat(Key.gRight)) {
             if (this.velX < 960) {
-               this.velX += 240;
+               this.velX = GameTime.advance(this, "velX", this.velX, 240);
                if (this.velX > 960) {
                   this.velX = 960;
                }
             }
          } else if (this.velX > 0) {
-            this.velX -= 240;
+            this.velX = GameTime.advance(this, "velX", this.velX, -(240));
             if (this.velX < 0) {
                this.velX = 0;
             }
          } else if (this.velX < 0) {
-            this.velX += 240;
+            this.velX = GameTime.advance(this, "velX", this.velX, 240);
             if (this.velX > 0) {
                this.velX = 0;
             }
@@ -233,7 +235,7 @@ public class PlayerSuperSonic extends PlayerObject {
             this.velY = START_JUMP_VELOCITY;
             this.collisionState = 1;
             SoundSystem.getInstance().playSe(11);
-            this.smallJumpCount = 9;
+            this.smallJumpCount = GameTime.set(this, "smallJumpCount", 9);
          }
 
          if (Key.press(Key.gSelect | 8388608) && !this.attackEffectShow) {
@@ -241,7 +243,7 @@ public class PlayerSuperSonic extends PlayerObject {
             this.attackEffectShow = true;
             this.attackEffectDrawer.restart();
             this.myAnimationID = 4;
-            this.attackEffectCount = 0;
+            this.attackEffectCount = GameTime.set(this, "attackEffectCount", 0);
             SoundSystem.getInstance().playSe(7);
          }
       }
@@ -256,7 +258,7 @@ public class PlayerSuperSonic extends PlayerObject {
    public void beHurt() {
       if (player.canBeHurt()) {
          this.myAnimationID = 6;
-         this.hurtCount = 20;
+         this.hurtCount = GameTime.set(this, "hurtCount", 20);
          SoundSystem.getInstance().playSe(14);
       }
 
@@ -363,7 +365,7 @@ public class PlayerSuperSonic extends PlayerObject {
             }
 
             if (!IsGamePause) {
-               ++this.attackEffectCount;
+               this.attackEffectCount = GameTime.advance(this, "attackEffectCount", this.attackEffectCount, 1);
             }
 
             if (this.attackEffectDrawer.checkEnd()) {
@@ -378,9 +380,9 @@ public class PlayerSuperSonic extends PlayerObject {
             this.myAnimationID = 7;
             this.drawer.setLoop(false);
             if (!IsGamePause) {
-               this.velY += this.getGravity();
-               this.posX += this.velX;
-               this.posY += this.velY;
+               this.velY = GameTime.advance(this, "velY", this.velY, this.getGravity());
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
                if (this.posY > (MapManager.getCamera().y + MapManager.CAMERA_HEIGHT << 6) + 4096) {
                   this.posY = (MapManager.getCamera().y + MapManager.CAMERA_HEIGHT << 6) + 4096;
                }
@@ -454,9 +456,9 @@ public class PlayerSuperSonic extends PlayerObject {
             this.pacman = null;
          }
 
-         this.velY += this.getGravity();
-         this.posX += this.velX;
-         this.posY += this.velY;
+         this.velY = GameTime.advance(this, "velY", this.velY, this.getGravity());
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
          if (this.posY > (MapManager.getCamera().y + MapManager.CAMERA_HEIGHT << 6) + 4096) {
             this.posY = (MapManager.getCamera().y + MapManager.CAMERA_HEIGHT << 6) + 4096;
             if (!this.finishDeadStuff) {
@@ -473,18 +475,18 @@ public class PlayerSuperSonic extends PlayerObject {
             }
          }
       } else if (this.pacman != null) {
-         this.moveCal.actionLogic(0, 0);
+         this.moveCal.moveVelocity(0, 0);
       } else {
          this.shadowPosition[0][1] = this.shadowPosition[1][1];
          this.shadowPosition[1][1] = this.shadowPosition[2][1];
          this.shadowPosition[2][1] = this.posY;
-         --this.hurtCount;
-         if (this.hurtCount == 12) {
+         this.hurtCount = GameTime.advance(this, "hurtCount", this.hurtCount, -(1));
+         if (GameTime.event(this, "hurtCount", "logic:484", GameTime.crosses(this, "hurtCount", this.hurtCount, 12))) {
             this.myAnimationID = 3;
          }
 
          if (this.hurtCount < 0) {
-            this.hurtCount = 0;
+            this.hurtCount = GameTime.set(this, "hurtCount", 0);
          }
 
          if (this.hurtCount < 13) {
@@ -500,7 +502,7 @@ public class PlayerSuperSonic extends PlayerObject {
             this.velX = -1243;
          }
 
-         this.moveCal.actionLogic(this.velX, this.velY);
+         this.moveCal.moveVelocity(this.velX, this.velY);
          int var1 = (this.velX + 960) * 2 / 3;
          this.shadowPosition[0][0] = this.posX - var1 * 3;
          this.shadowPosition[1][0] = this.posX - var1 * 2;

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -36,12 +38,12 @@ class SteamBase extends GimmickObject {
 
    public static void staticLogic() {
       if (count > 0) {
-         --count;
+         count = (byte) Math.max(0, GameTime.advance(SteamBase.class, "count", count, -(1)));
       }
 
       if (count == 0) {
          SteamPlatform.shot();
-         count = 50;
+         count = (byte) GameTime.set(SteamBase.class, "count", 50);
       }
 
       SteamPlatform.staticLogic();
@@ -69,9 +71,9 @@ class SteamBase extends GimmickObject {
       var3.setActionId(var2);
       this.drawInMap(var1, this.drawer);
       this.sp.drawPlatform(var1);
-      if (this.isInCamera() && count == 50) {
+      if (GameTime.event(SteamBase.class, "count", "draw:74", this.isInCamera() && GameTime.crosses(SteamBase.class, "count", count, 50))) {
          SoundSystem.getInstance().playSe(53);
-         count = 49;
+         count = (byte) GameTime.set(SteamBase.class, "count", 49);
       }
 
    }

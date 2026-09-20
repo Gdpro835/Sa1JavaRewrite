@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -36,10 +38,10 @@ class MonkeyBullet extends BulletObject {
          this.isbooming = false;
          this.drawer.setActionId(0);
          this.drawer.setLoop(true);
-         this.boom_cnt = 0;
-         this.posX += this.velX;
-         this.velY += GRAVITY;
-         this.posY += this.velY;
+         this.boom_cnt = GameTime.set(this, "boom_cnt", 0);
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+         this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
          if (this.posY + 416 >= this.getGroundY(this.posX, this.posY)) {
             this.posY = this.getGroundY(this.posX, this.posY) - 416;
             switch(this.drop_cnt) {
@@ -60,7 +62,7 @@ class MonkeyBullet extends BulletObject {
          break;
       case 1:
          if (this.boom_cnt < 10) {
-            ++this.boom_cnt;
+            this.boom_cnt = Math.min(10, GameTime.advance(this, "boom_cnt", this.boom_cnt, 1));
          } else {
             this.drawer.setActionId(1);
             this.drawer.setLoop(false);
@@ -91,7 +93,7 @@ class MonkeyBullet extends BulletObject {
       if (var1 == player && player.canBeHurt()) {
          player.beHurt();
          this.state = 1;
-         this.boom_cnt = 10;
+         this.boom_cnt = GameTime.set(this, "boom_cnt", 10);
       }
 
    }

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -69,7 +71,7 @@ class Shatter extends GimmickObject {
    public void logic() {
       if (this.trigger) {
          int var1 = this.posY;
-         this.posY += 600;
+         this.posY = GameTime.advance(this, "posY", this.posY, 600);
          if (this.posY >= this.posYOriginal + 3072) {
             this.posY = this.posYOriginal + 3072;
          }

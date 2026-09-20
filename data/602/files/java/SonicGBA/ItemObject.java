@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import Lib.SoundSystem;
 import com.sega.engine.action.ACCollision;
@@ -74,7 +76,7 @@ public class ItemObject extends GameObject {
       }
 
       this.used = true;
-      this.moveCount = 20;
+      this.moveCount = GameTime.set(this, "moveCount", 20);
       player.getPreItem(this.objId);
       SoundSystem.getInstance().playSe(29);
    }
@@ -238,17 +240,17 @@ public class ItemObject extends GameObject {
    public void logic() {
       if (this.used) {
          if (this.moveCount > 0) {
-            --this.moveCount;
-            if (this.moveCount == 19 && this.objId >= 5 && this.objId <= 7) {
+            this.moveCount = Math.max(0, GameTime.advance(this, "moveCount", this.moveCount, -(1)));
+            if (GameTime.event(this, "moveCount", "logic:244", GameTime.crosses(this, "moveCount", this.moveCount, 19) && this.objId >= 5 && this.objId <= 7)) {
                PlayerObject.getTmpRing(this.objId);
             }
 
-            this.posY -= 200;
-            this.posYoffset -= 200;
+            this.posY = GameTime.advance(this, "posY", this.posY, -(200));
+            this.posYoffset = GameTime.advance(this, "posYoffset", this.posYoffset, -(200));
          }
 
          if (this.moveCount == 0) {
-            this.moveCount = -1;
+            this.moveCount = GameTime.set(this, "moveCount", -1);
             if (this.objId >= 5 && this.objId <= 7) {
                soundInstance.playSe(12);
             }

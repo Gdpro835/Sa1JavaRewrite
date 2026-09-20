@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -134,7 +136,7 @@ class Poal extends GimmickObject {
       case 1:
          PlayerObject var5;
          if (this.drawer.getActionId() == this.drawIdStart + 1 && this.drawer.checkEnd()) {
-            this.restCount = 10;
+            this.restCount = GameTime.set(this, "restCount", 10);
             this.state = 2;
             var5 = player;
             byte var6;
@@ -176,7 +178,7 @@ class Poal extends GimmickObject {
                }
 
                var5.doPoalMotion(var3 + 800, var1 + var2, var4);
-               ++this.offsetCount;
+               this.offsetCount = GameTime.advance(this, "offsetCount", this.offsetCount, 1);
                if (this.offsetCount >= PULL_OFFSET.length) {
                   this.offsetCount = PULL_OFFSET.length - 1;
                }
@@ -185,7 +187,7 @@ class Poal extends GimmickObject {
          break;
       case 2:
          if (this.restCount > 0) {
-            --this.restCount;
+            this.restCount = Math.max(0, GameTime.advance(this, "restCount", this.restCount, -(1)));
          }
 
          if (this.restCount == 0 && this.drawer.checkEnd()) {

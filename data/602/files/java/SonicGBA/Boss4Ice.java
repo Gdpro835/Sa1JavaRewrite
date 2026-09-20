@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -22,7 +24,7 @@ class Boss4Ice extends Platform {
          iceImage = MFImage.createImage("/gimmick/boss4_ice.png");
       }
 
-      this.iceDownCounter = 0;
+      this.iceDownCounter = GameTime.set(this, "iceDownCounter", 0);
       this.drop_vel = var3;
       this.endPos = var4;
       this.IsDisplay = true;
@@ -94,7 +96,7 @@ class Boss4Ice extends Platform {
 
    public void logic() {
       if (this.IsDisplay) {
-         ++this.iceDownCounter;
+         this.iceDownCounter = GameTime.advance(this, "iceDownCounter", this.iceDownCounter, 1);
          int var2 = this.posX;
          int var1 = this.posY;
          if (player.isFootOnObject(this)) {
@@ -104,9 +106,9 @@ class Boss4Ice extends Platform {
          }
 
          if (!this.boss4.dead && this.posY >= StageManager.getWaterLevel() << 6) {
-            this.posY += this.drop_vel;
+            this.posY = GameTime.advancePosition(this, "posY", this.posY, "drop_vel", this.drop_vel);
          } else {
-            this.posY += this.drop_vel * 6;
+            this.posY = GameTime.advance(this, "posY", this.posY, this.drop_vel * 6);
          }
 
          this.checkWithPlayer(var2, var1, this.posX, this.posY);

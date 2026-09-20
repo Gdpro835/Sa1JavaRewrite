@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 
 class MoveCalculator {
@@ -27,25 +29,25 @@ class MoveCalculator {
    public static void staticLogic() {
       if (direction) {
          isSide = false;
-         ++moveCount2;
+         moveCount2 = GameTime.advance(MoveCalculator.class, "moveCount2", moveCount2, 1);
          if (moveCount2 > 34) {
-            moveCount2 = 34;
+            moveCount2 = GameTime.set(MoveCalculator.class, "moveCount2", 34);
             direction = false;
             isSide = true;
          }
       } else {
          isSide = false;
-         --moveCount2;
+         moveCount2 = GameTime.advance(MoveCalculator.class, "moveCount2", moveCount2, -(1));
          if (moveCount2 < 0) {
-            moveCount2 = 0;
+            moveCount2 = GameTime.set(MoveCalculator.class, "moveCount2", 0);
             direction = true;
             isSide = true;
          }
       }
 
       moveCount = moveCount2 - 17;
-      degree += 5;
-      degree %= 360;
+      degree = GameTime.advance(MoveCalculator.class, "degree", degree, 5);
+      degree = GameTime.wrap(MoveCalculator.class, "degree", degree, 360);
    }
 
    public int getPosition() {

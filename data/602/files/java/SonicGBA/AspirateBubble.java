@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -59,9 +61,9 @@ class AspirateBubble extends EnemyObject {
             this.dead = true;
          }
 
-         ++this.frame;
-         this.frame %= 96;
-         this.posY -= 120;
+         this.frame = GameTime.advance(this, "frame", this.frame, 1);
+         this.frame = GameTime.wrap(this, "frame", this.frame, 96);
+         this.posY = GameTime.advance(this, "posY", this.posY, -(120));
          byte var1;
          if (this.frame <= 48) {
             var1 = 16;
@@ -70,7 +72,7 @@ class AspirateBubble extends EnemyObject {
          }
 
          this.velx = var1;
-         this.posX += this.velx;
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velx", this.velx);
          this.refreshCollisionRect(this.posX, this.posY);
       }
 

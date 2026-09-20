@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -65,7 +67,7 @@ class DrownBubble extends EnemyObject {
             this.dead = true;
          }
 
-         this.posY -= 64;
+         this.posY = GameTime.advance(this, "posY", this.posY, -(64));
          this.refreshCollisionRect(this.posX, this.posY);
       }
 

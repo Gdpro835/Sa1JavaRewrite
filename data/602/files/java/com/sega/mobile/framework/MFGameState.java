@@ -5,8 +5,6 @@ import com.sega.mobile.framework.device.MFGraphics;
 public interface MFGameState {
     public static final int VERSION = 104;
 
-    int getFrameTime();
-
     void onEnter();
 
     void onExit();
@@ -21,5 +19,6 @@ public interface MFGameState {
 
     void onResume();
 
-    void onTick();
+    /** Actual elapsed simulation seconds; called once per visible GL frame, not at a fixed rate. */
+    void onUpdate(double deltaSeconds);
 }

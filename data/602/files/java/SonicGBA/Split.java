@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.MyAPI;
 import Lib.SoundSystem;
@@ -33,8 +35,8 @@ class Split extends GimmickObject {
    public void logic() {
       if (this.controlling) {
          this.firstTouch = false;
-         this.degree += 2560;
-         this.degree %= 23040;
+         this.degree = GameTime.advance(this, "degree", this.degree, 2560);
+         this.degree = GameTime.wrap(this, "degree", this.degree, 23040);
          player.setBodyPositionX(this.posX + MyAPI.dCos(this.degree >> 6) * 512 / 100);
          player.setBodyPositionY(this.posY + MyAPI.dSin(this.degree >> 6) * 512 / 100);
          boolean var1 = false;

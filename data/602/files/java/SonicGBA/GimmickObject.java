@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.Line;
 import Lib.SoundSystem;
@@ -771,7 +773,7 @@ public class GimmickObject extends GameObject {
             }
             break;
          case 90:
-            ++framecnt;
+            framecnt = GameTime.advanceOnce(GimmickObject.class, "framecnt", framecnt, 1);
             var11 = this.collisionRect;
             var2 = player.getCheckPositionX();
             var3 = player.getCheckPositionY();

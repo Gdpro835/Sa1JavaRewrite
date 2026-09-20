@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.SoundSystem;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -58,7 +60,7 @@ class UpArm extends GimmickObject {
             var1.setOutOfControl(this);
             player.doPullMotion(this.posX, this.posY + 128);
             SoundSystem.getInstance().playSe(51);
-            frame = 1;
+            frame = GameTime.set(UpArm.class, "frame", 1);
          }
       }
 
@@ -87,18 +89,18 @@ class UpArm extends GimmickObject {
 
    public void logic() {
       if (this.waitCount > 0) {
-         --this.waitCount;
+         this.waitCount = Math.max(0, GameTime.advance(this, "waitCount", this.waitCount, -(1)));
       }
 
       switch(this.state) {
       case 1:
-         ++frame;
-         frame %= 100;
-         this.posY -= 480;
+         frame = GameTime.advance(UpArm.class, "frame", frame, 1);
+         frame = GameTime.wrap(UpArm.class, "frame", frame, 100);
+         this.posY = GameTime.advance(this, "posY", this.posY, -(480));
          if (this.posY < this.upLimit) {
             this.posY = this.upLimit;
             soundInstance.stopLoopSe();
-         } else if (frame == 4) {
+         } else if (GameTime.event(UpArm.class, "frame", "logic:103", GameTime.crosses(UpArm.class, "frame", frame, 4))) {
             soundInstance.playLoopSe(52);
          }
 
@@ -108,7 +110,7 @@ class UpArm extends GimmickObject {
             player.doJump();
             player.isOnlyJump = true;
             this.state = 2;
-            this.waitCount = 15;
+            this.waitCount = GameTime.set(this, "waitCount", 15);
             soundInstance.stopLoopSe();
          }
          break;
@@ -118,7 +120,7 @@ class UpArm extends GimmickObject {
          }
          break;
       case 3:
-         this.posY += 960;
+         this.posY = GameTime.advance(this, "posY", this.posY, 960);
          if (this.posY >= this.upLimit + 7680) {
             this.posY = this.upLimit + 7680;
             this.state = 0;

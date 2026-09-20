@@ -1,5 +1,7 @@
 package Special;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -60,11 +62,11 @@ public class SpecialMap implements SSDef {
             cameraX = CAMERA_MAX_X / 2;
         }
         cameraY = (CAMERA_MAX_Y * ((SpecialObject.player.posY >> 6) + 120)) / SSDef.PLAYER_MOVE_HEIGHT;
-        mapProgress += (SpecialObject.player.velZ << 6) / 1;
+        mapProgress = GameTime.advance(SpecialMap.class, "mapProgress", mapProgress, (SpecialObject.player.velZ << 6) / 1);
         while (mapProgress < 0) {
             mapProgress += 1024;
         }
-        mapProgress %= 1024;
+        mapProgress = GameTime.wrap(SpecialMap.class, "mapProgress", mapProgress, 1024);
         mapDrawer.setActionId(mapProgress >> 6);
     }
 

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -260,8 +262,8 @@ public class SmallAnimal extends GameObject implements MapBehavior {
             }
          }
       } else {
-         this.posX -= 1000;
-         this.posY -= 300;
+         this.posX = GameTime.advance(this, "posX", this.posX, -(1000));
+         this.posY = GameTime.advance(this, "posY", this.posY, -(300));
       }
 
       this.refreshCollisionRect(this.posX, this.posY);

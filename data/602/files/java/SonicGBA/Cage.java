@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -158,16 +160,16 @@ class Cage extends GimmickObject implements MapBehavior {
             this.doorPosY = this.posY;
             this.doorVelocityY = -600;
             this.animalCount = 7;
-            this.count = 0;
+            this.count = GameTime.set(this, "count", 0);
          }
          break;
       case 2:
-         this.doorPosX -= 300;
-         this.doorPosX2 += 300;
-         this.doorVelocityY += GRAVITY;
-         this.doorPosY += this.doorVelocityY;
+         this.doorPosX = GameTime.advance(this, "doorPosX", this.doorPosX, -(300));
+         this.doorPosX2 = GameTime.advance(this, "doorPosX2", this.doorPosX2, 300);
+         this.doorVelocityY = GameTime.advance(this, "doorVelocityY", this.doorVelocityY, GRAVITY);
+         this.doorPosY = GameTime.advancePosition(this, "doorPosY", this.doorPosY, "doorVelocityY", this.doorVelocityY);
          if (this.count > 0) {
-            --this.count;
+            this.count = Math.max(0, GameTime.advance(this, "count", this.count, -(1)));
          }
 
          if (this.count == 0 && this.animalCount > 0) {
@@ -181,7 +183,7 @@ class Cage extends GimmickObject implements MapBehavior {
             var1 = this.posX;
             var3 = this.posX;
             SmallAnimal.addPatrolAnimal(1, var4, var2 - 640, 1, var1 - 3200, var3 + 3200);
-            this.count = 4;
+            this.count = GameTime.set(this, "count", 4);
             --this.animalCount;
          }
       }

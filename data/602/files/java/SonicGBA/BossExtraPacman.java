@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.MyRandom;
@@ -37,7 +39,7 @@ class BossExtraPacman extends BulletObject implements ACMoveCalUser {
 
       this.drawer = pacmanAnimation.getDrawer(0, true, 0);
       this.state = 0;
-      this.count = 0;
+      this.count = GameTime.set(this, "count", 0);
       this.moveCal = new ACMoveCalculator(this, this);
    }
 
@@ -79,10 +81,10 @@ class BossExtraPacman extends BulletObject implements ACMoveCalUser {
          this.setDie();
       }
 
-      ++this.count;
+      this.count = GameTime.advance(this, "count", this.count, 1);
       switch(this.state) {
       case 0:
-         this.moveCal.actionLogic(-240, 0);
+         this.moveCal.moveVelocity(-240, 0);
          if (this.count > 12) {
             this.state = 1;
             boolean var2;
@@ -102,14 +104,14 @@ class BossExtraPacman extends BulletObject implements ACMoveCalUser {
                break;
             }
 
-            this.moveCal.actionLogic(0, Math.min(player.posY - this.posY, 240));
+            this.moveCal.moveVelocity(0, Math.min(player.posY - this.posY, 240));
          } else if (this.posY > player.posY) {
             if (this.isHigher) {
                this.state = 2;
                break;
             }
 
-            this.moveCal.actionLogic(0, Math.max(player.posY - this.posY, -240));
+            this.moveCal.moveVelocity(0, Math.max(player.posY - this.posY, -240));
          }
 
          if (player.posY == this.posY) {
@@ -117,7 +119,7 @@ class BossExtraPacman extends BulletObject implements ACMoveCalUser {
          }
          break;
       case 2:
-         this.moveCal.actionLogic(-720, 0);
+         this.moveCal.moveVelocity(-720, 0);
       case 3:
       default:
          break;
@@ -126,7 +128,7 @@ class BossExtraPacman extends BulletObject implements ACMoveCalUser {
          this.posY = player.posY;
          if (this.drawer.checkEnd()) {
             this.state = 5;
-            this.count = 0;
+            this.count = GameTime.set(this, "count", 0);
             if (this.superSonic != null) {
                this.superSonic.setPackageObj(this);
             }
@@ -154,11 +156,11 @@ class BossExtraPacman extends BulletObject implements ACMoveCalUser {
       case 6:
          for(int var1 = 0; var1 < this.pieceInfo.length; ++var1) {
             int[] var3 = this.pieceInfo[var1];
-            var3[3] += GRAVITY >> 2;
+            var3[3] = GameTime.advance(var3, String.valueOf(3), var3[3], GRAVITY >> 2);
             var3 = this.pieceInfo[var1];
-            var3[0] += this.pieceInfo[var1][2];
+            var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.pieceInfo[var1][2]);
             var3 = this.pieceInfo[var1];
-            var3[1] += this.pieceInfo[var1][3];
+            var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.pieceInfo[var1][3]);
          }
       }
 

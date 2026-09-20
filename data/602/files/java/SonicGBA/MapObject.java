@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.engine.action.ACBlock;
 import com.sega.engine.action.ACCollision;
@@ -110,7 +112,7 @@ public class MapObject extends GameObject implements ACWorldCalUser, ACWorldColl
       }
 
       this.posZ = this.currentLayer;
-      this.worldCal.actionLogic(this.moveDistanceX, this.moveDistanceY);
+      this.worldCal.moveVelocity(this.moveDistanceX, this.moveDistanceY);
    }
 
    public boolean chkCrash() {
@@ -291,7 +293,7 @@ public class MapObject extends GameObject implements ACWorldCalUser, ACWorldColl
       switch(this.state) {
       case 0:
          if (this.totalVelocity != 0) {
-            this.totalVelocity += this.gravity * MyAPI.dSin(this.moveDegree) / 100;
+            this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, this.gravity * MyAPI.dSin(this.moveDegree) / 100);
          }
          break;
       case 1:
@@ -303,7 +305,7 @@ public class MapObject extends GameObject implements ACWorldCalUser, ACWorldColl
             var1 = this.gravity;
          }
 
-         this.velY = var2 + var1;
+         this.velY = GameTime.advance(this, "velY", var2, var1);
       }
 
       this.checkWithMap();
@@ -328,7 +330,7 @@ public class MapObject extends GameObject implements ACWorldCalUser, ACWorldColl
             var1 = this.gravity;
          }
 
-         this.velY = var2 + var1;
+         this.velY = GameTime.advance(this, "velY", var2, var1);
       }
 
       this.checkWithMap();

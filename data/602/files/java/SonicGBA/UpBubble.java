@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -87,8 +89,8 @@ class UpBubble extends GimmickObject {
             this.velx = MyRandom.nextInt(-20, 0);
          }
 
-         this.posX += this.velx;
-         this.posY += this.vely;
+         this.posX = GameTime.advancePosition(this, "posX", this.posX, "velx", this.velx);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
          this.refreshCollisionRect(this.posX, this.posY);
          if (this.posY <= StageManager.getWaterLevel() << 6) {
             this.initFlag = true;

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -165,12 +167,12 @@ class BossF1 extends BossObject {
       if (this.ball != null && this.ball.getPlayerHurt()) {
          this.face_state = 1;
          this.ball.resetPlayerHurt();
-         this.face_cnt = 0;
+         this.face_cnt = GameTime.set(this, "face_cnt", 0);
       }
 
       if (this.face_state != 0) {
          if (this.face_cnt < 8) {
-            ++this.face_cnt;
+            this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
          } else {
             if (this.machine_state == 4) {
                this.machine_state = 0;
@@ -181,7 +183,7 @@ class BossF1 extends BossObject {
             }
 
             this.face_state = 0;
-            this.face_cnt = 0;
+            this.face_cnt = GameTime.set(this, "face_cnt", 0);
          }
       }
 
@@ -203,8 +205,8 @@ class BossF1 extends BossObject {
    }
 
    private void degreeCal() {
-      this.lineVelocity += (GRAVITY - 60) * MyAPI.dSin((this.degree >> 6) - 90) / 100;
-      this.degree -= ((this.lineVelocity << 6) / this.RADIUS << 6) * 180 / 201;
+      this.lineVelocity = GameTime.advance(this, "lineVelocity", this.lineVelocity, (GRAVITY - 60) * MyAPI.dSin((this.degree >> 6) - 90) / 100);
+      this.degree = GameTime.advance(this, "degree", this.degree, -(((this.lineVelocity << 6) / this.RADIUS << 6) * 180 / 201));
    }
 
    public static void releaseAllResource() {
@@ -217,7 +219,7 @@ class BossF1 extends BossObject {
    }
 
    public void balllogic(boolean var1) {
-      this.oppoBallPosY += this.ballvely;
+      this.oppoBallPosY = GameTime.advance(this, "oppoBallPosY", this.oppoBallPosY, this.ballvely);
       if (this.oppoBallPosY > 4992) {
          this.oppoBallPosY = 4992;
       }
@@ -266,7 +268,7 @@ class BossF1 extends BossObject {
             }
 
             this.face_state = 2;
-            this.face_cnt = 0;
+            this.face_cnt = GameTime.set(this, "face_cnt", 0);
          } else {
             this.state = 3;
             this.face_state = 3;
@@ -303,7 +305,7 @@ class BossF1 extends BossObject {
                   }
 
                   this.face_state = 2;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                } else {
                   this.state = 3;
                   this.face_state = 3;
@@ -392,7 +394,7 @@ class BossF1 extends BossObject {
                   MapManager.setCameraLeftLimit(864 - SCREEN_WIDTH / 2);
                   MapManager.setCameraRightLimit(SCREEN_WIDTH / 2 + 864);
                   this.show_step = 0;
-                  this.enter_screen_frame_cn = 0;
+                  this.enter_screen_frame_cn = GameTime.set(this, "enter_screen_frame_cn", 0);
                   SoundSystem.getInstance().playBgm(46);
                   this.displayFlag = true;
                }
@@ -404,9 +406,9 @@ class BossF1 extends BossObject {
             switch(this.show_step) {
             case 0:
                if (this.enter_screen_frame_cn < 18) {
-                  ++this.enter_screen_frame_cn;
+                  this.enter_screen_frame_cn = Math.min(18, GameTime.advance(this, "enter_screen_frame_cn", this.enter_screen_frame_cn, 1));
                } else {
-                  this.posY += 270;
+                  this.posY = GameTime.advance(this, "posY", this.posY, 270);
                   if (this.posY >= 39936) {
                      this.posY = 39936;
                      this.show_step = 1;
@@ -414,7 +416,7 @@ class BossF1 extends BossObject {
                }
                break label202;
             case 1:
-               this.posY += 270;
+               this.posY = GameTime.advance(this, "posY", this.posY, 270);
                if (this.posY >= 43264) {
                   this.posY = 43264;
                   this.show_step = 2;
@@ -422,7 +424,7 @@ class BossF1 extends BossObject {
                }
                break label202;
             case 2:
-               this.posX -= 240;
+               this.posX = GameTime.advance(this, "posX", this.posX, -(240));
                if (this.posX > 55296) {
                   break label202;
                }
@@ -449,14 +451,14 @@ class BossF1 extends BossObject {
                break label202;
             case 3:
                if (this.laugh_cn < 10) {
-                  ++this.laugh_cn;
+                  this.laugh_cn = Math.min(10, GameTime.advance(this, "laugh_cn", this.laugh_cn, 1));
                } else {
                   this.changeAniState(this.faceDrawer, 0);
                }
 
                for(var1 = 0; var1 < 6; ++var1) {
                   var5 = this.ballPos[var1];
-                  var5[1] += this.ballVel[var1];
+                  var5[1] = GameTime.advance(var5, String.valueOf(1), var5[1], this.ballVel[var1]);
                }
 
                if (this.ballPos[4][1] < 48064) {
@@ -485,22 +487,22 @@ class BossF1 extends BossObject {
                this.changeAniState(this.machineDrawer, 1);
                this.oppoBallPosX = 0;
                this.oppoBallPosY = 4992;
-               this.frameCn = 0;
+               this.frameCn = GameTime.set(this, "frameCn", 0);
                this.ballvely = 0;
                break label202;
             case 4:
                this.bossStateChange();
                if (this.show_step != 5) {
                   if (this.frameCn < 17) {
-                     ++this.frameCn;
+                     this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
                   } else {
-                     this.frameCn = 17;
+                     this.frameCn = GameTime.set(this, "frameCn", 17);
                   }
 
                   if (this.frameCn < 8) {
-                     this.ballvely -= 96;
+                     this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, -(96));
                   } else if (this.frameCn < 16) {
-                     this.ballvely += 96;
+                     this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, 96);
                   } else {
                      this.ballvely = 0;
                      this.oppoBallPosY = 0;
@@ -508,11 +510,11 @@ class BossF1 extends BossObject {
                }
 
                if (this.posX > 54528) {
-                  this.posY += this.vely;
-                  this.posX += this.velocity;
+                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                } else {
                   this.show_step = 5;
-                  this.frameCn = 0;
+                  this.frameCn = GameTime.set(this, "frameCn", 0);
                   this.posY = 42880;
                   this.posX = 54528;
                   this.vely = 7;
@@ -524,28 +526,28 @@ class BossF1 extends BossObject {
                this.bossStateChange();
                if (this.state != 2) {
                   if (this.frameCn < 17) {
-                     ++this.frameCn;
+                     this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
                      this.Accy = (BALL_ACC_MAX - this.frameCn * 22) / 2;
                      if (this.Accy < 0) {
                         this.Accy = 0;
                      }
 
-                     this.ballvely += this.Accy;
+                     this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, this.Accy);
                   } else {
-                     this.frameCn = 17;
+                     this.frameCn = GameTime.set(this, "frameCn", 17);
                      this.oppoBallPosY = 4992;
                   }
                }
 
                if (this.posX > 53760) {
-                  this.posY += this.vely;
-                  this.posX += this.velocity;
+                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                } else {
                   this.state = 2;
                   this.posY = 43136;
                   this.posX = 53760;
                   this.pro_step = 0;
-                  this.frameCn = 0;
+                  this.frameCn = GameTime.set(this, "frameCn", 0);
                   this.vely = -15;
                   this.ballvely = 0;
                   this.machine_state = 0;
@@ -560,23 +562,23 @@ class BossF1 extends BossObject {
             switch(this.pro_step) {
             case 0:
                if (this.frameCn < 17) {
-                  ++this.frameCn;
+                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
                   this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely -= this.Accy;
+                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, -(this.Accy));
                } else {
-                  this.frameCn = 17;
+                  this.frameCn = GameTime.set(this, "frameCn", 17);
                   this.oppoBallPosY = 0;
                   this.oppoBallPosX = 4992;
                }
 
                if (this.posY > 42880) {
-                  this.posY += this.vely;
+                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
                } else {
                   this.posY = 42880;
                   this.pro_step = 1;
                   this.velocity = 180;
                   this.vely = 15;
-                  this.frameCn = 0;
+                  this.frameCn = GameTime.set(this, "frameCn", 0);
                   this.machine_state = 1;
                   this.face_state = 0;
                   this.directTrans = true;
@@ -587,25 +589,25 @@ class BossF1 extends BossObject {
                break label202;
             case 1:
                if (this.frameCn < 17) {
-                  ++this.frameCn;
+                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
                   this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely += this.Accy;
+                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, this.Accy);
                } else {
-                  this.frameCn = 17;
+                  this.frameCn = GameTime.set(this, "frameCn", 17);
                   this.oppoBallPosY = 4992;
                   this.oppoBallPosX = 0;
                }
 
                if (this.posX < 56832) {
-                  this.posX += this.velocity;
-                  this.posY += this.vely;
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
+                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
                } else {
                   this.posX = 56832;
                   this.posY = 43136;
                   this.pro_step = 2;
                   this.vely = -15;
                   this.machine_state = 0;
-                  this.frameCn = 0;
+                  this.frameCn = GameTime.set(this, "frameCn", 0);
                   this.ballvely = 0;
                }
 
@@ -613,21 +615,21 @@ class BossF1 extends BossObject {
                break label202;
             case 2:
                if (this.frameCn < 17) {
-                  ++this.frameCn;
+                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
                   this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely -= this.Accy;
+                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, -(this.Accy));
                } else {
-                  this.frameCn = 17;
+                  this.frameCn = GameTime.set(this, "frameCn", 17);
                   this.oppoBallPosY = 0;
                   this.oppoBallPosX = 4992;
                }
 
                if (this.posY > 42880) {
-                  this.posY += this.vely;
+                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
                } else {
                   this.posY = 42880;
                   this.pro_step = 3;
-                  this.frameCn = 0;
+                  this.frameCn = GameTime.set(this, "frameCn", 0);
                   this.directTrans = false;
                   this.velocity = -180;
                   this.vely = 15;
@@ -640,25 +642,25 @@ class BossF1 extends BossObject {
                break label202;
             case 3:
                if (this.frameCn < 17) {
-                  ++this.frameCn;
+                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
                   this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely += this.Accy;
+                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, this.Accy);
                } else {
-                  this.frameCn = 17;
+                  this.frameCn = GameTime.set(this, "frameCn", 17);
                   this.oppoBallPosY = 4992;
                   this.oppoBallPosX = 0;
                }
 
                if (this.posX > 53760) {
-                  this.posX += this.velocity;
-                  this.posY += this.vely;
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
+                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
                } else {
                   this.posX = 53760;
                   this.posY = 43136;
                   this.pro_step = 0;
                   this.vely = -15;
                   this.machine_state = 0;
-                  this.frameCn = 0;
+                  this.frameCn = GameTime.set(this, "frameCn", 0);
                   this.ballvely = 0;
                }
 
@@ -670,7 +672,7 @@ class BossF1 extends BossObject {
             if (this.posY >= 46336) {
                this.posY = 46336;
             } else {
-               this.posY += 270;
+               this.posY = GameTime.advance(this, "posY", this.posY, 270);
             }
 
             this.bossbroken.logicBoom(this.posX, this.posY - 1280);
@@ -686,9 +688,9 @@ class BossF1 extends BossObject {
                this.ballPos[4][1] = this.getGroundY(this.ballPos[4][0], this.ballPos[4][1]);
                this.drop_cnt = 3;
             } else if (this.drop_cnt != 3) {
-               this.drop_vely += GRAVITY;
+               this.drop_vely = GameTime.advance(this, "drop_vely", this.drop_vely, GRAVITY);
                var5 = this.ballPos[4];
-               var5[1] += this.drop_vely;
+               var5[1] = GameTime.advance(var5, String.valueOf(1), var5[1], this.drop_vely);
                this.ball.setEnd();
                this.isDisplayBall = false;
             }
@@ -715,13 +717,13 @@ class BossF1 extends BossObject {
                MapManager.setCameraRightLimit(MapManager.getPixelWidth());
                this.dead = true;
             } else {
-               this.posX += 480;
+               this.posX = GameTime.advance(this, "posX", this.posX, 480);
             }
 
             if (this.posY >= 45056) {
                this.posY = 45056;
             } else {
-               this.posY += 270;
+               this.posY = GameTime.advance(this, "posY", this.posY, 270);
             }
          }
 

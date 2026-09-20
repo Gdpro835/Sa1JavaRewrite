@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -27,7 +29,7 @@ class Caterpillar extends EnemyObject {
       this.posY += 2560;
       this.circleCenterX = this.posX + (this.mWidth >> 1);
       this.circleCenterY = this.posY;
-      this.plus_cnt = 0;
+      this.plus_cnt = GameTime.set(this, "plus_cnt", 0);
       if (caterpillarAnimation == null) {
          caterpillarAnimation = new Animation("/animation/caterpillar");
       }
@@ -109,7 +111,7 @@ class Caterpillar extends EnemyObject {
          int var1;
          switch(this.state) {
          case 0:
-            this.plus_cnt += this.plus;
+            this.plus_cnt = GameTime.advance(this, "plus_cnt", this.plus_cnt, this.plus);
 
             for(var1 = 0; var1 < this.pos.length; ++var1) {
                this.pos[var1][0] = this.circleCenterX - (this.mWidth >> 1) * MyAPI.dCos(this.dg * (this.plus_cnt - var1 * 3)) / 100;

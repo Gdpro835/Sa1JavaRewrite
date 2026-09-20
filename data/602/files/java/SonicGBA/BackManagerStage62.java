@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -78,10 +80,10 @@ class BackManagerStage62 extends BackGroundManager {
             int[] var16;
             if (var2 == 0) {
                var16 = this.lightX;
-               var16[var2] += 120;
+               var16[var2] = GameTime.advance(var16, String.valueOf(var2), var16[var2], 120);
             } else {
                var16 = this.lightX;
-               var16[var2] -= 120;
+               var16[var2] = GameTime.advance(var16, String.valueOf(var2), var16[var2], -(120));
             }
 
             var16 = this.lightX;

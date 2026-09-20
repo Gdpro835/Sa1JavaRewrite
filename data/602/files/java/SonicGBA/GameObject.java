@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.Coordinate;
@@ -16,9 +18,6 @@ import java.io.InputStream;
 import java.util.Vector;
 import State.TitleState;
 import android.widget.Toast;
-import android.os.Handler;
-import android.os.Looper;
-import Lib.CopyFields;
 
 public abstract class GameObject extends ACObject implements SonicDef {
    private static final int AVAILABLE_RANGE = 1;
@@ -103,6 +102,7 @@ public abstract class GameObject extends ACObject implements SonicDef {
    private static int startX;
    private static int startY;
    public static long systemClock;
+   private static double worldSeconds;
    public CollisionRect collisionRect = new CollisionRect();
    protected int currentLayer;
    protected boolean firstTouch = true;
@@ -112,7 +112,7 @@ public abstract class GameObject extends ACObject implements SonicDef {
    private boolean needInit;
    protected int objId;
    public CollisionRect preCollisionRect = new CollisionRect();
-   public static boolean newth = false;
+   private static PlayerObject appliedRemote;
    
    static {
       for(int var0 = 0; var0 < 4; ++var0) {
@@ -882,49 +882,34 @@ public abstract class GameObject extends ACObject implements SonicDef {
    }
    
    public static void setPlayer2() {
-   if (!MFMain.multiplayer && player2 == null && TitleState.characterslots == 2 && MFMain.tails >= 7) {
-          int id = player.getCharacterID();
-          player2 = PlayerObject.getPlayer(id == 0 ? 1 : id == 1 ? 0 : id == 2 ? 3 : id == 3 ? 2 : 1);
-          //player2.invincibleCount = 9999;
-          player2.posX = player.posX - 5;
-          player2.posY = player.posY;
-          player2.setPlayer(player2);
-          player2.Player2Hurt = true;
-      } else {
-      if (MFMain.multiplayer) {
-      while (player2 == null) {
-      player2 = PlayerObject.getPlayer(MFMain.getPlayerMulti().getCharacterIDMulti());
-      player2.setPlayer(player2);
+      if (player == null) return;
+      if (!MFMain.multiplayer) {
+         if (player2 == null && TitleState.characterslots == 2 && MFMain.tails >= 7) {
+            int id = player.getCharacterID();
+            player2 = PlayerObject.getPlayer(id == 0 ? 1 : id == 1 ? 0 : id == 2 ? 3 : id == 3 ? 2 : 1);
+            player2.setPlayer(player2);
+            player2.setFootPositionX(player.getFootPositionX() - (16 << 6));
+            player2.setFootPositionY(player.getFootPositionY());
+            player2.Player2Hurt = true;
+         }
+         return;
       }
-      final Handler mainHandler = new Handler(Looper.getMainLooper());
-Thread t = new Thread(new Runnable() {
-    @Override
-    public void run() {
-        while (MFMain.multiplayer) {
-                mainHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        CopyFields.copyFields(MFMain.getPlayerMulti(), player2);
-                        player2.setPlayer(player2);
-                    }
-                });
-            try {
-                Thread.sleep(15);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-});
-t.start();
-      if (player2 != null) {
-      player2.posX = player.posX - 5;
-      player2.posY = player.posY;
-      player2.Player2Hurt = true;
+      PlayerObject remote = MFMain.getPlayerMulti();
+      if (remote == null || remote == appliedRemote) return;
+      if (player2 == null) {
+         player2 = PlayerObject.getPlayer(remote.getCharacterIDMulti());
+         player2.setPlayer(player2);
+         player2.Player2Hurt = true;
       }
-      }
-      }
-      }
+      // Only transfer remote gameplay values, never GL resources, clocks or static fields.
+      player2.setFootPositionX(remote.getFootPositionX());
+      player2.setFootPositionY(remote.getFootPositionY());
+      player2.setVelX(remote.getVelX());
+      player2.setVelY(remote.getVelY());
+      player2.setAnimationId(remote.getAnimationId());
+      player2.faceDirection = remote.faceDirection;
+      appliedRemote = remote;
+   }
 
    public static void initObject(int var0, int var1, boolean var2) {
       closeObject(var2);
@@ -1376,11 +1361,9 @@ t.start();
 
    public static void logicObjects() {
       if (!IsGamePause) {
-         if (systemClock < Long.MAX_VALUE) {
-            ++systemClock;
-         } else {
-            systemClock = 0L;
-         }
+         if (MFMain.multiplayer) setPlayer2();
+         worldSeconds += GameTime.deltaSeconds();
+         systemClock = (long) (worldSeconds / GameTime.ASSET_TIME_UNIT_SECONDS);
 
          int var0;
          for(var0 = 0; var0 < 4; ++var0) {
@@ -1395,49 +1378,14 @@ t.start();
          if (player.Jumped() && player2 != null && player.collisionChkWithObject(player2)) {
             player.doWhileCollision(player2, 0);
          }
-         /*if (player2 != null) {
-    int followSpeed = 256;
-
-    if (player2.posX < player.posX - 44) {
-        player2.posX += followSpeed;
-    } else if (player2.posX > player.posX + 44) {
-        player2.posX -= followSpeed;
-    }
-
-    if (player2.posY < player.posY - 44) {
-        player2.posY += followSpeed;
-    } else if (player2.posY > player.posY + 44) {
-        player2.posY -= followSpeed;
-    }
-
-    player2.logic();
-         }*/
          if (player2 != null) {
-         if (!newth && !MFMain.multiplayer) {
-         newth = true;
-    Thread t = new Thread(new Runnable() {
-    @Override
-    public void run() {
-        while (player2 != null) {
-            int dx = player2.posX - player.posX;
-            int dy = player2.posY - player.posY;
-            int dx2 = player2.footPointX - player.footPointX;
-            int dy2 = player2.footPointY - player.footPointY;
-            if (Math.abs(dx) > 10 || Math.abs(dy) > 10 || Math.abs(dx2) > 10 || Math.abs(dy2) > 10) {
-                player2.posX = player.posX -2;
-                player2.posY = player.posY;
+            if (!MFMain.multiplayer && (Math.abs(player2.posX - player.posX) > (320 << 6)
+                    || Math.abs(player2.posY - player.posY) > (240 << 6))) {
+                player2.setFootPositionX(player.getFootPositionX() - (16 << 6));
+                player2.setFootPositionY(player.getFootPositionY());
+                player2.setVelX(player.getVelX());
+                player2.setVelY(player.getVelY());
             }
-        try {
-              Thread.sleep(5);
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-              break;
-            }
-        }
-    }
-});
-t.start();
-}
 player2.logic();
 if (!MFMain.multiplayer) player2.runAI();
 player2.collisionCheckWithGameObject();

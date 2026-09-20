@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -154,8 +156,8 @@ class Boss6 extends BossObject {
       } else {
          this.attack_cn = 0;
          this.attack_step = 1;
-         this.fire_time = 0;
-         this.fire_cn = 0;
+         this.fire_time = GameTime.set(this, "fire_time", 0);
+         this.fire_cn = GameTime.set(this, "fire_cn", 0);
       }
 
    }
@@ -163,12 +165,12 @@ class Boss6 extends BossObject {
    private int machineSpeed() {
       if (this.startFlag) {
          if (this.speedCount > 17) {
-            this.speed -= 25;
+            this.speed = GameTime.advance(this, "speed", this.speed, -(25));
          } else {
-            this.speed += 25;
+            this.speed = GameTime.advance(this, "speed", this.speed, 25);
          }
 
-         --this.speedCount;
+         this.speedCount = GameTime.advance(this, "speedCount", this.speedCount, -(1));
          if (this.speedCount == 0) {
             this.speed = 0;
             this.startFlag = false;
@@ -176,19 +178,19 @@ class Boss6 extends BossObject {
          }
       } else {
          if (this.speedCount > 35) {
-            this.speed -= 12;
+            this.speed = GameTime.advance(this, "speed", this.speed, -(12));
          } else {
-            this.speed += 12;
+            this.speed = GameTime.advance(this, "speed", this.speed, 12);
          }
 
          if (this.direct) {
-            ++this.speedCount;
-            if (this.speedCount == 70) {
+            this.speedCount = GameTime.advance(this, "speedCount", this.speedCount, 1);
+            if (GameTime.event(this, "speedCount", "machineSpeed:188", GameTime.crosses(this, "speedCount", this.speedCount, 70))) {
                this.speed = 0;
                this.direct = false;
             }
          } else {
-            --this.speedCount;
+            this.speedCount = GameTime.advance(this, "speedCount", this.speedCount, -(1));
             if (this.speedCount == 0) {
                this.speed = 0;
                this.direct = true;
@@ -240,7 +242,7 @@ class Boss6 extends BossObject {
          this.setAniState(this.machineDrawer, 3);
          this.machineDrawer.setLoop(false);
          this.machineUp = true;
-         this.holdheadup_cn = 0;
+         this.holdheadup_cn = GameTime.set(this, "holdheadup_cn", 0);
          int var1 = MyRandom.nextInt(0, 100);
          if (var1 < 10) {
             this.holdheadup_cn_max = 24;
@@ -276,7 +278,7 @@ class Boss6 extends BossObject {
                this.setAniState(this.machineDrawer, 2);
                this.machineDrawer.setLoop(true);
                this.setAniState(this.faceDrawer, 2);
-               this.hurt_cn = 0;
+               this.hurt_cn = GameTime.set(this, "hurt_cn", 0);
             }
 
             if (this.HP <= 2) {
@@ -318,7 +320,7 @@ class Boss6 extends BossObject {
                      this.setAniState(this.machineDrawer, 2);
                      this.machineDrawer.setLoop(true);
                      this.setAniState(this.faceDrawer, 2);
-                     this.hurt_cn = 0;
+                     this.hurt_cn = GameTime.set(this, "hurt_cn", 0);
                   }
 
                   if (this.HP <= 2) {
@@ -430,20 +432,20 @@ class Boss6 extends BossObject {
             switch(this.show_step) {
             case 0:
                if (this.posX > 648192) {
-                  this.posX -= 256;
+                  this.posX = GameTime.advance(this, "posX", this.posX, -(256));
                } else {
                   this.posX = 648192;
                   this.show_step = 1;
                   this.setAniState(this.faceDrawer, 1);
-                  this.laugh_cn = 0;
+                  this.laugh_cn = GameTime.set(this, "laugh_cn", 0);
                }
                break label181;
             case 1:
                if (this.laugh_cn < 60) {
-                  ++this.laugh_cn;
+                  this.laugh_cn = Math.min(60, GameTime.advance(this, "laugh_cn", this.laugh_cn, 1));
                } else {
                   this.show_step = 2;
-                  this.laugh_cn = 0;
+                  this.laugh_cn = GameTime.set(this, "laugh_cn", 0);
                   this.setAniState(this.faceDrawer, 0);
                }
                break label181;
@@ -453,7 +455,7 @@ class Boss6 extends BossObject {
             case 3:
                this.state = 2;
                this.direct = false;
-               this.speedCount = 35;
+               this.speedCount = GameTime.set(this, "speedCount", 35);
                this.speed = 0;
                this.startFlag = true;
             default:
@@ -474,9 +476,9 @@ class Boss6 extends BossObject {
                   byte var1;
                   AnimationDrawer var7;
                   if (this.fire_time < 19) {
-                     ++this.fire_time;
+                     this.fire_time = Math.min(19, GameTime.advance(this, "fire_time", this.fire_time, 1));
                   } else {
-                     this.fire_time = 0;
+                     this.fire_time = GameTime.set(this, "fire_time", 0);
                      var7 = this.machineDrawer;
                      if (this.machineUp) {
                         var1 = 5;
@@ -491,7 +493,7 @@ class Boss6 extends BossObject {
                      var3 = player.getFootPositionX();
                      int var6 = player.getFootPositionY();
                      BulletObject.addBullet(19, var8, var2, var3, var6);
-                     ++this.fire_cn;
+                     this.fire_cn = GameTime.advance(this, "fire_cn", this.fire_cn, 1);
                   }
 
                   if (this.machineDrawer.checkEnd()) {
@@ -507,7 +509,7 @@ class Boss6 extends BossObject {
                   }
 
                   if (this.fire_cn >= 3) {
-                     this.fire_cn = 0;
+                     this.fire_cn = GameTime.set(this, "fire_cn", 0);
                      this.attack_step = 0;
                   }
                }
@@ -515,22 +517,22 @@ class Boss6 extends BossObject {
 
             if (this.face_state == 2) {
                if (this.hurt_cn < 6) {
-                  ++this.hurt_cn;
+                  this.hurt_cn = Math.min(6, GameTime.advance(this, "hurt_cn", this.hurt_cn, 1));
                } else {
-                  this.hurt_cn = 0;
+                  this.hurt_cn = GameTime.set(this, "hurt_cn", 0);
                   this.setAniState(this.machineDrawer, 4);
                   this.machineDrawer.setLoop(false);
                   this.face_state = 0;
                   this.attack_step = this.last_attack_step;
-                  this.holdheadup_cn = this.holdheadup_cn_max - 2;
+                  this.holdheadup_cn = GameTime.set(this, "holdheadup_cn", this.holdheadup_cn_max - 2);
                }
             }
 
             if (this.machineUp) {
                if (this.holdheadup_cn < this.holdheadup_cn_max) {
-                  ++this.holdheadup_cn;
+                  this.holdheadup_cn = Math.min(this.holdheadup_cn_max, GameTime.advance(this, "holdheadup_cn", this.holdheadup_cn, 1));
                } else {
-                  this.holdheadup_cn = 0;
+                  this.holdheadup_cn = GameTime.set(this, "holdheadup_cn", 0);
                   this.setAniState(this.machineDrawer, 4);
                   this.machineDrawer.setLoop(false);
                   this.machineUp = false;
@@ -560,7 +562,7 @@ class Boss6 extends BossObject {
                }
 
                if (var3 >= var9) {
-                  this.posX += var8;
+                  this.posX = GameTime.advance(this, "posX", this.posX, var8);
                   if (this.posX <= 640512) {
                      this.posX = 640512;
                   }
@@ -603,7 +605,7 @@ class Boss6 extends BossObject {
             }
          case 3:
             this.bossbroken.logicBoom(this.posX, this.posY);
-            if (this.posY + this.velY >= this.getGroundY(this.posX, this.posY) - 1280) {
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) >= this.getGroundY(this.posX, this.posY) - 1280) {
                this.state = 4;
                this.escapefacedrawer.setActionId(4);
                this.escapefacedrawer.setLoop(true);
@@ -615,8 +617,8 @@ class Boss6 extends BossObject {
                MapManager.calCameraImmidiately();
                this.blockArray.setDisplayState();
             } else {
-               this.velY += 10;
-               this.posY += this.velY;
+               this.velY = GameTime.advance(this, "velY", this.velY, 10);
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
             }
             break;
          case 4:
@@ -630,7 +632,7 @@ class Boss6 extends BossObject {
 
                this.state = 5;
                this.WaitCnt = 0;
-               this.wait_cnt = 0;
+               this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
                this.fly_top = 150400;
                this.fly_end = 656000;
                player.getBossScore();
@@ -641,9 +643,9 @@ class Boss6 extends BossObject {
             }
             break;
          case 5:
-            ++this.wait_cnt;
+            this.wait_cnt = GameTime.advance(this, "wait_cnt", this.wait_cnt, 1);
             if (this.wait_cnt >= this.wait_cnt_max && this.posY >= this.fly_top - this.fly_top_range) {
-               this.posY -= this.escape_v;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(this.escape_v));
             }
 
             if (this.posY <= this.fly_top - this.fly_top_range && this.WaitCnt == 0) {
@@ -672,9 +674,9 @@ class Boss6 extends BossObject {
             }
 
             if (this.WaitCnt == 3 || this.WaitCnt == 4) {
-               this.posX += this.escape_v;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.escape_v);
                if (this.posX - this.fly_end > this.fly_top_range) {
-                  this.posY -= this.fly_top_range;
+                  this.posY = GameTime.advance(this, "posY", this.posY, -(this.fly_top_range));
                }
             }
 

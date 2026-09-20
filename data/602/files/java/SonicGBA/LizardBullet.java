@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -22,8 +24,8 @@ class LizardBullet extends BulletObject {
       int var2 = this.posX;
       int var1 = this.posY;
       if (this.velY < 0) {
-         this.velY += GRAVITY;
-         this.posY += this.velY;
+         this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
       } else {
          this.velY = 0;
          this.drawer.setActionId(1);

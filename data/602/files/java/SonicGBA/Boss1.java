@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -339,7 +341,7 @@ class Boss1 extends BossObject {
 
             if (this.IsStopWait) {
                if (this.stop_wait_cnt < 32) {
-                  ++this.stop_wait_cnt;
+                  this.stop_wait_cnt = Math.min(32, GameTime.advance(this, "stop_wait_cnt", this.stop_wait_cnt, 1));
                } else {
                   this.state = 1;
                }
@@ -349,19 +351,19 @@ class Boss1 extends BossObject {
          case 2:
             if (this.face_state != 0) {
                if (this.face_cnt < 8) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                } else {
                   this.face_state = 0;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
             if (this.car_state == 1) {
                if (this.car_cnt < 8) {
-                  ++this.car_cnt;
+                  this.car_cnt = Math.min(8, GameTime.advance(this, "car_cnt", this.car_cnt, 1));
                } else {
                   this.car_state = 0;
-                  this.car_cnt = 0;
+                  this.car_cnt = GameTime.set(this, "car_cnt", 0);
                }
             }
 
@@ -369,13 +371,13 @@ class Boss1 extends BossObject {
             this.changeAniState(this.facedrawer, this.face_state);
             if (this.state != 4) {
                if (this.velocity > 0) {
-                  this.posX += this.velocity;
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                   if (this.posX >= this.limitRightX) {
                      this.posX = this.limitRightX;
                      this.velocity = -this.velocity;
                   }
                } else {
-                  this.posX += this.velocity;
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                   if (this.posX <= this.limitLeftX) {
                      this.posX = this.limitLeftX;
                      this.velocity = -this.velocity;
@@ -396,19 +398,19 @@ class Boss1 extends BossObject {
          case 3:
             if (this.face_state != 0) {
                if (this.face_cnt < 8) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                } else {
                   this.face_state = 0;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
             if (this.car_state == 1) {
                if (this.car_cnt < 8) {
-                  ++this.car_cnt;
+                  this.car_cnt = Math.min(8, GameTime.advance(this, "car_cnt", this.car_cnt, 1));
                } else {
                   this.car_state = 0;
-                  this.car_cnt = 0;
+                  this.car_cnt = GameTime.set(this, "car_cnt", 0);
                }
             }
 
@@ -421,19 +423,19 @@ class Boss1 extends BossObject {
          case 4:
             if (this.face_state != 0) {
                if (this.face_cnt < 8) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                } else {
                   this.face_state = 0;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
             if (this.car_state == 1) {
                if (this.car_cnt < 8) {
-                  ++this.car_cnt;
+                  this.car_cnt = Math.min(8, GameTime.advance(this, "car_cnt", this.car_cnt, 1));
                } else {
                   this.car_state = 0;
-                  this.car_cnt = 0;
+                  this.car_cnt = GameTime.set(this, "car_cnt", 0);
                }
             }
 
@@ -442,13 +444,13 @@ class Boss1 extends BossObject {
             this.posX = var4;
             this.posY = var3;
             if (this.velocity > 0) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                if (this.posX >= this.limitRightX) {
                   this.posX = this.limitRightX;
                   this.velocity = -this.velocity;
                }
             } else {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                if (this.posX <= this.limitLeftX) {
                   this.posX = this.limitLeftX;
                   this.velocity = -this.velocity;
@@ -460,15 +462,15 @@ class Boss1 extends BossObject {
          case 5:
             if (this.face_state != 0) {
                if (this.face_cnt < 8) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                } else {
                   this.face_state = 0;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
             this.changeAniState(this.facedrawer, this.face_state);
-            if (this.posY + this.velY >= this.getGroundY(this.posX, this.posY)) {
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) >= this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
                switch(this.drop_cnt) {
                case 0:
@@ -480,24 +482,24 @@ class Boss1 extends BossObject {
                   this.drop_cnt = 2;
                }
             } else {
-               this.posX += this.velX;
-               this.velY += GRAVITY;
-               this.posY += this.velY;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+               this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
             }
 
             if (this.flywheel_y - this.con_size >= this.getGroundY(this.flywheel_lx, this.flywheel_y)) {
                this.flywheel_y = this.getGroundY(this.flywheel_lx, this.flywheel_y) + this.con_size;
             } else {
                if (this.velocity > 0) {
-                  this.flywheel_lx -= this.flywheel_vx;
-                  this.flywheel_rx += this.flywheel_vx;
+                  this.flywheel_lx = GameTime.advance(this, "flywheel_lx", this.flywheel_lx, -(this.flywheel_vx));
+                  this.flywheel_rx = GameTime.advance(this, "flywheel_rx", this.flywheel_rx, this.flywheel_vx);
                } else {
-                  this.flywheel_lx += this.flywheel_vx;
-                  this.flywheel_rx -= this.flywheel_vx;
+                  this.flywheel_lx = GameTime.advance(this, "flywheel_lx", this.flywheel_lx, this.flywheel_vx);
+                  this.flywheel_rx = GameTime.advance(this, "flywheel_rx", this.flywheel_rx, -(this.flywheel_vx));
                }
 
-               this.flywheel_vy += GRAVITY >> 1;
-               this.flywheel_y += this.flywheel_vy;
+               this.flywheel_vy = GameTime.advance(this, "flywheel_vy", this.flywheel_vy, GRAVITY >> 1);
+               this.flywheel_y = GameTime.advance(this, "flywheel_y", this.flywheel_y, this.flywheel_vy);
             }
 
             this.arm.logic(this.posX, this.posY, this.state, this.velocity);
@@ -512,9 +514,9 @@ class Boss1 extends BossObject {
             }
             break;
          case 6:
-            ++this.wait_cnt;
+            this.wait_cnt = GameTime.advance(this, "wait_cnt", this.wait_cnt, 1);
             if (this.wait_cnt >= this.wait_cnt_max && this.posY >= this.fly_top - this.fly_top_range) {
-               this.posY -= this.escape_v;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(this.escape_v));
             }
 
             if (this.posY <= this.fly_top - this.fly_top_range && this.WaitCnt == 0) {
@@ -543,7 +545,7 @@ class Boss1 extends BossObject {
             }
 
             if (this.WaitCnt == 3 || this.WaitCnt == 4) {
-               this.posX += this.escape_v;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.escape_v);
             }
 
             if (this.posX > this.side_right << 6 && this.WaitCnt == 3) {

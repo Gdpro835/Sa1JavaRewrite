@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -21,7 +23,7 @@ class FlipV extends GimmickObject {
       }
 
       this.drawer = flipAnimation.getDrawer(0, true, 0);
-      this.count = 0;
+      this.count = GameTime.set(this, "count", 0);
    }
 
    public static void releaseAllResource() {
@@ -82,15 +84,15 @@ class FlipV extends GimmickObject {
 
    public void draw(MFGraphics var1) {
       if (this.count != 0) {
-         ++this.count;
+         this.count = GameTime.advance(this, "count", this.count, 1);
       }
 
-      if (this.count == 5 && player instanceof PlayerAmy) {
+      if (GameTime.event(this, "count", "draw:90", GameTime.crosses(this, "count", this.count, 5) && player instanceof PlayerAmy)) {
          ((PlayerAmy)player).setCannotAttack(false);
       }
 
       if (this.count >= 10) {
-         this.count = 0;
+         this.count = GameTime.set(this, "count", 0);
       }
 
       this.drawInMap(var1, this.drawer);

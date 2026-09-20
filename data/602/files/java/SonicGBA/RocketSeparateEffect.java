@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -104,7 +106,7 @@ public class RocketSeparateEffect implements SonicDef {
 
    public void logic() {
       if (!GameObject.IsGamePause) {
-         ++this.count;
+         this.count = GameTime.advance(this, "count", this.count, 1);
          int var1;
          int var2;
          switch(this.state) {
@@ -112,7 +114,7 @@ public class RocketSeparateEffect implements SonicDef {
          default:
             break;
          case 1:
-            this.count = 0;
+            this.count = GameTime.set(this, "count", 0);
             this.state = 4;
             if (this.effectID != 0) {
                PlayerObject.timeStopped = true;
@@ -120,11 +122,11 @@ public class RocketSeparateEffect implements SonicDef {
             break;
          case 2:
             MapManager.setShake(20, MyRandom.nextInt(5, 10));
-            if (this.count == 80) {
+            if (GameTime.event(this, "count", "logic:125", GameTime.crosses(this, "count", this.count, 80))) {
                this.state = 3;
             }
 
-            if (this.count % 4 == 0) {
+            if (GameTime.periodic(this, "count", "logic:129", this.count, 4, 0)) {
                SoundSystem.getInstance().playSe(35);
             }
             break;
@@ -156,7 +158,7 @@ public class RocketSeparateEffect implements SonicDef {
                   this.state = 5;
                }
 
-               this.count = 0;
+               this.count = GameTime.set(this, "count", 0);
             }
             break;
          case 5:
@@ -166,18 +168,18 @@ public class RocketSeparateEffect implements SonicDef {
                this.brokeVel = 2;
                this.createParts(2);
                MapManager.setMapBrokeParam(this.markY, this.brokeOffset);
-               this.count = 0;
+               this.count = GameTime.set(this, "count", 0);
                if (this.effectID == 2) {
                   BackGroundManager.next();
                }
             }
             break;
          case 6:
-            if (this.count % 4 == 0) {
+            if (GameTime.periodic(this, "count", "logic:178", this.count, 4, 0)) {
                SoundSystem.getInstance().playSe(35);
             }
 
-            this.brokeOffset += this.brokeVel;
+            this.brokeOffset = GameTime.advance(this, "brokeOffset", this.brokeOffset, this.brokeVel);
             if (this.brokeOffset > this.brokeVel * 10) {
                this.state = 7;
             }
@@ -185,12 +187,12 @@ public class RocketSeparateEffect implements SonicDef {
             MapManager.setMapBrokeParam(this.markY, this.brokeOffset);
             break;
          case 7:
-            if (this.count % 4 == 0) {
+            if (GameTime.periodic(this, "count", "logic:190", this.count, 4, 0)) {
                SoundSystem.getInstance().playSe(35);
             }
 
-            ++this.brokeVel;
-            this.brokeOffset += this.brokeVel;
+            this.brokeVel = GameTime.advance(this, "brokeVel", this.brokeVel, 1);
+            this.brokeOffset = GameTime.advance(this, "brokeOffset", this.brokeOffset, this.brokeVel);
             this.createParts(2);
             MapManager.setShakeX(MyRandom.nextInt(5, 10));
             MapManager.setShake(20, MyRandom.nextInt(5, 10));
@@ -203,7 +205,7 @@ public class RocketSeparateEffect implements SonicDef {
             }
             break;
          case 8:
-            if (this.count % 4 == 0) {
+            if (GameTime.periodic(this, "count", "logic:208", this.count, 4, 0)) {
                SoundSystem.getInstance().playSe(35);
             }
 
@@ -217,7 +219,7 @@ public class RocketSeparateEffect implements SonicDef {
             }
             break;
          case 9:
-            if (this.count == 2) {
+            if (GameTime.event(this, "count", "logic:222", GameTime.crosses(this, "count", this.count, 2))) {
                SoundSystem.getInstance().playSequenceSe(45);
             }
 
@@ -233,9 +235,9 @@ public class RocketSeparateEffect implements SonicDef {
       for(int var2 = 0; var2 < this.partsInfoVec.size(); ++var2) {
          int[] var6 = (int[])this.partsInfoVec.elementAt(var2);
          if (!GameObject.IsGamePause) {
-            var6[4] += 2;
-            var6[1] += var6[3];
-            var6[2] += var6[4];
+            var6[4] = GameTime.advance(var6, String.valueOf(4), var6[4], 2);
+            var6[1] = GameTime.advance(var6, String.valueOf(1), var6[1], var6[3]);
+            var6[2] = GameTime.advance(var6, String.valueOf(2), var6[2], var6[4]);
             if (var6[2] > SCREEN_HEIGHT + 20) {
                this.partsInfoVec.removeElementAt(var2);
                --var2;

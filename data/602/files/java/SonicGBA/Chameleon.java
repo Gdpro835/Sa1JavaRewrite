@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -29,7 +31,7 @@ class Chameleon extends EnemyObject {
       }
 
       this.drawer = chameleonAnimation.getDrawer(0, true, 0);
-      this.attack_cnt = 0;
+      this.attack_cnt = GameTime.set(this, "attack_cnt", 0);
       this.collision_offset_x = 0;
    }
 
@@ -71,7 +73,7 @@ class Chameleon extends EnemyObject {
          switch(this.state) {
          case 0:
             if (this.velocity > 0) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(2);
                this.drawer.setLoop(true);
@@ -84,7 +86,7 @@ class Chameleon extends EnemyObject {
                   this.state = 1;
                }
             } else {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(0);
                this.drawer.setLoop(true);
@@ -99,10 +101,10 @@ class Chameleon extends EnemyObject {
             }
 
             if (this.attack_cnt < 10) {
-               ++this.attack_cnt;
+               this.attack_cnt = Math.min(10, GameTime.advance(this, "attack_cnt", this.attack_cnt, 1));
             }
 
-            if (this.alert_state == 0 && this.attack_cnt == 10 && this.IsFacePlayer()) {
+            if (this.alert_state == 0 && this.attack_cnt >= 10 && this.IsFacePlayer()) {
                this.state = 2;
                if (this.posX < player.getCheckPositionX()) {
                   this.drawer.setActionId(2);
@@ -114,7 +116,7 @@ class Chameleon extends EnemyObject {
                   this.drawer.setLoop(false);
                }
 
-               this.attack_cnt = 0;
+               this.attack_cnt = GameTime.set(this, "attack_cnt", 0);
             }
 
             this.posY = this.getGroundY(this.posX, this.posY);
@@ -125,7 +127,7 @@ class Chameleon extends EnemyObject {
                this.state = 0;
             }
 
-            this.attack_cnt = 0;
+            this.attack_cnt = GameTime.set(this, "attack_cnt", 0);
             this.posY = this.getGroundY(this.posX, this.posY);
             this.checkWithPlayer(var2, var1, this.posX, this.posY);
             break;

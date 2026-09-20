@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -32,7 +34,7 @@ class LadyBug extends EnemyObject {
       super(var1, var2, var3, var4, var5, var6, var7);
       this.circleCenterX = this.posX + (this.mWidth >> 1);
       this.circleCenterY = this.posY;
-      this.plus_cnt = 0;
+      this.plus_cnt = GameTime.set(this, "plus_cnt", 0);
       if (ladybugAnimation == null) {
          ladybugAnimation = new Animation("/animation/ladybug");
       }
@@ -67,9 +69,9 @@ class LadyBug extends EnemyObject {
                this.state = 2;
                this.drawer.setActionId(2);
                this.drawer.setLoop(true);
-               this.attack_cnt = 0;
+               this.attack_cnt = GameTime.set(this, "attack_cnt", 0);
             } else if (this.wait_cnt < this.wait_cnt_max) {
-               ++this.wait_cnt;
+               this.wait_cnt = GameTime.advance(this, "wait_cnt", this.wait_cnt, 1);
             } else {
                this.state = 1;
             }
@@ -80,24 +82,24 @@ class LadyBug extends EnemyObject {
             this.drawer.setActionId(1);
             this.drawer.setLoop(true);
             if (this.plus > 0) {
-               this.plus_cnt += this.plus;
+               this.plus_cnt = GameTime.advance(this, "plus_cnt", this.plus_cnt, this.plus);
                if (this.plus_cnt >= 180 / this.dg) {
-                  this.plus_cnt = 180 / this.dg;
+                  this.plus_cnt = GameTime.set(this, "plus_cnt", 180 / this.dg);
                   this.plus = -this.plus;
                   this.state = 0;
                   this.drawer.setActionId(0);
                   this.drawer.setLoop(true);
-                  this.wait_cnt = 0;
+                  this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
                }
             } else {
-               this.plus_cnt += this.plus;
+               this.plus_cnt = GameTime.advance(this, "plus_cnt", this.plus_cnt, this.plus);
                if (this.plus_cnt <= 0) {
-                  this.plus_cnt = 0;
+                  this.plus_cnt = GameTime.set(this, "plus_cnt", 0);
                   this.plus = -this.plus;
                   this.state = 0;
                   this.drawer.setActionId(0);
                   this.drawer.setLoop(true);
-                  this.wait_cnt = 0;
+                  this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
                }
             }
 
@@ -107,7 +109,7 @@ class LadyBug extends EnemyObject {
             break;
          case 2:
             if (this.attack_cnt < this.attack_cnt_max) {
-               ++this.attack_cnt;
+               this.attack_cnt = Math.min(this.attack_cnt_max, GameTime.advance(this, "attack_cnt", this.attack_cnt, 1));
             } else {
                int var3 = this.emenyid;
                int var7 = this.posX;

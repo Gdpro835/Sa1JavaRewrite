@@ -1,29 +1,40 @@
 package Lib;
 
 import PyxEditor.PyxAnimation;
+import GameEngine.time.GameTime;
+import GameEngine.time.AnimationTimeline;
 import com.sega.mobile.framework.device.MFGraphics;
 
 public class AnimationDrawer {
-    private static int ZOOM = 6;
-    private static final int STANDARD_FRAME_SPEED = (1 << ZOOM);
+    private static final java.util.WeakHashMap<AnimationDrawer, Boolean> active =
+            new java.util.WeakHashMap<AnimationDrawer, Boolean>();
+    public static void updateAll() {
+        for (AnimationDrawer drawer : active.keySet()) if (drawer.started) drawer.advance();
+    }
+    private final AnimationTimeline timeline = new AnimationTimeline();
+    private long lastAdvanceFrame = Long.MIN_VALUE;
+    private final AnimationTimeline.Durations durations = new AnimationTimeline.Durations() {
+        public int frameCount() { return ani.getFrameNum(actionId); }
+        public double seconds(int frame) {
+            double unit = mustKeepTime > 0 ? mustKeepTime / 1000.0 : GameTime.ASSET_TIME_UNIT_SECONDS;
+            return Math.max(1, ani.getFrameDuration(actionId, frame)) * unit;
+        }
+    };
     private static boolean allPause = false;
     private short actionId;
-    private int actualTime;
     private Animation ani;
     private short attr;
     private boolean end;
     private boolean endTrigger;
     private boolean loop;
-    private long lostFrameTime;
+    private boolean started;
     private short m_CurFrame;
-    private int m_Timer;
     private boolean m_bPause;
     private int mustKeepTime = -1;
     private byte[] reARect;
     private byte[] reCRect;
     private int speedDivide = 1;
     private int speedMulti = 1;
-    long startTime;
     private byte transId;
 
     public static void setAllPause(boolean pause) {
@@ -40,6 +51,7 @@ public class AnimationDrawer {
     }
 
     public AnimationDrawer(Animation ani2) {
+        active.put(this, Boolean.TRUE);
         this.ani = ani2;
         this.actionId = 0;
         this.attr = Const.TRANS[0];
@@ -48,6 +60,7 @@ public class AnimationDrawer {
     }
 
     public AnimationDrawer(Animation ani2, int actionId2, boolean loop2, int transId2) {
+        active.put(this, Boolean.TRUE);
         this.ani = ani2;
         this.actionId = (short) actionId2;
         this.attr = Const.TRANS[transId2];
@@ -64,6 +77,7 @@ public class AnimationDrawer {
             }
         }
         this.ani = null;
+        active.remove(this);
     }
 
     public void setActionId(int actionId2) {
@@ -136,65 +150,28 @@ public class AnimationDrawer {
     }
 
     public void moveOn() {
-        this.actualTime += (STANDARD_FRAME_SPEED * this.speedMulti) / this.speedDivide;
-        this.m_Timer = (byte) (this.actualTime >> ZOOM);
-        this.endTrigger = false;
-        this.ani.SetCurAni(this.actionId);
-        this.ani.SetCurFrame(this.m_CurFrame);
-        if (this.ani.isTimeOver(this.m_Timer)) {
-            boolean trigger = false;
-            if (this.m_CurFrame < this.ani.getFrameNum(this.actionId) && !this.end) {
-                trigger = true;
-            }
-            if (this.mustKeepTime == -1) {
-                this.m_CurFrame = (short) (this.m_CurFrame + 1);
-            } else if (this.lostFrameTime < ((long) (-this.mustKeepTime))) {
-                this.lostFrameTime += (long) this.mustKeepTime;
-            } else {
-                if (this.lostFrameTime > ((long) this.mustKeepTime)) {
-                    this.m_CurFrame = (short) (this.m_CurFrame + 1);
-                    this.lostFrameTime -= (long) this.mustKeepTime;
-                }
-                this.m_CurFrame = (short) (this.m_CurFrame + 1);
-            }
-            if (this.m_CurFrame < this.ani.getFrameNum(this.actionId)) {
-                this.m_Timer = 0;
-                this.actualTime %= STANDARD_FRAME_SPEED;
-            } else if (this.loop) {
-                this.m_Timer = 0;
-                this.m_CurFrame = 0;
-                this.actualTime %= STANDARD_FRAME_SPEED;
-            } else {
-                this.m_CurFrame = (byte) (this.ani.getFrameNum(this.actionId) - 1);
-                this.end = true;
-                if (trigger) {
-                    this.endTrigger = true;
-                }
-            }
-        }
+        started = true;
+        advance();
+    }
+
+    private void advance() {
+        if (ani == null || lastAdvanceFrame == GameTime.frameId()) return;
+        lastAdvanceFrame = GameTime.frameId();
+        endTrigger = false;
+        if (m_bPause || allPause) return;
+        timeline.advance(GameTime.deltaSeconds() * Math.abs(speedMulti / (double) speedDivide), loop, durations);
+        m_CurFrame = (short) timeline.frame();
+        end = timeline.ended();
+        endTrigger = timeline.endTriggered();
     }
 
     public void draw(MFGraphics g, int x, int y, boolean zoomEnable) {
-        this.ani.SetCurAni(this.actionId);
-        this.ani.SetLoop(this.loop);
-        if (zoomEnable) {
-            this.ani.DrawAni(g, this.actionId, this.m_CurFrame, MyAPI.zoomOut(x), MyAPI.zoomOut(y), this.attr);
-        } else {
-            this.ani.DrawAni(g, this.actionId, this.m_CurFrame, x, y, this.attr);
-        }
-        if (this.mustKeepTime != -1) {
-            if (this.startTime == 0) {
-                this.startTime = System.currentTimeMillis() - ((long) this.mustKeepTime);
-            }
-            long nowTime = System.currentTimeMillis();
-            this.lostFrameTime += (nowTime - this.startTime) - ((long) this.mustKeepTime);
-            this.startTime = nowTime;
-        }
-        if (this.m_bPause || allPause) {
-            this.lostFrameTime = 0;
-        } else {
-            moveOn();
-        }
+        if (ani == null) return;
+        started = true;
+        ani.SetCurAni(actionId);
+        ani.SetLoop(loop);
+        if (zoomEnable) ani.DrawAni(g, actionId, m_CurFrame, MyAPI.zoomOut(x), MyAPI.zoomOut(y), attr);
+        else ani.DrawAni(g, actionId, m_CurFrame, x, y, attr);
     }
 
     public void setPause(boolean pause) {
@@ -210,10 +187,11 @@ public class AnimationDrawer {
     }
 
     public void restart() {
-        this.startTime = 0;
+        timeline.reset();
+        lastAdvanceFrame = Long.MIN_VALUE;
+        endTrigger = false;
         this.end = false;
         this.m_CurFrame = 0;
-        this.actualTime = 0;
     }
 
     public int getCurrentFrameWidth() {
@@ -233,6 +211,7 @@ public class AnimationDrawer {
     }
 
     public void setEnd() {
+        timeline.finish();
         this.end = true;
     }
 

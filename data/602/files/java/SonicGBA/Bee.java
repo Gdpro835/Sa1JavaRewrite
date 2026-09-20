@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.MyAPI;
 import Lib.crlFP32;
@@ -104,7 +106,7 @@ class Bee extends EnemyObject {
          switch(this.state) {
          case 0:
             if (this.velocity > 0) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(2);
                this.drawer.setLoop(true);
@@ -117,7 +119,7 @@ class Bee extends EnemyObject {
                   this.attack_flag = false;
                }
             } else {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(0);
                this.drawer.setLoop(true);

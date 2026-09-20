@@ -1,5 +1,7 @@
 package Ending;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -151,10 +153,10 @@ public class SpecialEnding extends State implements SonicDef {
     }
 
     public void logic() {
-        this.count++;
+        this.count = GameTime.advance(this, "count", this.count, 1);
         if (this.planeShocking) {
-            this.planeVelY -= 3;
-            this.planeY += this.planeVelY;
+            this.planeVelY = GameTime.advance(this, "planeVelY", this.planeVelY, -(3));
+            this.planeY = GameTime.advancePosition(this, "planeY", this.planeY, "planeVelY", this.planeVelY);
             if (this.planeVelY < 0 && this.planeY <= PLANE_STABLE_Y) {
                 this.planeShocking = false;
                 this.planeY = PLANE_STABLE_Y;
@@ -168,16 +170,16 @@ public class SpecialEnding extends State implements SonicDef {
                 this.state = 1;
                 return;
             case 1:
-                this.planeX -= 3;
+                this.planeX = GameTime.advance(this, "planeX", this.planeX, -(3));
                 if (this.planeX <= PLANE_START_TO_TOUCH_X) {
                     this.playerX += this.planeX - PLANE_START_TO_TOUCH_X;
                     this.state = 2;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     return;
                 }
                 return;
             case 2:
-                this.planeX -= 3;
+                this.planeX = GameTime.advance(this, "planeX", this.planeX, -(3));
                 this.playerY = ((this.count * (TOUCH_POINT_Y - -10)) / 7) - 10;
                 if (this.count >= 7) {
                     this.state = 3;
@@ -190,12 +192,12 @@ public class SpecialEnding extends State implements SonicDef {
                 }
                 return;
             case 3:
-                this.planeX -= 3;
+                this.planeX = GameTime.advance(this, "planeX", this.planeX, -(3));
                 this.playerX = this.planeX - 11;
                 this.playerY = this.planeY - 34;
                 return;
             case 4:
-                this.planeX -= 3;
+                this.planeX = GameTime.advance(this, "planeX", this.planeX, -(3));
                 this.playerX = this.planeX - 11;
                 this.playerY = this.planeY - 34;
                 return;
@@ -255,12 +257,12 @@ public class SpecialEnding extends State implements SonicDef {
 
     private void cloudLogic() {
         if (this.cloudCount > 0) {
-            this.cloudCount--;
+            this.cloudCount = Math.max(0, GameTime.advance(this, "cloudCount", this.cloudCount, -(1)));
         }
         for (int i = 0; i < 10; i++) {
             if (this.cloudInfo[i][0] != 0) {
                 int[] iArr = this.cloudInfo[i];
-                iArr[1] = iArr[1] + CLOUD_VELOCITY[this.cloudInfo[i][0] - 1];
+                iArr[1] = GameTime.advance(iArr, "cloudX", iArr[1], CLOUD_VELOCITY[this.cloudInfo[i][0] - 1]);
                 if (this.cloudInfo[i][1] >= SCREEN_WIDTH + 75) {
                     this.cloudInfo[i][0] = 0;
                 }
@@ -269,7 +271,7 @@ public class SpecialEnding extends State implements SonicDef {
                 this.cloudInfo[i][0] = MyRandom.nextInt(1, 3);
                 this.cloudInfo[i][1] = -60;
                 this.cloudInfo[i][2] = MyRandom.nextInt(20, SCREEN_HEIGHT - 40);
-                this.cloudCount = MyRandom.nextInt(8, 20);
+                this.cloudCount = GameTime.set(this, "cloudCount", MyRandom.nextInt(8, 20));
             }
         }
     }

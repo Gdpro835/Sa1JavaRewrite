@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -22,9 +24,9 @@ class RobotBullet extends BulletObject {
 
    public void bulletLogic() {
       this.checkWithPlayer(this.posX, this.posY, this.posX, this.posY);
-      this.posX += this.velX;
-      this.velY += GRAVITY;
-      this.posY += this.velY;
+      this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+      this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+      this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
    }
 
    public boolean chkDestroy() {

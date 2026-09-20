@@ -1,5 +1,7 @@
 package Special;
 
+import GameEngine.time.GameTime;
+
 import Common.BarWord;
 import Common.NumberDrawer;
 import Common.WhiteBarDrawer;
@@ -233,18 +235,18 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
 
     public void logic() {
         if (this.trikCount > 0) {
-            this.trikCount--;
+            this.trikCount = Math.max(0, GameTime.advance(this, "trikCount", this.trikCount, -(1)));
             if (this.trikCount == 0 && this.actionID != 26) {
                 devcideRingFollow(false);
             }
         }
         if (!this.noMoving) {
-            this.posZ += this.velZ;
-            this.ringHudY = MyAPI.calNextPosition((double) this.ringHudY, 5.0d, 1, 3);
-            this.ringNumY = MyAPI.calNextPosition((double) this.ringNumY, 15.0d, 1, 3);
+            this.posZ = GameTime.advancePosition(this, "posZ", this.posZ, "velZ", this.velZ);
+            this.ringHudY = MyAPI.calNextPosition(this, "ringHudY", (double) this.ringHudY, 5.0d, 1, 3);
+            this.ringNumY = MyAPI.calNextPosition(this, "ringNumY", (double) this.ringNumY, 15.0d, 1, 3);
         }
         this.moveDistance = 0;
-        this.count++;
+        this.count = GameTime.advance(this, "count", this.count, 1);
         int preX = this.posX;
         int preY = this.posY;
         if (this.state != 10) {
@@ -291,11 +293,11 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
             }
         }
         if (this.state != 10) {
-            this.posX += this.velX;
-            this.posY += this.velY;
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+            this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
         } else if (this.count >= 15) {
-            this.posX += this.velX;
-            this.posY += this.velY;
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+            this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
         }
         switch (this.state) {
             case 0:
@@ -358,19 +360,19 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                     if (GlobalResource.spsetConfig == 1) {
                         switch (this.acc_value) {
                             case 2:
-                                this.posX = MyAPI.calNextPosition((double) this.posX, 0.0d, 3, 16);
+                                this.posX = MyAPI.calNextPosition(this, "posX", (double) this.posX, 0.0d, 3, 16);
                                 break;
                             case 4:
-                                this.posX = MyAPI.calNextPosition((double) this.posX, 0.0d, 3, 8);
+                                this.posX = MyAPI.calNextPosition(this, "posX", (double) this.posX, 0.0d, 3, 8);
                                 break;
                             case 6:
-                                this.posX = MyAPI.calNextPosition((double) this.posX, 0.0d, 9, 16);
+                                this.posX = MyAPI.calNextPosition(this, "posX", (double) this.posX, 0.0d, 9, 16);
                                 break;
                         }
                     } else {
-                        this.posX = MyAPI.calNextPosition((double) this.posX, 0.0d, 1, 4);
+                        this.posX = MyAPI.calNextPosition(this, "posX", (double) this.posX, 0.0d, 1, 4);
                     }
-                    this.posY = MyAPI.calNextPosition((double) this.posY, 0.0d, 1, 4);
+                    this.posY = MyAPI.calNextPosition(this, "posY", (double) this.posY, 0.0d, 1, 4);
                     if (this.drawer.checkEnd()) {
                         this.actionID = 19;
                         break;
@@ -385,12 +387,12 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                 this.posX = preX;
                 this.posY = preY;
                 if (this.velZ > 4) {
-                    this.velZ = MyAPI.calNextPosition((double) this.velZ, 4.0d, 1, 4);
+                    this.velZ = MyAPI.calNextPosition(this, "velZ", (double) this.velZ, 4.0d, 1, 4);
                 }
                 moveToCenter();
-                this.checkCount++;
+                this.checkCount = GameTime.advance(this, "checkCount", this.checkCount, 1);
                 if (!isInCenter() || this.checkCount <= 20) {
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.actionID = 1;
                     this.checkSuccess = (this.ringNum >= this.targetRingNum) | this.debugPassStage;
                 } else if (this.checkSuccess) {
@@ -401,10 +403,10 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                         }
                     }
                     if (!this.isGoal) {
-                        if (this.count == 16) {
+                        if (GameTime.event(this, "count", "logic:406", GameTime.crosses(this, "count", this.count, 16))) {
                             initScoreBase();
                         }
-                        if (this.count == 20) {
+                        if (GameTime.event(this, "count", "logic:409", GameTime.crosses(this, "count", this.count, 20))) {
                             this.targetRingNum = RING_TARGET[SpecialMap.specialStageID][1];
                             WhiteBarDrawer.getInstance().initBar(this, 0);
                         }
@@ -413,15 +415,15 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                         }
                     } else if (this.count > 48) {
                         this.state = 9;
-                        this.count = 0;
+                        this.count = GameTime.set(this, "count", 0);
                     }
                 } else {
-                    this.boardOffsetZ -= 30;
-                    this.boardOffsetX -= 30;
+                    this.boardOffsetZ = GameTime.advance(this, "boardOffsetZ", this.boardOffsetZ, -(30));
+                    this.boardOffsetX = GameTime.advance(this, "boardOffsetX", this.boardOffsetX, -(30));
                     this.actionID = 21;
                     if (this.count > 48) {
                         this.state = 9;
-                        this.count = 0;
+                        this.count = GameTime.set(this, "count", 0);
                     }
                 }
                 setStayAnimation();
@@ -440,7 +442,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                 if (showTutorial && GlobalResource.spsetConfig == 1) {
                     this.state = 11;
                     this.actionID = 1;
-                    this.count++;
+                    this.count = GameTime.advance(this, "count", this.count, 1);
                     this.tutorX = SCREEN_WIDTH << 1;
                     this.tutorSkip = new MFTouchKey(0, MyAPI.zoomOut(Def.SCREEN_HEIGHT) - 20, 30, 20, 1);
                     MFDevice.addComponent(this.tutorSkip);
@@ -458,18 +460,18 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                 break;
             case 10:
                 if (this.count >= 15) {
-                    this.velX = MyAPI.calNextPosition((double) this.velX, 0.0d, 1, 4, 3.0d);
-                    this.velY = MyAPI.calNextPosition((double) this.velY, 0.0d, 1, 4, 3.0d);
+                    this.velX = MyAPI.calNextPosition(this, "velX", (double) this.velX, 0.0d, 1, 4, 3.0d);
+                    this.velY = MyAPI.calNextPosition(this, "velY", (double) this.velY, 0.0d, 1, 4, 3.0d);
                     if (this.velZ > 4) {
-                        this.velZ = MyAPI.calNextPosition((double) this.velZ, 4.0d, 1, 4);
+                        this.velZ = MyAPI.calNextPosition(this, "velZ", (double) this.velZ, 4.0d, 1, 4);
                     }
                 }
                 if (this.velZ < 4) {
-                    this.velZ++;
+                    this.velZ = GameTime.advance(this, "velZ", this.velZ, 1);
                 }
-                this.posX += this.velX;
-                this.posY += this.velY;
-                this.posZ += this.velZ;
+                this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+                this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
+                this.posZ = GameTime.advancePosition(this, "posZ", this.posZ, "velZ", this.velZ);
                 if (this.velX == 0 && this.velY == 0 && this.velZ == 4) {
                     this.state = 0;
                 }
@@ -483,7 +485,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                 this.posX = preX;
                 this.posY = preY;
                 setStayAnimation();
-                if (this.count == 10) {
+                if (GameTime.event(this, "count", "logic:488", GameTime.crosses(this, "count", this.count, 10))) {
                     State.fadeInit(0, 200);
                 }
                 if (Key.press(Key.B_S1 | 16777216) && !this.tutorMoving && this.skipOffsetY == 0) {
@@ -533,7 +535,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
         if (!this.isPause) {
             if (this.state != 10 && this.state != 4 && ((this.state != 5 || !isInCenter() || this.checkCount <= 20) && this.state != 9)) {
                 int i2 = this.scaleCount;
-                this.scaleCount = i2 + 1;
+                this.scaleCount = GameTime.advance(this, "scaleCount", i2, 1);
                 if (i2 >= 17) {
                     this.scaleCount = 0;
                 }
@@ -560,7 +562,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                 }
             } else if (this.checkSuccess) {
                 int i3 = this.scaleCount;
-                this.scaleCount = i3 + 1;
+                this.scaleCount = GameTime.advance(this, "scaleCount", i3, 1);
                 if (i3 >= 17) {
                     this.scaleCount = 0;
                 }
@@ -633,7 +635,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                 State.drawFade(g);
                 if (this.count > 10 && State.fadeChangeOver()) {
                     int tutorDesX = (SCREEN_WIDTH >> 1) - (SCREEN_WIDTH * this.tutorID);
-                    this.tutorX = MyAPI.calNextPosition((double) this.tutorX, (double) tutorDesX, 1, 3);
+                    this.tutorX = MyAPI.calNextPosition(this, "tutorX", (double) this.tutorX, (double) tutorDesX, 1, 3);
                     for (int i4 = 0; i4 < this.tutorialDrawer.length; i4++) {
                         this.tutorialDrawer[i4].setPause(true);
                         if (this.tutorX == tutorDesX) {
@@ -646,7 +648,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                             this.tutorialDrawer[i4].draw(g, TUTORIAL_ANIMATION_ID[this.tutorID][i4], (this.tutorID * SCREEN_WIDTH) + this.tutorX, SCREEN_HEIGHT >> 1, true, 0);
                         }
                     }
-                    this.skipOffsetY = MyAPI.calNextPosition((double) this.skipOffsetY, (double) (this.tutorID > 1 ? 20 : 0), 1, 3);
+                    this.skipOffsetY = MyAPI.calNextPosition(this, "skipOffsetY", (double) this.skipOffsetY, (double) (this.tutorID > 1 ? 20 : 0), 1, 3);
                     this.tutorialSkipDrawer.draw(g, Key.repeat(Key.B_S1) ? 1 : 0, 0, this.skipOffsetY + (SCREEN_HEIGHT - 1), true, 0);
                     break;
                 }
@@ -672,7 +674,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
                 if (this.startFlag) {
                     this.fontAnimationDrawer.draw(g, 4, this.startX, this.startY, false, 0);
                     if (this.whiteBar.getState() == 3) {
-                        this.startX -= 96;
+                        this.startX = GameTime.advance(this, "startX", this.startX, -(96));
                     }
                 }
                 WhiteBarDrawer.getInstance().drawBar(g);
@@ -696,7 +698,7 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
             NumberDrawer.drawNum(g, 0, this.ringNum, (SCREEN_WIDTH >> 1) - 12, this.ringNumY - 12, 2);
         }
         if (this.triking && this.trikCount == 0 && this.trickCount2 < 16) {
-            this.trickCount2++;
+            this.trickCount2 = GameTime.advance(this, "trickCount2", this.trickCount2, 1);
             if (this.actionID == 26 || this.niceTriking) {
                 this.fontAnimationDrawer.draw(g, 5, SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1, false, 0);
                 this.niceTriking = true;
@@ -716,9 +718,9 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
     }
 
     public void logicWelcome() {
-        this.welcomeVelY += GRAVITY;
-        this.welcomeY += this.welcomeVelY;
-        this.welcomeX += WELCOMT_VEL_X;
+        this.welcomeVelY = GameTime.advance(this, "welcomeVelY", this.welcomeVelY, GRAVITY);
+        this.welcomeY = GameTime.advance(this, "welcomeY", this.welcomeY, this.welcomeVelY);
+        this.welcomeX = GameTime.advance(this, "welcomeX", this.welcomeX, WELCOMT_VEL_X);
     }
 
     public void drawWelcome(MFGraphics g) {
@@ -784,19 +786,19 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
     public void beSpringX(int velX2) {
         this.velX = velX2 << 6;
         this.state = 10;
-        this.count = 0;
+        this.count = GameTime.set(this, "count", 0);
     }
 
     public void beSpringY(int velY2) {
         this.velY = velY2 << 6;
         this.state = 10;
-        this.count = 0;
+        this.count = GameTime.set(this, "count", 0);
     }
 
     public void beSpringZ(int velZ2) {
         this.velZ = velZ2;
         this.state = 10;
-        this.count = 0;
+        this.count = GameTime.set(this, "count", 0);
     }
 
     public void beHurt() {
@@ -839,8 +841,8 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
         this.checkSuccess = (this.ringNum >= this.targetRingNum) | this.debugPassStage;
         this.noMoving = true;
         this.state = 5;
-        this.count = 0;
-        this.checkCount = 0;
+        this.count = GameTime.set(this, "count", 0);
+        this.checkCount = GameTime.set(this, "checkCount", 0);
         this.isGoal = false;
         this.velZ = 4;
     }
@@ -886,8 +888,8 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
     }
 
     public void moveToCenter() {
-        this.posX = MyAPI.calNextPosition((double) this.posX, 0.0d, 2, 24);
-        this.posY = MyAPI.calNextPosition((double) this.posY, 0.0d, 2, 24);
+        this.posX = MyAPI.calNextPosition(this, "posX", (double) this.posX, 0.0d, 2, 24);
+        this.posY = MyAPI.calNextPosition(this, "posY", (double) this.posY, 0.0d, 2, 24);
     }
 
     public boolean isInCenter() {
@@ -954,8 +956,8 @@ public class SpecialPlayer extends SpecialObject implements BarWord {
     public void setTrikCount() {
         this.triking = true;
         this.niceTriking = false;
-        this.trikCount = 6;
-        this.trickCount2 = 0;
+        this.trikCount = GameTime.set(this, "trikCount", 6);
+        this.trickCount2 = GameTime.set(this, "trickCount2", 0);
     }
 
     public void devcideRingFollow(boolean flag) {

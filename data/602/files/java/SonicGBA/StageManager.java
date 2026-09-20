@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.MyAPI;
 import Lib.Record;
@@ -142,7 +144,7 @@ public class StageManager implements SonicDef {
       isSaveTimeModeScore = false;
       rankingOffsetX = new int[5];
       movingRow = 0;
-      movingCount = 0;
+      movingCount = GameTime.set(StageManager.class, "movingCount", 0);
       HIGH_SCORE_Y_TMP = SCREEN_HEIGHT - MENU_SPACE * 5 >> 1;
       HIGH_SCORE_Y = FONT_H_HALF + 44;
       RANK_STR_FOR_EN = new String[]{"1st", "2nd", "3rd", "4th", "5th"};
@@ -240,7 +242,7 @@ public class StageManager implements SonicDef {
          int var6;
          int var7;
          int var8;
-         if (drawNewScore == var3 && System.currentTimeMillis() / 300L % 2L == 0L) {
+         if (drawNewScore == var3 && GameTime.milliseconds() / 300L % 2L == 0L) {
             var5 = SCREEN_WIDTH;
             var6 = rankingOffsetX[var3];
             var7 = HIGH_SCORE_Y;
@@ -277,16 +279,16 @@ public class StageManager implements SonicDef {
          }
       }
 
-      if (movingRow < rankingOffsetX.length && movingCount % 2 == 0) {
+      if (movingRow < rankingOffsetX.length && GameTime.periodic(StageManager.class, "movingCount", "drawNormalHighScore:282", movingCount, 2, 0)) {
          ++movingRow;
       }
 
-      ++movingCount;
+      movingCount = GameTime.advance(StageManager.class, "movingCount", movingCount, 1);
 
       for(var3 = 0; var3 < movingRow; ++var3) {
          int[] var9 = rankingOffsetX;
          double var1 = (double)rankingOffsetX[var3];
-         var9[var3] = MyAPI.calNextPosition(var1, 0.0D, 1, 3);
+         var9[var3] = MyAPI.calNextPosition(var9, String.valueOf(var3), var1, 0.0D, 1, 3);
       }
 
    }
@@ -882,7 +884,7 @@ public class StageManager implements SonicDef {
 
    public static void normalHighScoreInit() {
       movingRow = 0;
-      movingCount = 0;
+      movingCount = GameTime.set(StageManager.class, "movingCount", 0);
 
       for(int var0 = 0; var0 < rankingOffsetX.length; ++var0) {
          rankingOffsetX[var0] = SCREEN_WIDTH;
@@ -1053,7 +1055,7 @@ public class StageManager implements SonicDef {
    public static void setStageGameover() {
       if (!stageGameoverFlag) {
          stageGameoverFlag = true;
-         stageGameoverCount = 10;
+         stageGameoverCount = GameTime.set(StageManager.class, "stageGameoverCount", 10);
       }
 
    }
@@ -1065,7 +1067,7 @@ public class StageManager implements SonicDef {
    public static void setStagePass() {
       if (!stagePassFlag) {
          stagePassFlag = true;
-         stagePassCount = 0;
+         stagePassCount = GameTime.set(StageManager.class, "stagePassCount", 0);
       }
 
    }
@@ -1073,7 +1075,7 @@ public class StageManager implements SonicDef {
    public static void setStageRestart() {
       if (!stageRestartFlag) {
          stageRestartFlag = true;
-         stageRestartCount = 10;
+         stageRestartCount = GameTime.set(StageManager.class, "stageRestartCount", 10);
       }
 
    }
@@ -1081,7 +1083,7 @@ public class StageManager implements SonicDef {
    public static void setStageTimeover() {
       if (!stageTimeoverFlag) {
          stageTimeoverFlag = true;
-         stageTimeoverCount = 0;
+         stageTimeoverCount = GameTime.set(StageManager.class, "stageTimeoverCount", 0);
       }
 
    }
@@ -1137,19 +1139,19 @@ public class StageManager implements SonicDef {
 
    public static void stageLogic() {
       if (stagePassFlag && stagePassCount > 0) {
-         --stagePassCount;
+         stagePassCount = GameTime.advance(StageManager.class, "stagePassCount", stagePassCount, -(1));
       }
 
       if (stageRestartFlag && stageRestartCount > 0) {
-         --stageRestartCount;
+         stageRestartCount = GameTime.advance(StageManager.class, "stageRestartCount", stageRestartCount, -(1));
       }
 
       if (stageGameoverFlag && stageGameoverCount > 0) {
-         --stageGameoverCount;
+         stageGameoverCount = GameTime.advance(StageManager.class, "stageGameoverCount", stageGameoverCount, -(1));
       }
 
       if (stageTimeoverFlag && stageTimeoverCount > 0) {
-         --stageTimeoverCount;
+         stageTimeoverCount = GameTime.advance(StageManager.class, "stageTimeoverCount", stageTimeoverCount, -(1));
       }
 
    }

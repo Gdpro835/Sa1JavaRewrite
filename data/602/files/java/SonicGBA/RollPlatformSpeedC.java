@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -64,8 +66,8 @@ class RollPlatformSpeedC extends GimmickObject {
    }
 
    public static void staticLogic() {
-      degree += 180;
-      degree %= 23040;
+      degree = GameTime.advance(RollPlatformSpeedC.class, "degree", degree, 180);
+      degree = GameTime.wrap(RollPlatformSpeedC.class, "degree", degree, 23040);
    }
 
    public void doWhileCollision(PlayerObject var1, int var2) {

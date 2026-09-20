@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Coordinate;
 import Lib.SoundSystem;
@@ -41,9 +43,9 @@ class FreeFallSystem extends GimmickObject {
       this.barOriginalPosX = this.posX;
       this.barOriginalPosY = this.posY;
       this.initFlag = false;
-      this.frame = 0;
+      this.frame = GameTime.set(this, "frame", 0);
       this.isActive = false;
-      this.shootCnt = 0;
+      this.shootCnt = GameTime.set(this, "shootCnt", 0);
       this.shootDirection = false;
    }
 
@@ -68,7 +70,7 @@ class FreeFallSystem extends GimmickObject {
 
    public void doWhileNoCollision() {
       if (this.isActive) {
-         this.shootCnt = 0;
+         this.shootCnt = GameTime.set(this, "shootCnt", 0);
          this.isActive = false;
       }
 
@@ -105,7 +107,7 @@ class FreeFallSystem extends GimmickObject {
                this.isActive = true;
             }
 
-            this.posY += 320;
+            this.posY = GameTime.advance(this, "posY", this.posY, 320);
             if (this.posY >= this.posYOriginal + 30720) {
                this.posY = this.posYOriginal + 30720;
                this.releaseAble = true;
@@ -118,7 +120,7 @@ class FreeFallSystem extends GimmickObject {
          this.bar.barLogic();
          this.platform.platformLogic();
          if (this.releaseAble) {
-            ++this.shootCnt;
+            this.shootCnt = GameTime.advance(this, "shootCnt", this.shootCnt, 1);
             if (this.shootCnt < 80) {
                if (Key.press(Key.gLeft)) {
                   player.changeVisible(true);
@@ -126,7 +128,7 @@ class FreeFallSystem extends GimmickObject {
                   player.setVelX(-2000);
                   player.faceDirection = false;
                   this.moving = false;
-                  this.frame = 0;
+                  this.frame = GameTime.set(this, "frame", 0);
                   this.releaseAble = false;
                   player.setAnimationId(3);
                   player.restartAniDrawer();
@@ -135,7 +137,7 @@ class FreeFallSystem extends GimmickObject {
                   player.outOfControl = false;
                   player.setVelX(2000);
                   this.moving = false;
-                  this.frame = 0;
+                  this.frame = GameTime.set(this, "frame", 0);
                   this.releaseAble = false;
                   player.faceDirection = true;
                   player.setAnimationId(3);
@@ -147,7 +149,7 @@ class FreeFallSystem extends GimmickObject {
                player.setVelX(-2000);
                player.faceDirection = false;
                this.moving = false;
-               this.frame = 0;
+               this.frame = GameTime.set(this, "frame", 0);
                this.releaseAble = false;
                player.setAnimationId(3);
                player.restartAniDrawer();
@@ -156,7 +158,7 @@ class FreeFallSystem extends GimmickObject {
                player.outOfControl = false;
                player.setVelX(2000);
                this.moving = false;
-               this.frame = 0;
+               this.frame = GameTime.set(this, "frame", 0);
                this.releaseAble = false;
                player.faceDirection = true;
                player.setAnimationId(3);
@@ -165,16 +167,16 @@ class FreeFallSystem extends GimmickObject {
          }
 
          if (this.moving && !IsGamePause) {
-            ++this.frame;
+            this.frame = GameTime.advance(this, "frame", this.frame, 1);
             if (this.frame <= 32) {
-               if (this.frame % 7 == 0) {
+               if (GameTime.periodic(this, "frame", "logic:172", this.frame, 7, 0)) {
                   SoundSystem.getInstance().playSe(73);
                }
             } else if (this.frame <= 64) {
-               if (this.frame % 4 == 0) {
+               if (GameTime.periodic(this, "frame", "logic:176", this.frame, 4, 0)) {
                   SoundSystem.getInstance().playSe(74);
                }
-            } else if (this.frame % 2 == 0) {
+            } else if (GameTime.periodic(this, "frame", "logic:179", this.frame, 2, 0)) {
                SoundSystem.getInstance().playSe(75);
             }
          }

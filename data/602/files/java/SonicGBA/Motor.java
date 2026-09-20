@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -58,7 +60,7 @@ class Motor extends EnemyObject {
          switch(this.state) {
          case 0:
             if (this.velocity > 0) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(2);
                if (this.posX >= this.limitRightX) {
@@ -68,7 +70,7 @@ class Motor extends EnemyObject {
                   this.drawer.setTrans(0);
                }
             } else {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(0);
                if (this.posX <= this.limitLeftX) {
@@ -80,18 +82,18 @@ class Motor extends EnemyObject {
             }
 
             if (this.release_cnt < this.release_cnt_max) {
-               ++this.release_cnt;
+               this.release_cnt = Math.min(this.release_cnt_max, GameTime.advance(this, "release_cnt", this.release_cnt, 1));
             }
 
-            if (this.alert_state == 0 && this.release_cnt == this.release_cnt_max && this.posX != this.limitLeftX && this.posX != this.limitRightX) {
+            if (this.alert_state == 0 && this.release_cnt >= this.release_cnt_max && this.posX != this.limitLeftX && this.posX != this.limitRightX) {
                if (this.posX < player.getCheckPositionX()) {
                   if (this.drawer.getTransId() == 2 && this.drawer.getActionId() == 0) {
                      this.state = 1;
-                     this.attck_cnt = 0;
+                     this.attck_cnt = GameTime.set(this, "attck_cnt", 0);
                   }
                } else if (this.posX > player.getCheckPositionX() && this.drawer.getTransId() == 0 && this.drawer.getActionId() == 0) {
                   this.state = 1;
-                  this.attck_cnt = 0;
+                  this.attck_cnt = GameTime.set(this, "attck_cnt", 0);
                }
             }
 
@@ -105,9 +107,9 @@ class Motor extends EnemyObject {
                }
 
                if (this.attck_cnt < 5) {
-                  ++this.attck_cnt;
+                  this.attck_cnt = Math.min(5, GameTime.advance(this, "attck_cnt", this.attck_cnt, 1));
                } else {
-                  this.posX += this.velocity * 3;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.velocity * 3);
                   if (this.posX >= this.limitRightX) {
                      this.posX = this.limitRightX;
                   }
@@ -120,9 +122,9 @@ class Motor extends EnemyObject {
                }
 
                if (this.attck_cnt < 5) {
-                  ++this.attck_cnt;
+                  this.attck_cnt = Math.min(5, GameTime.advance(this, "attck_cnt", this.attck_cnt, 1));
                } else {
-                  this.posX += this.velocity * 3;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.velocity * 3);
                   if (this.posX <= this.limitLeftX) {
                      this.posX = this.limitLeftX;
                   }
@@ -131,7 +133,7 @@ class Motor extends EnemyObject {
 
             if (this.posX == this.limitLeftX || this.posX == this.limitRightX) {
                this.state = 0;
-               this.release_cnt = 0;
+               this.release_cnt = GameTime.set(this, "release_cnt", 0);
             }
 
             this.posY = this.getGroundY(this.posX, this.posY);

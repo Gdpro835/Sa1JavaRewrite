@@ -1,5 +1,7 @@
 package Special;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 
 /* compiled from: SpecialObject */
@@ -20,12 +22,12 @@ class SSFollowRing extends SSRing {
 
     public void logic() {
         if (this.sleepCount > 0) {
-            this.sleepCount--;
+            this.sleepCount = Math.max(0, GameTime.advance(this, "sleepCount", this.sleepCount, -(1)));
         }
         if (this.follow && !this.used && this.sleepCount == 0) {
-            this.posX = MyAPI.calNextPosition((double) this.posX, (double) (player.posX >> 6), 1, 4, 3.0d);
-            this.posY = MyAPI.calNextPosition((double) this.posY, (double) (player.posY >> 6), 1, 4, 3.0d);
-            this.posZ = MyAPI.calNextPosition((double) this.posZ, (double) player.posZ, 1, 4, 4.0d);
+            this.posX = MyAPI.calNextPosition(this, "posX", (double) this.posX, (double) (player.posX >> 6), 1, 4, 3.0d);
+            this.posY = MyAPI.calNextPosition(this, "posY", (double) this.posY, (double) (player.posY >> 6), 1, 4, 3.0d);
+            this.posZ = MyAPI.calNextPosition(this, "posZ", (double) this.posZ, (double) player.posZ, 1, 4, 4.0d);
         }
     }
 

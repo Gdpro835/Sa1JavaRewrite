@@ -36,6 +36,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import com.sega.mobile.framework.utility.MFScreen;
 import android.view.View;
+import GameEngine.time.GameTime;
+import com.sega.MFLib.Main;
+import com.sega.mobile.framework.opengl.GLGraphics;
 
 public final class MFDevice {
     public static final int APN_CMNET = 2;
@@ -87,345 +90,143 @@ public final class MFDevice {
     /* access modifiers changed from: private */
     public static long lastSystemTime;
     private static boolean logicTrace;
-    protected static MyGameCanvas mainCanvas = new MyGameCanvas(MFMain.getInstance());
-    public static volatile boolean tickFlag = true;
-    public static boolean newth = false;
-    public static int ii = 0;
-    public static int ii2 = 0;
-    public static boolean started = false;
-    public static long ls = 0;
-    public static double delta = 0;
-    public static double delta2 = 0;
-    public static ScheduledExecutorService executor;
-    public static volatile boolean isPaused = false;
-    //public static final Object inputLock = new Object();
-    /*public static boolean showFPS = false;
-    public static int lastFPS = 0;
-    public static volatile String FPSString = "FPS: ";
-    public static volatile int fw = 0;
-    public static volatile int fh = 0;
-    public static volatile boolean render;*/
+    protected static volatile MyGameCanvas mainCanvas;
+    public static final Object GAME_LOCK = new Object();
+    public static volatile boolean isPaused;
+    private static boolean engineInitialized;
+    private static boolean fullscreen;
+    private static GLGraphics gpu;
 
-    protected static Runnable mainRunnable = new Runnable() {
-        public final void run() {
-            MFDevice.interruptPauseFlag = false;
-            MFDevice.responseInterrupt = true;
-            MFDevice.exitFlag = false;
-            MFDevice.lastSystemTime = System.currentTimeMillis();
-            MFDevice.initRecords();
-            MFGraphics.init();
-            MFSound.init();
-            MFSensor.init();
-            MFGamePad.resetKeys();
-            MFDevice.vibrator = (Vibrator) MFMain.getInstance().getSystemService("vibrator");
-            MFDevice.componentVector = new Vector();
-            MFDevice.vibraionFlag = true;
-            MFDevice.inVibrationFlag = false;
-            
-            /*double amountOfTicks = MainState.getms();
-            double ns = 1000000000 / amountOfTicks;
-            long timer = System.currentTimeMillis();
-            int frames = 0;
-            while (!MFDevice.exitFlag) {
-            render = false;
-            MFDevice.currentSystemTime = System.nanoTime();
-            MFDevice.delta += (MFDevice.currentSystemTime - MFDevice.lastSystemTime) / ns;
-            MFDevice.lastSystemTime = MFDevice.currentSystemTime;
-            while (isPaused) {
-            }
-            if (StageManager.loadStep == 0 || GameState.isLoadingSkipped == false) {
-                long timePassed = MFDevice.currentSystemTime - MFDevice.lastSystemTime;
-                MFDevice.delta -= timePassed / ns;
-            }
-            if (currentState == null || currentSystemTime - lastSystemTime <= 0L) {
-                continue;
-            }
-            if (delta >= 1) render = true;
-            while (delta >= 1) {
-            tick();
-            MFDevice.delta--;
-            }
-            frames++;
-            if (System.currentTimeMillis() - timer > 1000) {
-            timer += 1000;
-            lastFPS = frames;
-            frames = 0;
-            }
-            }*/
-            /*while (!MFDevice.exitFlag) {
-                if (MFDevice.tickFlag) {
-                    tick();
-                    MFDevice.tickFlag = false;
-                }
-                if (!MFDevice.newth) {
-                    new Thread(new Runnable() {
-                        public void run() {
-                            while (!MFDevice.exitFlag) {
-                                int i = 0;
-                                if (!(StageManager.loadStep == 0 || GameState.isLoadingSkipped == false)) {
-                                    i = MainState.getms() - 16;
-                                }
-                                try {
-                                    Thread.sleep((long) (MainState.getms() - i));
-                                    MFDevice.tickFlag = true;
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                    MFDevice.exitFlag = true;
-                                }
-                            }
-                        }
-                    }).start();
-                    MFDevice.newth = true;
-                }
-            }*/
-            //long timer = System.currentTimeMillis();
-            //int frames = 0;
-        for(; !exitFlag; lastSystemTime = System.currentTimeMillis()) {
-            while (isPaused) {
-            try {
-                Thread.sleep(5);
-            } catch (Exception e) {
-            }
-            }
-            this.tick();
-            /*frames++;
-            if (System.currentTimeMillis() - timer > 1000) {
-            timer += 1000;
-            lastFPS = frames;
-            frames = 0;
-            }
-            render = true;*/
-            long var1;
-            long var3;
-            MFGameState var7;
-            do {
-                if (StageManager.loadStep == 0 || GameState.isLoadingSkipped == false && GlobalResource.loadingTipsConfig == 0) {
-                    currentSystemTime = System.currentTimeMillis();
-                }
-                if (currentState == null || currentSystemTime - lastSystemTime <= 0L) {
-                    break;
-                }
-                var1 = currentSystemTime;
-                var3 = lastSystemTime;
-                var7 = currentState;
-            } while(var1 - var3 < (long)var7.getFrameTime());
-        }
-        /*for(int i = 0; !exitFlag; lastSystemTime = System.nanoTime()) {
-            if (started && (StageManager.loadStep == 0 || GameState.isLoadingSkipped == false)) {
-               currentSystemTime = System.nanoTime();
-            }
-            if (!started || currentState == null || currentSystemTime - lastSystemTime <= 0L) {
-            this.tick();
-            ls = lastSystemTime;
-            started = true;
-            continue;
-            }
-            long delta = currentSystemTime - ls;
-            if (delta >= currentState.getFrameTime() * 1_000_000L) {
-            this.tick();
-            ls = lastSystemTime;
-            } else {
-            try {
-            long sleepTime = currentState.getFrameTime() * 1_000_000L - delta;
-            if (sleepTime > 0) Thread.sleep(sleepTime / 1_000_000L, (int) (sleepTime % 1_000_000L));
-            } catch (InterruptedException e) {
-            }
-            }
-        }*/
-        
-/*while (!exitFlag) {
-    lastSystemTime = System.nanoTime();
-    this.tick();
-    long delta;
-    long frameIntervalms = MFLib.MainState.getms();
-    do {
-    if (StageManager.loadStep == 0 || GameState.isLoadingSkipped == false) {
-       currentSystemTime = System.nanoTime();
-    }
-    if (currentState == null || currentSystemTime - lastSystemTime <= 0L) {
-        break;
-    }
-    delta = (currentSystemTime - lastSystemTime) / 1_000_000L;
-    long sleepTime = frameIntervalms - delta;
-    if (sleepTime < 0) break;
-    try {
-        Thread.sleep(sleepTime);
-    } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        break;
-    }
-    } while(delta < frameIntervalms);
-}*/
-        /*lastSystemTime = System.currentTimeMillis();//System.nanoTime();
-        executor = Executors.newSingleThreadScheduledExecutor();
-while (!exitFlag) {
-
-    if (MFDevice.inSuspendFlag || !mainCanvas.getHolder().getSurface().isValid()) {
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ignored) {
-        }
-        continue;
-    }
-
-if (MainState.fps60) {
-        fps();
-        if (StageManager.loadStep != 0 && GameState.isLoadingSkipped != false) {
-        this.tick();
-        }
-        delta2 += delta;
-        double interval = 1.0 / MFLib.MainState.getfps();
-        if (delta2 >= interval) {
-        this.tick();
-        delta2 -= interval;
-        }
-        } else {
-        if (tickFlag) {
-        this.tick();
-        tickFlag = false;
-        }
-    boolean z = !MainState.fps60 && (GameState.state == 4 || 
-    (GameState.state == 5 && GameState.isLoadingSkipped != false) || 
-    (GameState.state != 5 && (StageManager.characterFromGame == -1 || 
-    StageManager.stageIDFromGame == -1)));
-    ii = z ? 16 : MainState.getms();
-    if (started && ii != ii2) {
-       executor.shutdown();
-       executor = Executors.newSingleThreadScheduledExecutor();
-       started = false;
-       newth = false;
-    }
-    ii2 = ii;
-if (newth) continue;
-executor.scheduleAtFixedRate(new Runnable() {
-    @Override
-    public void run() {
-                tickFlag = true;
-                if (exitFlag) newth = false;
-    }
-}, 0, ii, TimeUnit.MILLISECONDS);
-if (!exitFlag) newth = true;
-started = true;
-}*/
-    /*long frameTimeNanos = (long) (1_000_000_000L / MainState.getms());
-    long sleepTimeNanos = frameTimeNanos - elapsedNanos;
-
-    if (sleepTimeNanos > 0L) {
-        long sleepMillis = sleepTimeNanos / 1_000_000L;
-        int sleepNanos = (int) (sleepTimeNanos % 1_000_000L);
-
-        try {
-            Thread.sleep(sleepMillis, sleepNanos);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            exitFlag = true;
-        }
-
-        while (System.nanoTime() - lastNanoTime < frameTimeNanos) {
-            Thread.yield();
+    public static void shutdown() {
+        synchronized (GAME_LOCK) {
+            if (!engineInitialized) return;
+            if (currentState != null) currentState.onExit();
+            State.State.shutdown();
+            MFSound.releaseAllSound();
+            MFSensor.release();
+            stopVibrate();
+            componentVector.clear();
+            preLayerGraphics[0] = postLayerGraphics[0] = null;
+            currentState = nextState = null;
+            gpu = null;
+            graphics = null;
+            engineInitialized = false;
+            exitFlag = false;
+            mainThread = null;
+            GameTime.reset();
         }
     }
 
-    lastNanoTime = System.nanoTime();
-*/
-    /*if ((StageManager.loadStep != 0 || GameState.isLoadingSkipped != false &&
-         StageManager.loadStep == 0) && (StageManager.characterFromGame == -1 || 
-         StageManager.stageIDFromGame == -1)) {
-        MainState.tipfps60 = true;
-    } else {
-        MainState.tipfps60 = false;
-    }*/
-//}
-        /*while (!exitFlag) {
-    long lastSystemTime = System.currentTimeMillis();
-
-    this.tick(); // lógica do jogo
-
-    if (currentState == null) {
-        continue;
-    }
-
-    long frameTime = currentState.getFrameTime();
-    long elapsed = System.currentTimeMillis() - lastSystemTime;
-
-    if (elapsed < frameTime) {
-        try {
-            Thread.sleep(frameTime - elapsed);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public static Canvas attach(Context context) {
+        synchronized (GAME_LOCK) {
+            // Rebind legacy UI adapters without reinitializing game/charge records.
+            com.sega.mobile.platform.ChargePlatform.mContext = context;
+            if (context instanceof Main) PlatformStandard.Standard2.getMain((Main) context);
+            mainCanvas = new MyGameCanvas(context);
+            return mainCanvas;
         }
     }
-}*/
-        //executor.shutdown();
-        MFDevice.currentState.onExit();
-        MFMain.getInstance().notifyDestroyed();
-    }
-    
-    /*public void fps() {
-    currentSystemTime = System.currentTimeMillis();//System.nanoTime();
-    long elapsed = currentSystemTime - lastSystemTime;
-    lastSystemTime = currentSystemTime;
-    delta = Math.min(0.05, elapsed / 1000.0);
-    }*/
 
-        private void tick() {
-            //synchronized (MFDevice.inputLock) {
-            if (MFMain.browser) return;
-            if (MFDevice.mainCanvas.initialized()) {
-                synchronized (MFDevice.mainRunnable) {
-                    MFGamePad.keyTick();
-                    for (int i = 0; i < MFDevice.componentVector.size(); i++) {
-                        ((MFComponent) MFDevice.componentVector.elementAt(i)).tick();
-                    }
-                }
+    public static boolean isCurrentCanvas(Canvas canvas) {
+        return mainCanvas == canvas;
+    }
+
+    public static void bindSurface(Canvas canvas, GLGraphics graphics, int width, int height) {
+        if (!isCurrentCanvas(canvas)) return;
+        synchronized (GAME_LOCK) {
+            mainThread = Thread.currentThread();
+            gpu = graphics;
+            deviceWidth = width;
+            deviceHeight = height;
+            if (!engineInitialized) {
+                exitFlag = false;
+                responseInterrupt = true;
+                initRecords();
+                MFGraphics.init();
+                MFSound.init();
+                MFSensor.init();
+                MFGamePad.resetKeys();
+                vibrator = (Vibrator) MFMain.getInstance().getSystemService(Context.VIBRATOR_SERVICE);
+                componentVector = new Vector<MFComponent>();
+                vibraionFlag = true;
+                changeState(MFMain.getInstance().getEntryGameState());
+                engineInitialized = true;
+            }
+            configureViewport();
+        }
+    }
+
+    /** One variable-delta simulation update, then one GPU frame; no tick catch-up loop. */
+    public static void renderFrame(double seconds) {
+        synchronized (GAME_LOCK) {
+            if (!engineInitialized || gpu == null) return;
+            double delta = isPaused || MFMain.browser ? 0.0 : seconds * (Main.BULLET_TIME ? 1.0 / 16.0 : 1.0);
+            GameTime.beginFrame(delta);
+            if (nextState != null) {
+                if (currentState != null) currentState.onExit();
+                currentState = nextState;
+                nextState = null;
+                currentState.onEnter();
+            }
+            if (currentState == null) return;
+            if (exitFlag) {
+                currentState.onExit();
+                currentState = null;
+                MFMain.getInstance().runOnUiThread(new Runnable() {
+                    public void run() { MFMain.getInstance().notifyDestroyed(); }
+                });
+                return;
+            }
+            if (delta > 0.0) {
+                MFGamePad.keyTick();
+                for (int i = 0; i < componentVector.size(); i++) componentVector.elementAt(i).tick();
                 MFSound.tick();
-                if (MFDevice.vibraionFlag) {
-                    if (MFDevice.vibrateTime > 0 && System.currentTimeMillis() - MFDevice.vibrateStartTime > ((long) MFDevice.vibrateTime)) {
-                        MFDevice.vibrateTime = 0;
-                        MFDevice.inVibrationFlag = false;
-                    }
-                    if (MFDevice.inVibrationFlag) {
-                        MFDevice.vibrationImpl(500);
-                    }
+                if (interruptPauseFlag && !inSuspendFlag && MFMain.getInstance().logicDeviceSuspend()) notifyResume();
+                if (!interruptPauseFlag) currentState.onUpdate(delta);
+                if (inVibrationFlag && vibrateTime > 0 && System.currentTimeMillis() - vibrateStartTime >= vibrateTime) {
+                    stopVibrate();
                 }
-                if (MFDevice.nextState != null) {
-                    if (MFDevice.currentState != null) {
-                        MFDevice.currentState.onExit();
-                    }
-                    MFDevice.currentState = MFDevice.nextState;
-                    MFDevice.currentState.onEnter();
-                    MFDevice.nextState = null;
-                }
-                MFDevice.graphics.reset();
-                if (MFDevice.clearBuffer) {
-                    MFDevice.clearScreen();
-                }
-                if (MFDevice.interruptPauseFlag) {
-                    if (!MFDevice.inSuspendFlag && MFMain.getInstance().logicDeviceSuspend()) {
-                        MFDevice.notifyResume();
-                    }
-                    MFMain.getInstance().drawDeviceSuspend(MFDevice.graphics);
-                } else {
-                    MFDevice.currentState.onTick();
-                    if (!MFDevice.exitFlag) {
-                        for (int i2 = 1; i2 > 0; i2--) {
-                            if (MFDevice.preLayerGraphics[i2 - 1] != null) {
-                                MFDevice.currentState.onRender(MFDevice.preLayerGraphics[i2 - 1], -i2);
-                            }
-                        }
-                        MFDevice.currentState.onRender(MFDevice.graphics);
-                        for (int i3 = 1; i3 <= 1; i3++) {
-                            if (MFDevice.postLayerGraphics[i3 - 1] != null) {
-                                MFDevice.currentState.onRender(MFDevice.postLayerGraphics[i3 - 1], i3);
-                            }
-                        }
-                    }
-                }
-                MFDevice.mainCanvas.repaint();
             }
-            //}
+            if (preLayerGraphics[0] != null) {
+                gpu.viewport(deviceWidth, deviceHeight, 1f, 0f, 0f);
+                preLayerGraphics[0].reset();
+                currentState.onRender(preLayerGraphics[0], -1);
+            }
+            gpu.viewport(deviceWidth, deviceHeight, scaleFactor, drawRect.left, drawRect.top);
+            graphics.reset();
+            graphics.setClip(0, 0, screenWidth, screenHeight);
+            if (interruptPauseFlag) MFMain.getInstance().drawDeviceSuspend(graphics);
+            else currentState.onRender(graphics);
+            if (postLayerGraphics[0] != null) {
+                gpu.viewport(deviceWidth, deviceHeight, 1f, 0f, 0f);
+                postLayerGraphics[0].reset();
+                currentState.onRender(postLayerGraphics[0], 1);
+            }
         }
-    };
+    }
+
+    private static void configureViewport() {
+        if (gpu == null || deviceWidth <= 0 || deviceHeight <= 0) return;
+        screenWidth = Math.max(1, screenWidth);
+        screenHeight = Math.max(1, screenHeight);
+        scaleFactor = Math.min(deviceWidth / (float) screenWidth, deviceHeight / (float) screenHeight);
+        int w = Math.round(screenWidth * scaleFactor);
+        int h = Math.round(screenHeight * scaleFactor);
+        drawRect = new Rect((deviceWidth - w) / 2, (deviceHeight - h) / 2,
+                (deviceWidth - w) / 2 + w, (deviceHeight - h) / 2 + h);
+        bufferWidth = Math.round(deviceWidth / scaleFactor);
+        bufferHeight = Math.round(deviceHeight / scaleFactor);
+        horizontalOffset = Math.round(drawRect.left / scaleFactor);
+        verticvalOffset = Math.round(drawRect.top / scaleFactor);
+        bufferImage = null;
+        fontImage = null;
+        fontGraphics = null;
+        useClearFont = false;
+        graphics = MFGraphics.createMFGraphics(gpu, screenWidth, screenHeight);
+        if (preLayerGraphics[0] != null) preLayerGraphics[0] = MFGraphics.createMFGraphics(gpu, deviceWidth, deviceHeight);
+        if (postLayerGraphics[0] != null) postLayerGraphics[0] = MFGraphics.createMFGraphics(gpu, deviceWidth, deviceHeight);
+    }
+
     public static Thread mainThread;
     private static boolean methodCallTrace;
     /* access modifiers changed from: private */
@@ -471,44 +272,19 @@ started = true;
         }
 
         public final void keyPressed(int keyCode) {
-            synchronized (MFDevice.mainRunnable) {
+            synchronized (MFDevice.GAME_LOCK) {
                 MFGamePad.keyPressed(keyCode);
             }
         }
 
         public final void keyReleased(int keyCode) {
-            synchronized (MFDevice.mainRunnable) {
+            synchronized (MFDevice.GAME_LOCK) {
                 MFGamePad.keyReleased(keyCode);
             }
         }
 
         public final void paint(Graphics g) {
-            synchronized (MFDevice.mainRunnable) {
-                for (int i = 1; i > 0; i--) {
-                    if (MFDevice.preLayerImage[i - 1] != null) {
-                        g.drawImage(MFDevice.preLayerImage[i - 1], 0, 0, 0);
-                    }
-                }
-                if (MFDevice.bufferImage != null) {
-                    g.drawScreen(MFDevice.bufferImage, (Rect) null, new Rect(0, 0, MFDevice.deviceWidth, MFDevice.deviceHeight));
-                }
-                for (int i2 = 1; i2 <= 1; i2++) {
-                    if (MFDevice.postLayerImage[i2 - 1] != null) {
-                        g.drawImage(MFDevice.postLayerImage[i2 - 1], 0, 0, 0);
-                    }
-                }
-                if (MFDevice.fontImage != null) {
-                    g.drawImage(MFDevice.fontImage, 0, 0, 0);
-                }
-                /*if (MFDevice.showFPS && MFDevice.render) {
-                   g.setColor(255, 255, 255);
-                   MFDevice.FPSString = "FPS: " + lastFPS;
-                   MFDevice.fw = g.getFont().stringWidth(MFDevice.FPSString);
-                   MFDevice.fh = g.getFont().getHeight();
-                   g.drawString(MFDevice.FPSString, 10, 20, Graphics.TOP | Graphics.LEFT);
-                   render = false;
-                }*/
-            }
+            // Rendering is issued directly by renderFrame() on the GLES thread.
         }
 
         public final void pointerDragged(int id, int x, int y) {
@@ -568,23 +344,12 @@ started = true;
             }
         }
         
-        public final void hideNotify() {
-            if (!MFDevice.inSuspendFlag) {
-                MFDevice.inSuspendFlag = true;
-                MFDevice.notifyPause();
-            }
-        }
+        public final void hideNotify() { super.hideNotify(); }
 
-        public final void showNotify() {
-            if (MFDevice.inSuspendFlag) {
-               MFDevice.notifyResume();
-            }
-               MFMain.getInstance().drawDeviceSuspend(MFDevice.graphics);   
-               //MFDevice.inSuspendFlag = false;
-        }
+        public final void showNotify() { super.showNotify(); }
 
         public final void trackballMoved(int keyCode) {
-            synchronized (MFDevice.mainRunnable) {
+            synchronized (MFDevice.GAME_LOCK) {
                 MFGamePad.trackballMoved(keyCode);
             }
         }
@@ -599,26 +364,11 @@ started = true;
     }
 
     public static void changeState(MFGameState gameState) {
-        nextState = gameState;
+        synchronized (GAME_LOCK) { nextState = gameState; }
     }
 
     public static final void clearScreen() {
-        for (int i = 1; i > 0; i--) {
-            if (preLayerImage[i - 1] != null) {
-                preLayerImage[i - 1].earseColor(0);
-            }
-        }
-        if (bufferImage != null) {
-            bufferImage.earseColor(0);
-        }
-        for (int i2 = 1; i2 <= 1; i2++) {
-            if (postLayerImage[i2 - 1] != null) {
-                postLayerImage[i2 - 1].earseColor(0);
-            }
-        }
-        if (fontImage != null) {
-            fontImage.earseColor(0);
-        }
+        if (graphics != null) graphics.clearScreen(0);
     }
 
     public static long currentTimeMillis() {
@@ -840,6 +590,7 @@ started = true;
     }
 
     public static final Object getSystemDisplayable() {
+        if (mainCanvas == null) attach(MFMain.getInstance());
         return mainCanvas;
     }
     
@@ -912,88 +663,39 @@ started = true;
     }
 
     public static final void notifyExit() {
-        exitFlag = true;
+        synchronized (GAME_LOCK) { exitFlag = true; }
     }
 
     public static final void notifyPause() {
-        synchronized (mainRunnable) {
-            if (responseInterrupt && !interruptPauseFlag) {
-                /*stopVibrate();
-                MFGamePad.resetKeys();
-                MFSound.deviceInterrupt();*/
-                if (currentState != null) {
-                    currentState.onPause();
-                }
-                MFDevice.delta = 0;
-                MFDevice.delta2 = 0;
-                //MFDevice.lastSystemTime = System.nanoTime();
-                MFDevice.tickFlag = true;
-                MFDevice.started = false;
-                MFDevice.newth = false;
-                interruptPauseFlag = true;
-                if (componentVector != null) {
-                    for (int i = 0; i < componentVector.size(); i++) {
-                        componentVector.elementAt(i).reset();
-                    }
-                    interruptConfirm = new MFTouchKey(0, screenHeight - 50, 100, 50, 2112);
-                    addComponent(interruptConfirm);
-                }
-            }
+        synchronized (GAME_LOCK) {
+            isPaused = true;
+            if (engineInitialized) MFSensor.release();
+            inSuspendFlag = true;
+            stopVibrate();
+            MFGamePad.resetKeys();
+            if (componentVector != null) for (MFComponent component : componentVector) component.reset();
+            if (!interruptPauseFlag && currentState != null) currentState.onPause();
+            interruptPauseFlag = true;
         }
     }
 
     public static final void notifyResume() {
-        synchronized (mainRunnable) {
-            if (responseInterrupt && interruptPauseFlag) {
-                /*MFGamePad.resetKeys();
-                MFSound.deviceResume();*/
-                if (currentState != null) {
-                    currentState.onResume();
-                }
-                interruptPauseFlag = false;
-                if (componentVector != null) {
-                    /*for (int i = 0; i < componentVector.size(); i++) {
-                        componentVector.elementAt(i).reset();
-                    }*/
-                    removeComponent(interruptConfirm);
-                }
-                MFDevice.inSuspendFlag = false;
-            }
+        synchronized (GAME_LOCK) {
+            MFGamePad.resetKeys();
+            if (engineInitialized) MFSensor.init();
+            if (interruptPauseFlag && currentState != null) currentState.onResume();
+            interruptPauseFlag = false;
+            inSuspendFlag = false;
+            isPaused = false;
         }
     }
 
     public static final void notifyStart(int width, int height) {
-        if (mainThread == null) {
-            if (MFMain.getInstance().getRequestedOrientation() == 1) {
-                screenHeight = MFScreen.getScreenHeight(MFMain.getInstance());
-                screenWidth = MFScreen.getScreenWidth(MFMain.getInstance());
-                if (width > height) {
-                    deviceWidth = height;
-                    deviceHeight = width;
-                } else {
-                    deviceWidth = width;
-                    deviceHeight = height;
-                }
-            } else {
-                /*screenHeight*/screenWidth = MFScreen.getScreenWidth(MFMain.getInstance());
-                /*screenWidth*/screenHeight = MFScreen.getScreenHeight(MFMain.getInstance());
-                if (width < height) {
-                    deviceWidth = height;
-                    deviceHeight = width;
-                } else {
-                    deviceWidth = width;
-                    deviceHeight = height;
-                }
-            }
-            System.out.println("screenwidth:" + deviceWidth + ",screenheight:" + deviceHeight);
-            changeState(MFMain.getInstance().getEntryGameState());
-            //setFullscreenMode(false);
-            startThread();
-        }
+        if (gpu != null) bindSurface(mainCanvas, gpu, width, height);
     }
 
     public static final void notifyKeyPressed(int keyCode) {
-        currentState.onKeyDown(MFGamePad.decodeSystemKey(keyCode));
+        if (currentState != null) currentState.onKeyDown(MFGamePad.decodeSystemKey(keyCode));
     }
 
     private static byte[] openRecordStore(String str) {
@@ -1123,11 +825,8 @@ started = true;
     }
 
     public static void enableClearFont() {
-        useClearFont = true;
-        if (fontImage == null) {
-            fontImage = Image.createImage(deviceWidth, deviceHeight);
-            fontGraphics = MFGraphics.createMFFontGraphics(fontImage.getGraphics(), deviceWidth, deviceHeight);
-        }
+        // GPU glyph textures are composited with the scene; no extra CPU overlay.
+        useClearFont = false;
     }
 
     public static void disableClearFont() {
@@ -1137,15 +836,9 @@ started = true;
     }
 
     public static void enableLayer(int layer) {
-        if (layer <= 0 || layer > 1) {
-            if (layer < 0 && layer >= -1 && preLayerImage[(-layer) - 1] == null) {
-                preLayerImage[(-layer) - 1] = Image.createImage(deviceWidth, deviceHeight);
-                preLayerGraphics[(-layer) - 1] = MFGraphics.createMFGraphics(preLayerImage[(-layer) - 1].getGraphics(), deviceWidth, deviceHeight);
-            }
-        } else if (postLayerImage[layer - 1] == null) {
-            postLayerImage[layer - 1] = Image.createImage(deviceWidth, deviceHeight);
-            postLayerGraphics[layer - 1] = MFGraphics.createMFGraphics(postLayerImage[layer - 1].getGraphics(), deviceWidth, deviceHeight);
-        }
+        if (gpu == null) return;
+        if (layer == -1) preLayerGraphics[0] = MFGraphics.createMFGraphics(gpu, deviceWidth, deviceHeight);
+        else if (layer == 1) postLayerGraphics[0] = MFGraphics.createMFGraphics(gpu, deviceWidth, deviceHeight);
     }
 
     public static void disableLayer(int layer) {
@@ -1163,124 +856,17 @@ started = true;
     }
 
     public static void setFullscreenMode(boolean b) {
-        if (b) {
-            screenHeight = MFScreen.getScreenHeight(MFMain.getInstance());
-            screenWidth = MFScreen.getScreenWidth(MFMain.getInstance());
-            drawRect = new Rect(0, 0, deviceWidth, deviceHeight);
-            bufferImage = Image.createImage(deviceWidth, deviceHeight);
-            graphics = MFGraphics.createMFGraphics(bufferImage.getGraphics(), deviceWidth, deviceHeight);
-            bufferWidth = bufferImage.getWidth();
-            bufferHeight = bufferImage.getHeight();
-            horizontalOffset = (drawRect.left * bufferWidth) / deviceWidth;
-            verticvalOffset = (drawRect.top * bufferHeight) / deviceHeight;
-            preScaleZoomInFlag = false;
-            preScaleZoomOutFlag = false;
-            preScaleShift = 0;
-            scaleFactor = 1.0f;
-        } else {
-        if (((float) deviceWidth) / ((float) screenWidth) > ((float) deviceHeight) / ((float) screenHeight)) {
-            if (preScaleZoomOutFlag && screenHeight > deviceHeight) {
-                preScaleShift = 0;
-                int tmpHeight = screenHeight;
-                while (tmpHeight > deviceHeight && tmpHeight - deviceHeight > deviceHeight - (tmpHeight / 2)) {
-                    tmpHeight /= 2;
-                    screenWidth /= 2;
-                    screenHeight /= 2;
-                    preScaleShift++;
-                }
-                if (preScaleShift == 0) {
-                    preScaleZoomOutFlag = false;
-                }
-                preScaleZoomInFlag = false;
-            }
-            if (preScaleZoomInFlag && screenHeight < deviceHeight) {
-                preScaleShift = 0;
-                int tmpHeight2 = screenHeight;
-                while (tmpHeight2 < deviceHeight && deviceHeight - tmpHeight2 > (tmpHeight2 * 2) - deviceHeight) {
-                    tmpHeight2 *= 2;
-                    screenWidth *= 2;
-                    screenHeight *= 2;
-                    preScaleShift++;
-                }
-                if (preScaleShift == 0) {
-                    preScaleZoomInFlag = false;
-                }
-                preScaleZoomOutFlag = false;
-            }
-            int h = deviceHeight;
-            int w = (screenWidth * h) / screenHeight;
-            int x = (deviceWidth - w) / 2;
-            drawRect = new Rect(x, 0, x + w, 0 + h);
-            if (preScaleZoomOutFlag) {
-                bufferImage = Image.createImage(((screenHeight * deviceWidth) / deviceHeight) << preScaleShift, screenHeight << preScaleShift);
-            } else if (preScaleZoomInFlag) {
-                bufferImage = Image.createImage(((screenHeight * deviceWidth) / deviceHeight) >> preScaleShift, screenHeight >> preScaleShift);
-            } else {
-                bufferImage = Image.createImage((screenHeight * deviceWidth) / deviceHeight, screenHeight);
-            }
-            scaleFactor = ((float) deviceHeight) / ((float) screenHeight);
-            graphics = MFGraphics.createMFGraphics(bufferImage.getGraphics(), (screenHeight * deviceWidth) / deviceHeight, screenHeight);
-        } else {
-            if (preScaleZoomOutFlag && screenWidth > deviceWidth) {
-                preScaleShift = 0;
-                int tmpWidth = screenWidth;
-                while (tmpWidth > deviceWidth && ((float) tmpWidth) - ((float) deviceWidth) > ((float) (deviceWidth - (tmpWidth / 2)))) {
-                    tmpWidth /= 2;
-                    screenWidth /= 2;
-                    screenHeight /= 2;
-                    preScaleShift++;
-                }
-                if (preScaleShift == 0) {
-                    preScaleZoomOutFlag = false;
-                }
-                preScaleZoomInFlag = false;
-            }
-            if (preScaleZoomInFlag && screenWidth < deviceWidth) {
-                preScaleShift = 0;
-                int tmpWidth2 = screenWidth;
-                while (tmpWidth2 < deviceWidth && deviceWidth - tmpWidth2 < (tmpWidth2 * 2) - deviceWidth) {
-                    tmpWidth2 *= 2;
-                    screenWidth *= 2;
-                    screenHeight *= 2;
-                    preScaleShift++;
-                }
-                if (preScaleShift == 0) {
-                    preScaleZoomInFlag = false;
-                }
-                preScaleZoomOutFlag = false;
-            }
-            int w2 = deviceWidth;
-            int h2 = (screenHeight * w2) / screenWidth;
-            int y = (deviceHeight - h2) / 2;
-            scaleFactor = (float) (deviceWidth / screenWidth);
-            drawRect = new Rect(0, y, 0 + w2, y + h2);
-            if (preScaleZoomOutFlag) {
-                bufferImage = Image.createImage(screenWidth << preScaleShift, ((screenWidth * deviceHeight) / deviceWidth) << preScaleShift);
-            } else if (preScaleZoomInFlag) {
-                bufferImage = Image.createImage(screenWidth >> preScaleShift, ((screenWidth * deviceHeight) / deviceWidth) >> preScaleShift);
-            } else {
-                bufferImage = Image.createImage(screenWidth, (screenWidth * deviceHeight) / deviceWidth);
-            }
-            graphics = MFGraphics.createMFGraphics(bufferImage.getGraphics(), screenWidth, (screenWidth * deviceHeight) / deviceWidth);
-        }
-        bufferWidth = bufferImage.getWidth() >> preScaleShift;
-        bufferHeight = bufferImage.getHeight() >> preScaleShift;
-        horizontalOffset = (drawRect.left * bufferWidth) / deviceWidth;
-        verticvalOffset = (drawRect.top * bufferHeight) / deviceHeight;
-        
-        }
-        System.out.println("deviceWidth:" + deviceWidth + ",deviceHeight:" + deviceHeight);
-        System.out.println("bufferWidth:" + bufferWidth + ",bufferHeight:" + bufferHeight);
-        System.out.println("screenWidth:" + screenWidth + ",screenHeight:" + screenHeight);
-        System.out.println("horizontalOffset:" + horizontalOffset + ",verticvalOffset:" + verticvalOffset);
-        System.out.println("scaleFactor:" + scaleFactor);
-        System.out.println("drawRect:" + drawRect);
-        graphics.g.getCanvas().translate((float) horizontalOffset, (float) verticvalOffset);
+        fullscreen = b;
+        if (b) { screenWidth = deviceWidth; screenHeight = deviceHeight; }
+        preScaleZoomInFlag = preScaleZoomOutFlag = false;
+        preScaleShift = 0;
+        configureViewport();
     }
 
     public static void setPreScale(boolean zoomIn, boolean zoomOut) {
-        preScaleZoomInFlag = zoomIn;
-        preScaleZoomOutFlag = zoomOut;
+        // GLES scales the logical viewport, never the source bitmaps.
+        preScaleZoomInFlag = preScaleZoomOutFlag = false;
+        preScaleShift = 0;
     }
 
     private static void setRecord(String str, byte[] data, int len) {
@@ -1318,10 +904,7 @@ started = true;
     }
 
     public static final void startThread() {
-        if (mainThread == null) {
-            mainThread = new Thread(mainRunnable);
-            mainThread.start();
-        }
+        // GLSurfaceView owns the only simulation/render thread.
     }
 
     public static final void startVibrate() {

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -36,7 +38,7 @@ class Heriko extends EnemyObject {
       this.endPosX = this.posX + this.mWidth;
       this.dir = false;
       this.state = 0;
-      this.wait_cn = 0;
+      this.wait_cn = GameTime.set(this, "wait_cn", 0);
       this.IsFire = false;
    }
 
@@ -62,15 +64,15 @@ class Heriko extends EnemyObject {
          switch(this.state) {
          case 0:
             if (!this.dir) {
-               this.posX += 128;
-               this.journey += 128;
+               this.posX = GameTime.advance(this, "posX", this.posX, 128);
+               this.journey = GameTime.advance(this, "journey", this.journey, 128);
                if (this.posX >= this.endPosX) {
                   this.dir = true;
                   this.posX = this.endPosX;
                }
             } else {
-               this.posX -= 128;
-               this.journey += 128;
+               this.posX = GameTime.advance(this, "posX", this.posX, -(128));
+               this.journey = GameTime.advance(this, "journey", this.journey, 128);
                if (this.posX <= this.startPosX) {
                   this.dir = false;
                   this.posX = this.startPosX;
@@ -89,13 +91,13 @@ class Heriko extends EnemyObject {
             break;
          case 1:
             if (this.wait_cn < 30) {
-               ++this.wait_cn;
+               this.wait_cn = Math.min(30, GameTime.advance(this, "wait_cn", this.wait_cn, 1));
                if (this.drawer.checkEnd() && this.IsFire) {
                   this.IsFire = false;
                   BulletObject.addBullet(12, this.posX, this.posY, 0, 512);
                }
             } else {
-               this.wait_cn = 0;
+               this.wait_cn = GameTime.set(this, "wait_cn", 0);
                this.drawer.setActionId(0);
                this.drawer.setTrans(0);
                this.drawer.setLoop(true);

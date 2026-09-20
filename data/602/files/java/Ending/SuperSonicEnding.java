@@ -1,5 +1,7 @@
 package Ending;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -115,7 +117,7 @@ public class SuperSonicEnding extends State implements SonicDef {
 
     public void logic() {
         if (this.state != 16) {
-            this.count++;
+            this.count = GameTime.advance(this, "count", this.count, 1);
         }
         if (Key.press(536870912)) {
             pause();
@@ -124,7 +126,7 @@ public class SuperSonicEnding extends State implements SonicDef {
         switch (this.state) {
             case 0:
                 this.state = 1;
-                this.count = 0;
+                this.count = GameTime.set(this, "count", 0);
                 this.starCount = 0;
                 SoundSystem.getInstance().playBgmSequenceNoLoop(32, 45);
                 return;
@@ -146,41 +148,41 @@ public class SuperSonicEnding extends State implements SonicDef {
                 }
                 if (this.count >= 56) {
                     this.state = 4;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     return;
                 }
                 return;
             case 4:
-                if (this.count == 30) {
+                if (GameTime.event(this, "count", "logic:156", GameTime.crosses(this, "count", this.count, 30))) {
                     State.fadeInitAndStart(0, 255);
                 }
                 if (this.count > 30 && State.fadeChangeOver()) {
                     this.state = 5;
                     State.fading = false;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     return;
                 }
                 return;
             case 5:
-                if (this.count == 160) {
+                if (GameTime.event(this, "count", "logic:167", GameTime.crosses(this, "count", this.count, 160))) {
                     State.fadeInitAndStart(255, 0);
                     this.state = 6;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     return;
                 }
                 return;
             case 6:
                 if (this.count > 16) {
                     this.state = 7;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.pilotHeadID = 4;
                     return;
                 }
                 return;
             case 7:
                 if (this.count > 48) {
-                    this.shiningX -= 7;
-                    this.shiningY += 4;
+                    this.shiningX = GameTime.advance(this, "shiningX", this.shiningX, -(7));
+                    this.shiningY = GameTime.advance(this, "shiningY", this.shiningY, 4);
                     if (this.shiningY > 184) {
                         this.shiningY = 184;
                     }
@@ -189,19 +191,19 @@ public class SuperSonicEnding extends State implements SonicDef {
                     }
                     if (this.shiningX < -10) {
                         this.state = 9;
-                        this.planeY += this.planeOffsetY;
+                        this.planeY = GameTime.advance(this, "planeY", this.planeY, this.planeOffsetY);
                         return;
                     }
                     return;
                 }
                 return;
             case 9:
-                this.planeY += 10;
+                this.planeY = GameTime.advance(this, "planeY", this.planeY, 10);
                 if (this.planeY > SCREEN_HEIGHT + 80) {
                     this.state = 10;
                     this.planeX = (SCREEN_WIDTH * 3) / 4;
                     this.planeY = SCREEN_HEIGHT + 40;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.planeDegree = 0;
                     return;
                 }
@@ -219,7 +221,7 @@ public class SuperSonicEnding extends State implements SonicDef {
                     State.fadeInitAndStart(255, 0);
                     this.state = 11;
                     this.changeState = false;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.catchID = 0;
                     this.congratulationY = SCREEN_HEIGHT + 16;
                     this.thankY = SCREEN_HEIGHT + 16;
@@ -227,14 +229,14 @@ public class SuperSonicEnding extends State implements SonicDef {
                 }
                 return;
             case 11:
-                if (this.count == 72) {
+                if (GameTime.event(this, "count", "logic:232", GameTime.crosses(this, "count", this.count, 72))) {
                     State.fadeInitAndStart(0, 255);
                     this.changeState = true;
                 }
                 if (this.changeState && State.fadeChangeOver()) {
                     this.changeState = false;
                     State.fadeInitAndStart(255, 0);
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     if (this.catchID == 1) {
                         this.state = 12;
                         return;
@@ -248,7 +250,7 @@ public class SuperSonicEnding extends State implements SonicDef {
             case 12:
                 if (this.faceChangeDrawer.checkEnd() && this.faceChangeDrawer.getActionId() == 1) {
                     this.state = 13;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     return;
                 }
                 return;
@@ -263,7 +265,7 @@ public class SuperSonicEnding extends State implements SonicDef {
                         this.thankY = WORD_DESTINY_2;
                     }
                 }
-                if (this.count == BGM_ENDING_COUNT) {
+                if (GameTime.event(this, "count", "logic:268", GameTime.crosses(this, "count", this.count, BGM_ENDING_COUNT))) {
                     State.fadeInitAndStart(0, 255);
                     return;
                 } else if (isOver() && State.fadeChangeOver()) {
@@ -309,10 +311,10 @@ public class SuperSonicEnding extends State implements SonicDef {
                     this.isSkipPressed = true;
                     SoundSystem.getInstance().stopBgm(false);
                     State.fadeInitAndStart(0, 255);
-                    this.count2 = 10;
+                    this.count2 = GameTime.set(this, "count2", 10);
                 }
                 if (this.count2 >= 10) {
-                    this.count2++;
+                    this.count2 = GameTime.advance(this, "count2", this.count2, 1);
                     if (this.count2 >= 26 && State.fadeChangeOver()) {
                         State.fadeInitAndStart(0, 0);
                         Standard2.splashinit(true);
@@ -366,7 +368,7 @@ public class SuperSonicEnding extends State implements SonicDef {
                         case 2:
                             this.starDrawer[3].draw(g, (SCREEN_WIDTH >> 1) + STAR_POSITION[3][0], STAR_POSITION[3][1]);
                             if (this.starDrawer[3].checkEndTrigger()) {
-                                this.count = 0;
+                                this.count = GameTime.set(this, "count", 0);
                                 return;
                             }
                             return;
@@ -454,7 +456,7 @@ public class SuperSonicEnding extends State implements SonicDef {
     }
 
     private int getPlaneOffset() {
-        this.planeOffsetDegree += 5;
+        this.planeOffsetDegree = GameTime.advance(this, "planeOffsetDegree", this.planeOffsetDegree, 5);
         return ((MyAPI.dSin(this.planeOffsetDegree) * 8) / 100) + 8;
     }
 
@@ -469,12 +471,12 @@ public class SuperSonicEnding extends State implements SonicDef {
 
     private void cloudLogic() {
         if (this.cloudCount > 0) {
-            this.cloudCount--;
+            this.cloudCount = Math.max(0, GameTime.advance(this, "cloudCount", this.cloudCount, -(1)));
         }
         for (int i = 0; i < 10; i++) {
             if (this.cloudInfo[i][0] != 0) {
                 int[] iArr = this.cloudInfo[i];
-                iArr[1] = iArr[1] + CLOUD_VELOCITY[this.cloudInfo[i][0] - 1];
+                iArr[1] = GameTime.advance(iArr, "cloudX", iArr[1], CLOUD_VELOCITY[this.cloudInfo[i][0] - 1]);
                 if (this.cloudInfo[i][1] >= SCREEN_WIDTH + 75) {
                     this.cloudInfo[i][0] = 0;
                 }
@@ -483,7 +485,7 @@ public class SuperSonicEnding extends State implements SonicDef {
                 this.cloudInfo[i][0] = MyRandom.nextInt(1, 3);
                 this.cloudInfo[i][1] = -60;
                 this.cloudInfo[i][2] = MyRandom.nextInt(20, SCREEN_HEIGHT - 40);
-                this.cloudCount = MyRandom.nextInt(8, 20);
+                this.cloudCount = GameTime.set(this, "cloudCount", MyRandom.nextInt(8, 20));
             }
         }
     }
@@ -565,8 +567,8 @@ public class SuperSonicEnding extends State implements SonicDef {
         SoundSystem.getInstance().stopBgm(false);
         SoundSystem.getInstance().playBgm(33);
         Key.touchOpeningInit();
-        this.count = 0;
-        this.count2 = 0;
+        this.count = GameTime.set(this, "count", 0);
+        this.count2 = GameTime.set(this, "count2", 0);
     }
 
     private void interruptInit() {

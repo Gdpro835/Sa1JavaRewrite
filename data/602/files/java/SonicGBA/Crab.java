@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -49,24 +51,24 @@ class Crab extends EnemyObject {
          switch(this.state) {
          case 0:
             if (this.velocity > 0) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                if (this.posX >= this.limitRightX) {
                   this.posX = this.limitRightX;
                   this.velocity = -this.velocity;
                   this.state = 1;
                   this.drawer.setActionId(1);
                   this.drawer.setLoop(false);
-                  this.fire_cnt = 0;
+                  this.fire_cnt = GameTime.set(this, "fire_cnt", 0);
                }
             } else {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                if (this.posX <= this.limitLeftX) {
                   this.posX = this.limitLeftX;
                   this.velocity = -this.velocity;
                   this.state = 1;
                   this.drawer.setActionId(1);
                   this.drawer.setLoop(false);
-                  this.fire_cnt = 0;
+                  this.fire_cnt = GameTime.set(this, "fire_cnt", 0);
                }
             }
 
@@ -74,7 +76,7 @@ class Crab extends EnemyObject {
             this.checkWithPlayer(var1, var2, this.posX, this.posY);
             break;
          case 1:
-            if (this.fire_cnt == 0) {
+            if (GameTime.event(this, "fire_cnt", "initialShot", this.fire_cnt == 0)) {
                int var5 = this.emenyid;
                int var3 = this.posX;
                int var6 = this.posY;
@@ -89,7 +91,7 @@ class Crab extends EnemyObject {
                BulletObject.addBullet(var4, var6 + 1344, var5 - 1792, var3, var7);
             }
 
-            ++this.fire_cnt;
+            this.fire_cnt = GameTime.advance(this, "fire_cnt", this.fire_cnt, 1);
             if (this.drawer.checkEnd() || this.fire_cnt > 2) {
                this.state = 0;
                this.drawer.setActionId(0);

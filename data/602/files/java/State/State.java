@@ -3,6 +3,8 @@
 //
 package State;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import GameEngine.TouchDirectKey;
 import Lib.Animation;
@@ -396,11 +398,21 @@ public abstract class State implements SonicDef, StringIndex {
     }
 
     public static void drawFadeBase(MFGraphics var0, int var1) {
-        fadeAlpha = MyAPI.calNextPosition((double)fadeAlpha, (double)fadeToValue, 1, var1, 3.0);
+        fadeAlpha = MyAPI.calNextPosition(State.class, "fadeAlpha", (double)fadeAlpha, (double)fadeToValue, 1, var1, 3.0);
         drawFadeCore(var0);
     }
 
     private static void drawFadeCore(MFGraphics var0) {
+        if (var0.getg() instanceof com.sega.mobile.framework.opengl.GLGraphics) {
+            int oldColor = var0.getColor(), oldAlpha = var0.getAlpha();
+            var0.setColor(fadeRGB.length == 0 ? 0 : fadeRGB[0]);
+            var0.setAlpha(fadeAlpha);
+            var0.fillRect(0, 0, MyAPI.zoomOut(SCREEN_WIDTH), MyAPI.zoomOut(SCREEN_HEIGHT));
+            var0.setColor(oldColor);
+            var0.setAlpha(oldAlpha);
+            return;
+        }
+
         if (fadeAlpha != 0) {
             int var1;
             int var2;
@@ -437,13 +449,13 @@ public abstract class State implements SonicDef, StringIndex {
 
     public static void drawFadeInSpeed(final MFGraphics mfGraphics, final int n) {
         if (State.fadeFromValue > State.fadeToValue) {
-            State.fadeAlpha -= n;
+            State.fadeAlpha = GameTime.advance(State.class, "fadeAlpha", State.fadeAlpha, -(n));
             if (State.fadeAlpha <= State.fadeToValue) {
                 State.fadeAlpha = State.fadeToValue;
             }
         }
         else if (State.fadeFromValue < State.fadeToValue) {
-            State.fadeAlpha += n;
+            State.fadeAlpha = GameTime.advance(State.class, "fadeAlpha", State.fadeAlpha, n);
             if (State.fadeAlpha >= State.fadeToValue) {
                 State.fadeAlpha = State.fadeToValue;
             }
@@ -579,6 +591,13 @@ public abstract class State implements SonicDef, StringIndex {
         }
 
         drawTouchGameKeyBoardById(var1, var2, Key.circlePadXPos, 128);
+    }
+
+    public static void shutdown() {
+        if (state != null) state.close();
+        state = null;
+        stateId = -1;
+        Lib.AnimationDrawer.setAllPause(false);
     }
 
     public static void exitGame() {
@@ -1041,10 +1060,10 @@ public abstract class State implements SonicDef, StringIndex {
         var1.setColor(var2);
         MyAPI.fillRect(var1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         var1.setColor(var3);
-        this.titleBgOffsetX += MENU_BG_SPEED;
-        this.titleBgOffsetY += MENU_BG_SPEED;
-        this.titleBgOffsetX %= var4;
-        this.titleBgOffsetY %= var4;
+        this.titleBgOffsetX = GameTime.advance(this, "titleBgOffsetX", this.titleBgOffsetX, MENU_BG_SPEED);
+        this.titleBgOffsetY = GameTime.advance(this, "titleBgOffsetY", this.titleBgOffsetY, MENU_BG_SPEED);
+        this.titleBgOffsetX = GameTime.wrap(this, "titleBgOffsetX", this.titleBgOffsetX, var4);
+        this.titleBgOffsetY = GameTime.wrap(this, "titleBgOffsetY", this.titleBgOffsetY, var4);
 
         for(var2 = -var4 + this.titleBgOffsetX; var2 < SCREEN_WIDTH; var2 += var4) {
             for(var3 = -var4 - this.titleBgOffsetY; var3 < SCREEN_HEIGHT; var3 += var4) {
@@ -1070,8 +1089,8 @@ public abstract class State implements SonicDef, StringIndex {
 
     public void drawScrollFont(MFGraphics var1, int var2, int var3, int var4) {
         drawBar(var1, 0, var3);
-        this.selectMenuOffsetX += 8;
-        this.selectMenuOffsetX %= var4;
+        this.selectMenuOffsetX = GameTime.advance(this, "selectMenuOffsetX", this.selectMenuOffsetX, 8);
+        this.selectMenuOffsetX = GameTime.wrap(this, "selectMenuOffsetX", this.selectMenuOffsetX, var4);
 
         int var5;
         for(var5 = 0; var5 - this.selectMenuOffsetX > 0; var5 -= var4) {
@@ -1135,14 +1154,11 @@ public abstract class State implements SonicDef, StringIndex {
             muiAniDrawer = (new Animation(var6.toString())).getDrawer(0, false, 0);
         } else {
             muiAniDrawer.setActionId(62);
-            ++PageFrameCnt;
-            PageFrameCnt %= 11;
-            if (PageFrameCnt % 2 == 0) {
-                ++PageBackGroundOffsetX;
-                PageBackGroundOffsetX %= 64;
-                --PageBackGroundOffsetY;
-                PageBackGroundOffsetY %= 56;
-            }
+            PageFrameCnt = GameTime.advance(State.class, "PageFrameCnt", PageFrameCnt, 1);
+            PageFrameCnt = GameTime.wrap(State.class, "PageFrameCnt", PageFrameCnt, 11);
+            int backgroundSteps = GameTime.periods(State.class, "PageFrameCnt", "helpBackground", PageFrameCnt, 2, 0);
+            PageBackGroundOffsetX = (PageBackGroundOffsetX + backgroundSteps) % 64;
+            PageBackGroundOffsetY = ((PageBackGroundOffsetY - backgroundSteps) % 56 + 56) % 56;
 
             int var2;
             int var3;
@@ -1220,9 +1236,9 @@ public abstract class State implements SonicDef, StringIndex {
         muiUpArrowDrawer = (new Animation(var1.toString())).getDrawer(93, true, 0);
         muiDownArrowDrawer = (new Animation(var1.toString())).getDrawer(94, true, 0);
         Key.touchInstructionInit();
-        this.arrowframecnt = 0;
+        this.arrowframecnt = GameTime.set(this, "arrowframecnt", 0);
         this.isArrowClicked = false;
-        PageFrameCnt = 0;
+        PageFrameCnt = GameTime.set(State.class, "PageFrameCnt", 0);
         if (this.textBGImage == null) {
             this.textBGImage = MFImage.createImage("/animation/text_bg.png");
         }
@@ -1251,23 +1267,23 @@ public abstract class State implements SonicDef, StringIndex {
         }
 
         if (Key.repeat(4) || Key.touchhelpuparrow.Isin()) {
-            ++this.arrowframecnt;
+            this.arrowframecnt = GameTime.advance(this, "arrowframecnt", this.arrowframecnt, 1);
             if (this.arrowframecnt <= 4 && !this.isArrowClicked) {
                 MyAPI.logicString(false, true);
                 this.isArrowClicked = true;
-            } else if (this.arrowframecnt > 4 && this.arrowframecnt % 2 == 0) {
+            } else if (this.arrowframecnt > 4 && GameTime.periodic(this, "arrowframecnt", "helpLogic:1267", this.arrowframecnt, 2, 0)) {
                 MyAPI.logicString(false, true);
             }
         } else if (Key.repeat(8) || Key.touchhelpdownarrow.Isin()) {
-            ++this.arrowframecnt;
+            this.arrowframecnt = GameTime.advance(this, "arrowframecnt", this.arrowframecnt, 1);
             if (this.arrowframecnt <= 4 && !this.isArrowClicked) {
                 MyAPI.logicString(true, false);
                 this.isArrowClicked = true;
-            } else if (this.arrowframecnt > 4 && this.arrowframecnt % 2 == 0) {
+            } else if (this.arrowframecnt > 4 && GameTime.periodic(this, "arrowframecnt", "helpLogic:1275", this.arrowframecnt, 2, 0)) {
                 MyAPI.logicString(true, false);
             }
         } else {
-            this.arrowframecnt = 0;
+            this.arrowframecnt = GameTime.set(this, "arrowframecnt", 0);
             this.isArrowClicked = false;
         }
 
@@ -1356,7 +1372,7 @@ public abstract class State implements SonicDef, StringIndex {
 
         byte var1;
         if (this.isItemsSelect) {
-            ++this.itemsselectframe;
+            this.itemsselectframe = GameTime.advance(this, "itemsselectframe", this.itemsselectframe, 1);
             if (this.itemsselectframe > 8) {
                 fadeInit(220, 102);
                 if (this.finalitemsselectcursor == 0) {
@@ -1371,13 +1387,13 @@ public abstract class State implements SonicDef, StringIndex {
 
         if (Key.touchitemsselect2_1.IsButtonPress() && this.itemsselectcursor == 0 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 0;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
         } else if (Key.touchitemsselect2_2.IsButtonPress() && this.itemsselectcursor == 1 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 1;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
@@ -1478,7 +1494,7 @@ public abstract class State implements SonicDef, StringIndex {
 
         byte var1;
         if (this.isItemsSelect) {
-            ++this.itemsselectframe;
+            this.itemsselectframe = GameTime.advance(this, "itemsselectframe", this.itemsselectframe, 1);
             if (this.itemsselectframe > 8) {
                 fadeInit(220, 102);
                 if (this.finalitemsselectcursor == 0) {
@@ -1498,19 +1514,19 @@ public abstract class State implements SonicDef, StringIndex {
 
         if (Key.touchitemsselect3_1.IsButtonPress() && this.itemsselectcursor == 0 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 0;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
         } else if (Key.touchitemsselect3_2.IsButtonPress() && this.itemsselectcursor == 1 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 1;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
         } else if (Key.touchitemsselect3_3.IsButtonPress() && this.itemsselectcursor == 4 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 2;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
@@ -1626,7 +1642,7 @@ public abstract class State implements SonicDef, StringIndex {
 
         byte var1;
         if (this.isItemsSelect) {
-            ++this.itemsselectframe;
+            this.itemsselectframe = GameTime.advance(this, "itemsselectframe", this.itemsselectframe, 1);
             if (this.itemsselectframe > 8) {
                 fadeInit(220, 102);
                 if (this.finalitemsselectcursor == 0) {
@@ -1651,25 +1667,25 @@ public abstract class State implements SonicDef, StringIndex {
 
         if (Key.touchitemsselect4_1.IsButtonPress() && this.itemsselectcursor == 0 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 0;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
         } else if (Key.touchitemsselect4_2.IsButtonPress() && this.itemsselectcursor == 1 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 1;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
         } else if (Key.touchitemsselect4_3.IsButtonPress() && this.itemsselectcursor == 3 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 2;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
         } else if (Key.touchitemsselect4_4.IsButtonPress() && this.itemsselectcursor == 4 && !this.isItemsSelect) {
             this.isItemsSelect = true;
-            this.itemsselectframe = 0;
+            this.itemsselectframe = GameTime.set(this, "itemsselectframe", 0);
             this.finalitemsselectcursor = 3;
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
@@ -1837,7 +1853,7 @@ public abstract class State implements SonicDef, StringIndex {
     public void newLanguageInit() {
         Key.touchSecondEnsureClose();
         Key.touchSecondEnsureInit();
-        this.timeCnt = 0;
+        this.timeCnt = GameTime.set(this, "timeCnt", 0);
         this.isNewLanguageClick = false;
         fadeInit(0, 192);
         if (muiAniDrawer == null) {
@@ -1863,7 +1879,7 @@ public abstract class State implements SonicDef, StringIndex {
         }
 
         if (Key.touchsecondensureyes.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isNewLanguageClick) {
                 if (GlobalResource.languageConfig < 0) {
                     GlobalResource.languageConfig = 8;
@@ -1878,7 +1894,7 @@ public abstract class State implements SonicDef, StringIndex {
                 SoundSystem.getInstance().setSoundState(GlobalResource.soundConfig);
                 SoundSystem.getInstance().setSeState(GlobalResource.seConfig);
                 this.isNewLanguageClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "newLanguageLogic:1890", this.timeCnt, 2, 0)) {
                 if (GlobalResource.languageConfig < 0) {
                     GlobalResource.languageConfig = 8;
                 } else {
@@ -1893,7 +1909,7 @@ public abstract class State implements SonicDef, StringIndex {
                 SoundSystem.getInstance().setSeState(GlobalResource.seConfig);
             }
         } else if (Key.touchsecondensureno.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isNewLanguageClick) {
                 if (GlobalResource.languageConfig > 8) {
                     GlobalResource.languageConfig = 0;
@@ -1911,7 +1927,7 @@ public abstract class State implements SonicDef, StringIndex {
                 if (GlobalResource.languageConfig == 1) {
                     SoundSystem.getInstance().resumeBgm();
                 }
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "newLanguageLogic:1923", this.timeCnt, 2, 0)) {
                 if (GlobalResource.languageConfig > 8) {
                     GlobalResource.languageConfig = 0;
                 } else {
@@ -1929,7 +1945,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else {
-            this.timeCnt = 0;
+            this.timeCnt = GameTime.set(this, "timeCnt", 0);
             this.isNewLanguageClick = false;
         }
 
@@ -1999,7 +2015,7 @@ public abstract class State implements SonicDef, StringIndex {
         byte var1;
         if (Key.touchsecondensureyes.IsButtonPress() && this.confirmcursor == 0) {
             this.isConfirm = true;
-            this.confirmframe = 0;
+            this.confirmframe = GameTime.set(this, "confirmframe", 0);
             SoundSystem.getInstance().playSe(1);
             var1 = 1;
         } else if (Key.touchsecondensureno.IsButtonPress() && this.confirmcursor == 1) {
@@ -2017,7 +2033,7 @@ public abstract class State implements SonicDef, StringIndex {
 
     public void secondEnsureInit() {
         this.isConfirm = false;
-        this.confirmframe = 0;
+        this.confirmframe = GameTime.set(this, "confirmframe", 0);
         if (muiAniDrawer == null) {
             StringBuilder var1 = new StringBuilder("/lang");
             var1.append(GlobalResource.languageConfig);
@@ -2031,7 +2047,7 @@ public abstract class State implements SonicDef, StringIndex {
 
     public void secondEnsureInit2() {
         this.isConfirm = false;
-        this.confirmframe = 0;
+        this.confirmframe = GameTime.set(this, "confirmframe", 0);
         if (muiAniDrawer == null) {
             StringBuilder var1 = new StringBuilder("/lang");
             var1.append(GlobalResource.languageConfig);
@@ -2058,7 +2074,7 @@ public abstract class State implements SonicDef, StringIndex {
 
         byte var1;
         if (this.isConfirm) {
-            ++this.confirmframe;
+            this.confirmframe = GameTime.advance(this, "confirmframe", this.confirmframe, 1);
             if (this.confirmframe > 8) {
                 var1 = 1;
                 return var1;
@@ -2067,7 +2083,7 @@ public abstract class State implements SonicDef, StringIndex {
 
         if (Key.touchsecondensureyes.IsButtonPress() && this.confirmcursor == 0 && !this.isConfirm) {
             this.isConfirm = true;
-            this.confirmframe = 0;
+            this.confirmframe = GameTime.set(this, "confirmframe", 0);
             SoundSystem.getInstance().playSe(1);
             var1 = 0;
         } else if (Key.touchsecondensureno.IsButtonPress() && this.confirmcursor == 1 && !this.isConfirm) {
@@ -2087,7 +2103,7 @@ public abstract class State implements SonicDef, StringIndex {
         Key.touchPadOptionClose();
         Key.touchPadOptionInit();
         initTouchkeyBoard();
-        this.timeCnt = 0;
+        this.timeCnt = GameTime.set(this, "timeCnt", 0);
         this.isTouchPadClick = false;
         fadeInit(0, 192);
     }
@@ -2161,7 +2177,7 @@ public abstract class State implements SonicDef, StringIndex {
         }
 
         if (Key.touchpadoptionplus.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardOpacity > 3) {
                     GlobalResource.touchKeyBoardOpacity = 0;
@@ -2170,7 +2186,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadOpacityLogic:2182", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardOpacity > 3) {
                     GlobalResource.touchKeyBoardOpacity = 0;
                 } else {
@@ -2178,7 +2194,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else if (Key.touchpadoptionminus.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardOpacity < 0) {
                     GlobalResource.touchKeyBoardOpacity = 3;
@@ -2187,7 +2203,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadOpacityLogic:2199", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardOpacity < 0) {
                     GlobalResource.touchKeyBoardOpacity = 3;
                 } else {
@@ -2195,7 +2211,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else {
-            this.timeCnt = 0;
+            this.timeCnt = GameTime.set(this, "timeCnt", 0);
             this.isTouchPadClick = false;
         }
 
@@ -2311,7 +2327,7 @@ public abstract class State implements SonicDef, StringIndex {
         }
 
         if (Key.touchpadoptionleft1.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardLeftPosition < 0) {
                     GlobalResource.touchKeyBoardLeftPosition = (SCREEN_WIDTH >> 1) - 120 + (50 - (GlobalResource.touchKeyBoardSize * 10));
@@ -2320,7 +2336,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadPositionLogic:2332", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardLeftPosition < 0) {
                     GlobalResource.touchKeyBoardLeftPosition = (SCREEN_WIDTH >> 1) - 120 + (50 - (GlobalResource.touchKeyBoardSize * 10));
                 } else {
@@ -2329,7 +2345,7 @@ public abstract class State implements SonicDef, StringIndex {
             }
 
         } else if (Key.touchpadoptionright1.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardLeftPosition > (SCREEN_WIDTH >> 1) - 120 + (50 - (GlobalResource.touchKeyBoardSize * 10))) {
                     GlobalResource.touchKeyBoardLeftPosition = 0;
@@ -2338,7 +2354,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadPositionLogic:2350", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardLeftPosition > (SCREEN_WIDTH >> 1) - 120 + (50 - (GlobalResource.touchKeyBoardSize * 10))) {
                     GlobalResource.touchKeyBoardLeftPosition = 0;
                 } else {
@@ -2346,7 +2362,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else if (Key.touchpadoptionleft2.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardRightPosition > (SCREEN_WIDTH >> 1) - 120 + (40 - (GlobalResource.touchKeyBoardSize * 8))) {
                     GlobalResource.touchKeyBoardRightPosition = 0;
@@ -2355,7 +2371,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadPositionLogic:2367", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardRightPosition > (SCREEN_WIDTH >> 1) - 120 + (40 - (GlobalResource.touchKeyBoardSize * 8))) {
                     GlobalResource.touchKeyBoardRightPosition = 0;
                 } else {
@@ -2363,7 +2379,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else if (Key.touchpadoptionright2.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardRightPosition < 0) {
                     GlobalResource.touchKeyBoardRightPosition = (SCREEN_WIDTH >> 1) - 120 + (40 - (GlobalResource.touchKeyBoardSize * 8));
@@ -2372,7 +2388,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadPositionLogic:2384", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardRightPosition < 0) {
                     GlobalResource.touchKeyBoardRightPosition = (SCREEN_WIDTH >> 1) - 120 + (40 - (GlobalResource.touchKeyBoardSize * 8));
                 } else {
@@ -2380,7 +2396,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else {
-            this.timeCnt = 0;
+            this.timeCnt = GameTime.set(this, "timeCnt", 0);
             this.isTouchPadClick = false;
         }
 
@@ -2479,7 +2495,7 @@ public abstract class State implements SonicDef, StringIndex {
         }
 
         if (Key.touchpadoptionplus.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardSize > 5) {
                     GlobalResource.touchKeyBoardSize = 0;
@@ -2488,7 +2504,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadSizeLogic:2500", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardSize > 5) {
                     GlobalResource.touchKeyBoardSize = 0;
                 } else {
@@ -2496,7 +2512,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else if (Key.touchpadoptionminus.Isin()) {
-            ++this.timeCnt;
+            this.timeCnt = GameTime.advance(this, "timeCnt", this.timeCnt, 1);
             if (this.timeCnt <= 4 && !this.isTouchPadClick) {
                 if (GlobalResource.touchKeyBoardSize < 0) {
                     GlobalResource.touchKeyBoardSize = 5;
@@ -2505,7 +2521,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
 
                 this.isTouchPadClick = true;
-            } else if (this.timeCnt > 4 && this.timeCnt % 2 == 0) {
+            } else if (this.timeCnt > 4 && GameTime.periodic(this, "timeCnt", "touchPadSizeLogic:2517", this.timeCnt, 2, 0)) {
                 if (GlobalResource.touchKeyBoardSize < 0) {
                     GlobalResource.touchKeyBoardSize = 5;
                 } else {
@@ -2513,7 +2529,7 @@ public abstract class State implements SonicDef, StringIndex {
                 }
             }
         } else {
-            this.timeCnt = 0;
+            this.timeCnt = GameTime.set(this, "timeCnt", 0);
             this.isTouchPadClick = false;
         }
 

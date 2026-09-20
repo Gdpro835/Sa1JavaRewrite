@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -34,7 +36,7 @@ class Subeyuka extends GimmickObject {
       this.startPosY = this.posY;
       this.moving = false;
       this.mapObj = new MapObject(this.startPosX, this.startPosY, 0, 0, this, this.iLeft);
-      this.flyCount = 0;
+      this.flyCount = GameTime.set(this, "flyCount", 0);
    }
 
    public static void releaseAllResource() {
@@ -66,7 +68,7 @@ class Subeyuka extends GimmickObject {
                }
 
                isGotRings = false;
-               frame = 1;
+               frame = GameTime.set(Subeyuka.class, "frame", 1);
             }
 
             var1.beStop(0, var2, this);
@@ -85,7 +87,7 @@ class Subeyuka extends GimmickObject {
                   }
 
                   isGotRings = false;
-                  frame = 1;
+                  frame = GameTime.set(Subeyuka.class, "frame", 1);
                }
 
                var1.beStop(0, 1, this);
@@ -110,10 +112,10 @@ class Subeyuka extends GimmickObject {
    public void logic() {
       if (this.moving && !this.dead) {
          if ((StageManager.getCurrentZoneId() == 4 || StageManager.getCurrentZoneId() == 5) && this.iLeft == 1 && this.mapObj.getCurrentCrashCount() < 2) {
-            int var1 = this.flyCount + 1;
+            int var1 = GameTime.advance(this, "flyCount", this.flyCount, 1);
             this.flyCount = var1;
             if (var1 < 4) {
-               if (this.flyCount == 2) {
+               if (GameTime.event(this, "flyCount", "launchSound", GameTime.crosses(this, "flyCount", this.flyCount, 2))) {
                   soundInstance.playSe(64);
                }
 
@@ -124,11 +126,11 @@ class Subeyuka extends GimmickObject {
             }
          }
 
-         if (frame == 4 && StageManager.getCurrentZoneId() != 4 && StageManager.getCurrentZoneId() != 5) {
+         if (GameTime.event(Subeyuka.class, "frame", "logic:129", GameTime.crosses(Subeyuka.class, "frame", frame, 4) && StageManager.getCurrentZoneId() != 4 && StageManager.getCurrentZoneId() != 5)) {
             soundInstance.playLoopSe(65);
          }
 
-         ++frame;
+         frame = GameTime.advance(Subeyuka.class, "frame", frame, 1);
          this.mapObj.logic();
          this.posX = this.mapObj.getPosX();
          this.posY = this.mapObj.getPosY();

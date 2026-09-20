@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -20,7 +22,7 @@ class WindParts extends GimmickObject {
 
       this.drawer = animation.getDrawer(2 - this.iLeft, true, 0);
       this.posOriginalY = this.posY;
-      this.moveCount = 0;
+      this.moveCount = GameTime.set(this, "moveCount", 0);
    }
 
    public static void releaseAllResource() {
@@ -37,12 +39,12 @@ class WindParts extends GimmickObject {
    }
 
    public void logic() {
-      ++this.moveCount;
+      this.moveCount = GameTime.advance(this, "moveCount", this.moveCount, 1);
       if (this.moveCount >= 8) {
-         this.moveCount = 0;
+         this.moveCount = GameTime.set(this, "moveCount", 0);
          this.posY = this.posOriginalY;
       } else {
-         this.posY -= 500;
+         this.posY = GameTime.advance(this, "posY", this.posY, -(500));
       }
 
       this.refreshCollisionRect(this.posX, this.posY);

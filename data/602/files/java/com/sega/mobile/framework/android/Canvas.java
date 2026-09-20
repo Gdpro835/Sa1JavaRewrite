@@ -1,315 +1,228 @@
 package com.sega.mobile.framework.android;
 
 import android.content.Context;
+import android.opengl.GLSurfaceView;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import com.sega.mobile.framework.MFMain;
 import com.sega.mobile.framework.device.MFDevice;
+import com.sega.mobile.framework.opengl.GLGraphics;
+import com.sega.mobile.framework.opengl.SpriteBatch;
+import GameEngine.time.FrameClock;
 import SonicGBA.GameObject;
-import SonicGBA.PlayerObject;
 import SonicGBA.StageManager;
-import State.TitleState;
 import State.State;
-import State.GameState;
-import State.SpecialStageState;
-import Lib.SoundSystem;
+import java.util.Arrays;
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
-public class Canvas extends SurfaceView implements SurfaceHolder.Callback {
-    public int PID_BUFFER_SIZE = 10;
-    private boolean initialFlag = false;
-    protected Graphics mGraphics = new Graphics();
-    private SurfaceHolder mHolder;
-    public int[] pidBuffer = new int[this.PID_BUFFER_SIZE];
-    private boolean useMultiTouch = false;
-    public static int screenWidth;
-    public static int screenHeight;
+/** Android surface, input queue and GLES lifecycle. Simulation is owned by the GL thread. */
+public class Canvas extends GLSurfaceView implements GLSurfaceView.Renderer {
+    protected Graphics mGraphics;
+    private final SpriteBatch batch = new SpriteBatch();
+    private final FrameClock clock = new FrameClock();
+    private boolean useMultiTouch;
+    private volatile boolean focused;
+    private volatile boolean resumed;
+    private volatile boolean disposed;
+    private volatile boolean surfaceReady;
+    private int[] pointers = new int[16];
+    public static int screenWidth, screenHeight;
 
     public Canvas(Context context) {
         super(context);
-        for (int i = 0; i < this.PID_BUFFER_SIZE; i++) {
-            this.pidBuffer[i] = -1;
-        }
-        this.mHolder = getHolder();
-        this.mHolder.addCallback(this);
+        Arrays.fill(pointers, -1);
+        setEGLContextClientVersion(2);
+        setEGLConfigChooser(8, 8, 8, 8, 0, 0);
+        setPreserveEGLContextOnPause(true);
+        setRenderer(this);
+        setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         setFocusable(true);
-        setZOrderOnTop(false);
-        screenWidth = context.getResources().getDisplayMetrics().widthPixels;
-        screenHeight = context.getResources().getDisplayMetrics().heightPixels;
+        setFocusableInTouchMode(true);
     }
 
-    public void setFilterBitmap(boolean b) {
-        this.mGraphics.setFilterBitmap(b);
+    @Override public void onSurfaceCreated(GL10 ignored, EGLConfig config) {
+        surfaceReady = false;
+        if (disposed || !MFDevice.isCurrentCanvas(this)) return;
+        if (mGraphics instanceof GLGraphics) ((GLGraphics) mGraphics).release();
+        batch.create();
+        mGraphics = new GLGraphics(batch);
+        clock.reset();
     }
 
-    public void setAntiAlias(boolean b) {
-        this.mGraphics.setAntiAlias(b);
+    @Override public void onSurfaceChanged(GL10 ignored, int width, int height) {
+        if (disposed || mGraphics == null || !MFDevice.isCurrentCanvas(this)) return;
+        screenWidth = width; screenHeight = height;
+        batch.resize(width, height);
+        MFDevice.bindSurface(this, (GLGraphics) mGraphics, width, height);
+        surfaceReady = true;
+        clock.reset();
     }
 
-    public void setUseMultitouch(boolean b) {
-        this.useMultiTouch = b;
-    }
-
-    public void surfaceCreated(SurfaceHolder holder) {
-        MFDevice.notifyStart(getWidth(), getHeight());
-    }
-
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-    }
-
-    public void surfaceDestroyed(SurfaceHolder holder) {
-    }
-
-    public boolean keyDown(int keyCode, KeyEvent msg) {
-        keyPressed(keyCode);
-        return true;
-    }
-
-    public boolean keyUp(int keyCode, KeyEvent msg) {
-        keyReleased(keyCode);
-        return true;
-    }
-
-    private void increaseBuffer() {
-        this.PID_BUFFER_SIZE += 10;
-        int[] tempBuffer = new int[this.PID_BUFFER_SIZE];
-        for (int i = 0; i < this.PID_BUFFER_SIZE - 10; i++) {
-            tempBuffer[i] = this.pidBuffer[i];
+    @Override public void onDrawFrame(GL10 ignored) {
+        if (disposed || !surfaceReady || !MFDevice.isCurrentCanvas(this)) return;
+        double seconds = clock.advance(System.nanoTime());
+        if (!focused || !resumed || MFMain.browser) {
+            clock.reset();
+            seconds = 0.0;
         }
-        this.pidBuffer = tempBuffer;
-    }
-
-    public boolean touchEvent(MotionEvent event) {
-        if (!this.useMultiTouch) {
-            switch (event.getAction()) {
-                case 0:
-                    pointerPressed(0, (int) event.getX(), (int) event.getY());
-                    break;
-                case 1:
-                    pointerReleased(0, (int) event.getX(), (int) event.getY());
-                    break;
-                case 2:
-                    pointerDragged(0, (int) event.getX(), (int) event.getY());
-                    break;
-            }
-        } else {
-            int count = event.getPointerCount();
-            if (count >= this.PID_BUFFER_SIZE) {
-                count = this.PID_BUFFER_SIZE - 1;
-            }
-            int action = event.getAction();
-            int index = action >> 8;
-            int id = event.getPointerId(index);
-            if (id >= this.PID_BUFFER_SIZE) {
-                increaseBuffer();
-            }
-            switch (action & 255) {
-                case 0:
-                case 5:
-                    this.pidBuffer[id] = id;
-                    pointerPressed(this.pidBuffer[id], (int) event.getX(index), (int) event.getY(index));
-                    break;
-                case 1:
-                case 6:
-                    if (this.pidBuffer[id] != -1) {
-                        pointerReleased(this.pidBuffer[id], (int) event.getX(index), (int) event.getY(index));
-                        this.pidBuffer[id] = -1;
-                        break;
-                    } else {
-                        int i = 0;
-                        while (true) {
-                            if (i >= this.PID_BUFFER_SIZE) {
-                                break;
-                            } else if (this.pidBuffer[i] != -1) {
-                                pointerReleased(this.pidBuffer[i], (int) event.getX(index), (int) event.getY(index));
-                                this.pidBuffer[i] = -1;
-                                break;
-                            } else {
-                                i++;
-                            }
-                        }
-                    }
-                case 2:
-                    for (int i2 = 0; i2 < count; i2++) {
-                        int id2 = event.getPointerId(i2);
-                        if (this.pidBuffer[id2] != -1) {
-                            pointerDragged(this.pidBuffer[id2], (int) event.getX(i2), (int) event.getY(i2));
-                        } else {
-                            int j = 0;
-                            while (true) {
-                                if (j < this.PID_BUFFER_SIZE) {
-                                    if (this.pidBuffer[j] != -1) {
-                                        this.pidBuffer[id2] = this.pidBuffer[j];
-                                        this.pidBuffer[j] = -1;
-                                        pointerDragged(this.pidBuffer[id2], (int) event.getX(i2), (int) event.getY(i2));
-                                    } else {
-                                        j++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    break;
-            }
-        }
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-        if (StageManager.loadStep == 0) State.initTouchkeyBoard();
-            float x = event.getX();
-            float y = event.getY();
-            boolean isTopRightCorner = (x > screenWidth * 0.5) && (y < screenHeight * 0.5);
-            boolean isTopLeftCorner = (x < screenWidth * 0.2) && (y < screenHeight * 0.3);
-            /*boolean isTopMiddle = (x >= screenWidth * 0.4 && x <= screenWidth * 0.6) && (y < screenHeight * 0.5);
-            int fx = 10;
-            int fy = 10;
-            int fw = MFDevice.fw;
-            int fh = MFDevice.fh;
-            if (x >= fx && x <= fx + fw && y >= fy && y <= fy + fh) {
-                MFDevice.showFPS = !MFDevice.showFPS;
-                return true;
-            }*/
-            if (isTopRightCorner && !MFMain.multiplayer && GameObject.player != null && GameObject.player2 != null) {
-                if (MFMain.tapCount != 2) {
-                    MFMain.tapCount++;
-                } else if (MFMain.tapCount == 2) {
-                    MFMain.switchPlayerFocus();
-                    MFMain.tapCount = 0;
-                }
-            } /*else if (isTopLeftCorner && GameState.loadingEnd() && GameObject.player != null && GameObject.player2 == null) {
-                if (MFMain.tapCount2 != 5) {
-                    MFMain.tapCount2++;
-                } else if (MFMain.tapCount2 == 5) {
-                    MFMain.superPlayer();
-                    MFMain.tapCount2 = 0;
-                }
-            } else if (isTopLeftCorner && GameObject.player == null && TitleState.state == 2) {
-                if (!MFMain.cheat && MFMain.tapCount3 != 4) {
-                    MFMain.tapCount3++;
-                } else if (MFMain.tapCount3 == 4) {
-                    MFMain.cheat = true;
-                    SoundSystem.getInstance().playSe(84);
-                    MFMain.tapCount3 = 0;
-                }
-            } else if (isTopRightCorner && GameObject.player == null && TitleState.state == 2) {
-                if (MFMain.tails < 7 && MFMain.tapCount4 != 4) {
-                    MFMain.tapCount4++;
-                } else if (MFMain.tapCount3 == 4) {
-                    MFMain.tails = 7;
-                    //MainState.DemoMode = MainState.DemoMode ? false : true;
-                    SoundSystem.getInstance().playSe(84);
-                    MFMain.tapCount4 = 0;
-                }
-            }*/
-        }
-        return true;
-    }
-
-    public boolean onTrackballEvent(MotionEvent event) {
-        if (!MFDevice.enableTrackBall) {
-            return true;
-        }
-        switch (event.getAction()) {
-            case 0:
-                keyPressed(23);
-                return true;
-            case 1:
-                keyReleased(23);
-                return true;
-            case 2:
-                if (event.getX() > 0.0f) {
-                    trackballMoved(22);
-                    return true;
-                } else if (event.getX() < 0.0f) {
-                    trackballMoved(21);
-                    return true;
-                } else if (event.getY() > 0.0f) {
-                    trackballMoved(20);
-                    return true;
-                } else if (event.getY() >= 0.0f) {
-                    return true;
-                } else {
-                    trackballMoved(19);
-                    return true;
-                }
-            default:
-                return true;
-        }
-    }
-
-    public void onWindowFocusChanged(boolean hasWindowFocus) {
-        if (!this.initialFlag) {
-            this.initialFlag = true;
-        }
-        if (hasWindowFocus) {
-            setFocusable(true);
-            for (int i = 0; i < this.PID_BUFFER_SIZE; i++) {
-                this.pidBuffer[i] = -1;
-            }
-            showNotify();
-            return;
-        }
-        hideNotify();
-    }
-
-    public boolean initialized() {
-        return this.initialFlag;
-    }
-
-    public void hideNotify() {
-    }
-
-    public void showNotify() {
-    }
-
-    public void keyPressed(int keyCode) {
-    }
-
-    public void keyReleased(int keyCode) {
-    }
-
-    public void trackballMoved(int keyCode) {
-    }
-
-    public void pointerPressed(int id, int x, int y) {
-    }
-
-    public void pointerReleased(int id, int x, int y) {
-    }
-
-    public void pointerDragged(int id, int x, int y) {
-    }
-
-    public void paint(Graphics g) {
-    }
-
-    public void repaint() {
+        batch.begin();
         try {
-            this.mGraphics.setCanvas(this.mHolder.lockCanvas());
-            synchronized (this.mHolder) {
-                if (this.mGraphics.getCanvas() != null) {
-                    paint(this.mGraphics);
+            MFDevice.renderFrame(seconds);
+        } finally {
+            batch.end();
+        }
+    }
+
+    public Graphics getGraphics() { return mGraphics; }
+    public SpriteBatch getRendererStats() { return batch; }
+    public boolean initialized() { return focused && resumed && surfaceReady && !disposed; }
+    public void setFilterBitmap(final boolean enabled) {
+        queueEvent(new Runnable() { public void run() { if (mGraphics != null) mGraphics.setFilterBitmap(enabled); } });
+    }
+    public void setAntiAlias(final boolean enabled) {
+        queueEvent(new Runnable() { public void run() { if (mGraphics != null) mGraphics.setAntiAlias(enabled); } });
+    }
+    public void setUseMultitouch(boolean enabled) { useMultiTouch = enabled; }
+
+    public void pauseGame() {
+        resumed = false;
+        hideNotify();
+        super.onPause();
+    }
+    public void resumeGame() {
+        resumed = true;
+        super.onResume();
+        if (focused) showNotify();
+    }
+    public void dispose() {
+        disposed = true;
+        surfaceReady = false;
+        queueEvent(new Runnable() {
+            public void run() {
+                clock.reset();
+                resetPointers();
+                if (mGraphics instanceof GLGraphics) ((GLGraphics) mGraphics).release();
+                // EGL may already have been lost. GLSurfaceView destroys its remaining GL resources.
+            }
+        });
+    }
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        focused = hasFocus;
+        if (hasFocus && resumed) showNotify(); else hideNotify();
+    }
+    public void hideNotify() {
+        queueEvent(new Runnable() {
+            public void run() {
+                clock.reset(); resetPointers();
+                if (MFDevice.isCurrentCanvas(Canvas.this)) MFDevice.notifyPause();
+            }
+        });
+    }
+    public void showNotify() {
+        queueEvent(new Runnable() {
+            public void run() {
+                clock.reset(); resetPointers();
+                if (MFDevice.isCurrentCanvas(Canvas.this)) MFDevice.notifyResume();
+            }
+        });
+    }
+
+    @Override public boolean onTouchEvent(MotionEvent event) { return touchEvent(event); }
+    public boolean touchEvent(MotionEvent event) {
+        final MotionEvent copy = MotionEvent.obtain(event);
+        queueEvent(new Runnable() {
+            public void run() {
+                try {
+                    if (initialized() && MFDevice.isCurrentCanvas(Canvas.this)) processTouch(copy);
+                } finally { copy.recycle(); }
+            }
+        });
+        return true;
+    }
+    private void ensurePointer(int id) {
+        if (id < pointers.length) return;
+        int old = pointers.length;
+        pointers = Arrays.copyOf(pointers, Math.max(old * 2, id + 1));
+        Arrays.fill(pointers, old, pointers.length, -1);
+    }
+    private void resetPointers() {
+        for (int id : pointers) if (id >= 0) pointerReleased(id, 0, 0);
+        Arrays.fill(pointers, -1);
+    }
+    private void processTouch(MotionEvent event) {
+        int action = event.getActionMasked();
+        if (action == MotionEvent.ACTION_CANCEL) { resetPointers(); return; }
+        if (action == MotionEvent.ACTION_DOWN) resetPointers();
+        int index = event.getActionIndex();
+        if (index < 0 || index >= event.getPointerCount()) return;
+        int id = useMultiTouch ? event.getPointerId(index) : 0;
+        ensurePointer(id);
+        int x = (int) event.getX(index), y = (int) event.getY(index);
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+                if (!useMultiTouch && action != MotionEvent.ACTION_DOWN) break;
+                pointers[id] = id;
+                pointerPressed(id, x, y);
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+                if (!useMultiTouch && action != MotionEvent.ACTION_UP) break;
+                if (pointers[id] >= 0) pointerReleased(id, x, y);
+                pointers[id] = -1;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                int count = useMultiTouch ? event.getPointerCount() : 1;
+                for (int i = 0; i < count; i++) {
+                    id = useMultiTouch ? event.getPointerId(i) : 0;
+                    ensurePointer(id);
+                    // A missing DOWN (focus loss/cancel) is not another finger's identity.
+                    if (pointers[id] >= 0) pointerDragged(id, (int) event.getX(i), (int) event.getY(i));
                 }
-            }
-            if (this.mGraphics.getCanvas() != null) {
-                this.mHolder.unlockCanvasAndPost(this.mGraphics.getCanvas());
-            }
-        } catch (Throwable th) {
-            try {
-            if (this.mGraphics.getCanvas() != null) {
-                this.mHolder.unlockCanvasAndPost(this.mGraphics.getCanvas());
-            }
-            } catch (Exception e) {
-            e.printStackTrace();
+                break;
+        }
+        if (action == MotionEvent.ACTION_DOWN) {
+            if (StageManager.loadStep == 0) State.initTouchkeyBoard();
+            if (x > screenWidth * 0.5f && y < screenHeight * 0.5f
+                    && !MFMain.multiplayer && GameObject.player != null && GameObject.player2 != null) {
+                if (++MFMain.tapCount >= 3) { MFMain.switchPlayerFocus(); MFMain.tapCount = 0; }
             }
         }
     }
 
-    public void serviceRepaints() {
+    public boolean keyDown(final int keyCode, KeyEvent event) {
+        queueEvent(new Runnable() { public void run() { keyPressed(keyCode); } });
+        return true;
     }
-
-    public void setFullScreenMode(boolean b) {
-        if (b) {
-            MFMain.getInstance().requestWindowFeature(1);
-        }
+    public boolean keyUp(final int keyCode, KeyEvent event) {
+        queueEvent(new Runnable() { public void run() { keyReleased(keyCode); } });
+        return true;
     }
+    @Override public boolean onTrackballEvent(MotionEvent event) {
+        if (!MFDevice.enableTrackBall) return true;
+        final int action = event.getActionMasked();
+        final int code = action == MotionEvent.ACTION_MOVE
+                ? (Math.abs(event.getX()) > Math.abs(event.getY())
+                    ? (event.getX() > 0 ? 22 : 21) : (event.getY() > 0 ? 20 : 19)) : 23;
+        queueEvent(new Runnable() {
+            public void run() {
+                if (action == MotionEvent.ACTION_DOWN) keyPressed(code);
+                else if (action == MotionEvent.ACTION_UP) keyReleased(code);
+                else if (action == MotionEvent.ACTION_MOVE) trackballMoved(code);
+            }
+        });
+        return true;
+    }
+    public void keyPressed(int keyCode) { }
+    public void keyReleased(int keyCode) { }
+    public void trackballMoved(int keyCode) { }
+    public void pointerPressed(int id, int x, int y) { }
+    public void pointerReleased(int id, int x, int y) { }
+    public void pointerDragged(int id, int x, int y) { }
+    public void paint(Graphics graphics) { }
+    public void repaint() { requestRender(); }
+    public void serviceRepaints() { }
+    public void setFullScreenMode(boolean enabled) { }
 }

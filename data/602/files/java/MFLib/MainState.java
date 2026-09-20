@@ -6,6 +6,7 @@ package MFLib;
 import GameEngine.Def;
 import GameEngine.Key;
 import Lib.SoundSystem;
+import Lib.AnimationDrawer;
 import SonicGBA.GlobalResource;
 import SonicGBA.PlayerObject;
 import SonicGBA.StageManager;
@@ -20,8 +21,6 @@ import com.sega.mobile.platform.ChargePlatform;
 import com.sega.mobile.platform.ChargeListener;
 
 public class MainState implements MFGameState, Def {
-    public static final int FRAME_SKIP = 63;
-    private Main main;
     private boolean pauseFlag = false;
     private static String gameVersion = "";
     private static final String MF_VERSION = "";
@@ -29,25 +28,9 @@ public class MainState implements MFGameState, Def {
     //public static boolean tipfps60 = false;
 
     public MainState(Main main) {
-        this.main = main;
+        // Activity instances are not retained across Android recreation.
     }
     
-    public static int OpeningFPS() {
-    return FRAME_SKIP;
-    }
-    
-    public static double getfps() {
-        return Main.BULLET_TIME ? 1 : 1000.0 / FRAME_SKIP;
-    }
-    
-    public static int getms() {
-        return Main.BULLET_TIME ? 1008 : FRAME_SKIP;
-    }
-
-    public int getFrameTime() {
-        return Main.BULLET_TIME ? 1008 : FRAME_SKIP;
-    }
-
     public void onEnter() {
         init_bp();
         MFDevice.setAntiAlias(false);
@@ -60,7 +43,7 @@ public class MainState implements MFGameState, Def {
         //PlayerObject.setCharacter(0);
         //StageManager.setStageID(0);
         State.setState(0);
-        String versionStr = this.main.getAppProperty("MIDlet-Version");
+        String versionStr = MFMain.getInstance().getAppProperty("MIDlet-Version");
         if (!versionStr.startsWith("1.0")) {
             gameVersion = "ver:" + versionStr;
         }
@@ -90,7 +73,10 @@ public class MainState implements MFGameState, Def {
         State.stateDraw(g);
     }
 
-    public void onTick() {
+    public void onUpdate(double deltaSeconds) {
+        Lib.Animation.updateAll();
+        AnimationDrawer.updateAll();
+        PyxEditor.PyxAnimation.updateAll();
         pauseCheck();
         State.stateLogic();
         pauseCheck();

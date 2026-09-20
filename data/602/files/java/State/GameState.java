@@ -3,6 +3,8 @@
 //
 package State;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Def;
 import GameEngine.Key;
 import GameEngine.TouchKeyRange;
@@ -336,14 +338,14 @@ public class GameState extends State {
         this.offsetOfVolumeInterface = 0;
         this.pressDelay = 5;
         this.cloudInfo = new int[10][3];
-        this.cloudCount = 0;
+        this.cloudCount = GameTime.set(this, "cloudCount", 0);
         this.birdInfo = new int[10][3];
         this.BP_IsFromContinueTry = false;
         this.BP_CONTINUETRY_MENU_START_X = FRAME_X;
         this.BP_CONTINUETRY_MENU_START_Y = this.MORE_GAME_START_Y;
         this.BP_CONTINUETRY_MENU_WIDTH = FRAME_WIDTH;
         this.BP_CONTINUETRY_MENU_HEIGHT = this.MORE_GAME_HEIGHT;
-        this.overcnt = 0;
+        this.overcnt = GameTime.set(this, "overcnt", 0);
         this.IsPlayerNameDrawable = false;
         this.IsActNumDrawable = false;
         this.state = 5;
@@ -428,7 +430,7 @@ public class GameState extends State {
     }
 
     private boolean birdLogic() {
-        this.birdX -= 2;
+        this.birdX = GameTime.advance(this, "birdX", this.birdX, -(2));
         boolean var1;
         if (this.birdX < (SCREEN_WIDTH >> 1) + 30) {
             this.birdX = (SCREEN_WIDTH >> 1) + 30;
@@ -452,13 +454,13 @@ public class GameState extends State {
 
     private void cloudLogic() {
         if (this.cloudCount > 0) {
-            --this.cloudCount;
+            this.cloudCount = Math.max(0, GameTime.advance(this, "cloudCount", this.cloudCount, -(1)));
         }
 
         for(int var1 = 0; var1 < 10; ++var1) {
             if (this.cloudInfo[var1][0] != 0) {
                 int[] var2 = this.cloudInfo[var1];
-                var2[1] += CLOUD_VELOCITY[this.cloudInfo[var1][0] - 1];
+                var2[1] = GameTime.advance(var2, String.valueOf(1), var2[1], CLOUD_VELOCITY[this.cloudInfo[var1][0] - 1]);
                 if (this.cloudInfo[var1][1] >= SCREEN_WIDTH + 75) {
                     this.cloudInfo[var1][0] = 0;
                 }
@@ -468,7 +470,7 @@ public class GameState extends State {
                 this.cloudInfo[var1][0] = MyRandom.nextInt(1, 3);
                 this.cloudInfo[var1][1] = 0;
                 this.cloudInfo[var1][2] = MyRandom.nextInt(20, SCREEN_HEIGHT - 40);
-                this.cloudCount = MyRandom.nextInt(8, 20);
+                this.cloudCount = GameTime.set(this, "cloudCount", MyRandom.nextInt(8, 20));
             }
         }
 
@@ -484,7 +486,7 @@ public class GameState extends State {
 
     private void continueInit() {
         this.state = 42;
-        this.continueFrame = 0;
+        this.continueFrame = GameTime.set(this, "continueFrame", 0);
         this.continueScale = 1.0F;
         this.continueMoveBlackBarX = -SCREEN_WIDTH;
         this.continueMoveNumberX = -30;
@@ -512,8 +514,8 @@ public class GameState extends State {
     }
 
     private void degreeLogic() {
-        this.degree += 10;
-        this.degree %= 360;
+        this.degree = GameTime.advance(this, "degree", this.degree, 10);
+        this.degree = GameTime.wrap(this, "degree", this.degree, 360);
     }
 
     private void doReturnGameStuff() {
@@ -621,10 +623,10 @@ public class GameState extends State {
     }
 
     private void drawGameOverSingle(MFGraphics var1) {
-        ++this.continueFrame;
+        this.continueFrame = GameTime.advance(this, "continueFrame", this.continueFrame, 1);
         if (this.continueFrame >= 65) {
             if (this.continueScale > 0.0F) {
-                this.continueScale -= 0.2F;
+                this.continueScale += (float) ((-(0.2F)) * GameTime.assetUnits());
             } else {
                 this.continueScale = 0.0F;
             }
@@ -725,8 +727,8 @@ public class GameState extends State {
     }
 
     private void drawHugeStageName(MFGraphics var1, int var2, int var3, int var4) {
-        this.selectMenuOffsetX -= 8;
-        this.selectMenuOffsetX %= 224;
+        this.selectMenuOffsetX = GameTime.advance(this, "selectMenuOffsetX", this.selectMenuOffsetX, -(8));
+        this.selectMenuOffsetX = GameTime.wrap(this, "selectMenuOffsetX", this.selectMenuOffsetX, 224);
         if (var2 < 12) {
             var3 = var2 >> 1;
         } else {
@@ -801,8 +803,8 @@ public class GameState extends State {
     private void drawLoadingBar(MFGraphics var1, int var2) {
         this.drawTips(var1, var2);
         drawBar(var1, 0, var2);
-        this.selectMenuOffsetX += 8;
-        this.selectMenuOffsetX %= MENU_TITLE_MOVE_DIRECTION;
+        this.selectMenuOffsetX = GameTime.advance(this, "selectMenuOffsetX", this.selectMenuOffsetX, 8);
+        this.selectMenuOffsetX = GameTime.wrap(this, "selectMenuOffsetX", this.selectMenuOffsetX, MENU_TITLE_MOVE_DIRECTION);
 
         for(var2 = 0; var2 - this.selectMenuOffsetX > 0; var2 -= MENU_TITLE_MOVE_DIRECTION) {
         }
@@ -818,8 +820,8 @@ public class GameState extends State {
     }
 
     private void drawScrollString(MFGraphics var1, String var2, int var3, int var4, int var5, int var6, int var7, int var8, int var9) {
-        this.itemOffsetX += var4;
-        this.itemOffsetX %= var5;
+        this.itemOffsetX = GameTime.advance(this, "itemOffsetX", this.itemOffsetX, var4);
+        this.itemOffsetX = GameTime.wrap(this, "itemOffsetX", this.itemOffsetX, var5);
 
         for(var4 = 0; var4 - this.itemOffsetX > 0; var4 -= var5) {
         }
@@ -953,8 +955,8 @@ public class GameState extends State {
         }
 
         this.endingState = 0;
-        this.cloudCount = 0;
-        this.count = 20;
+        this.cloudCount = GameTime.set(this, "cloudCount", 0);
+        this.count = GameTime.set(this, "count", 20);
         this.planeInit();
         this.birdInit();
         this.staffInit();
@@ -963,7 +965,7 @@ public class GameState extends State {
 
     private void endingLogic() {
         if (this.count > 0) {
-            --this.count;
+            this.count = Math.max(0, GameTime.advance(this, "count", this.count, -(1)));
         }
 
         this.degreeLogic();
@@ -987,7 +989,7 @@ public class GameState extends State {
                 break;
             case 3:
                 if (this.showCount > 0) {
-                    --this.showCount;
+                    this.showCount = Math.max(0, GameTime.advance(this, "showCount", this.showCount, -(1)));
                 }
 
                 if (this.showCount == 0) {
@@ -999,7 +1001,7 @@ public class GameState extends State {
                         int var2 = this.position;
                         int var3 = SCREEN_WIDTH;
                         int var1 = SCREEN_WIDTH;
-                        this.position = MyAPI.calNextPositionReverse(var2, var3 >> 1, var1 * 3 >> 1, 1, 3);
+                        this.position = MyAPI.calNextPositionReverse(this, "position", var2, var3 >> 1, var1 * 3 >> 1, 1, 3);
                         if (this.position == SCREEN_WIDTH * 3 >> 1) {
                             this.outing = false;
                             this.position = -SCREEN_WIDTH >> 1;
@@ -1008,10 +1010,10 @@ public class GameState extends State {
                             Key.touchkeyboardInit();
                         }
                     } else {
-                        this.position = MyAPI.calNextPosition((double)this.position, (double)(SCREEN_WIDTH >> 1), 1, 3);
+                        this.position = MyAPI.calNextPosition(this, "position", (double)this.position, (double)(SCREEN_WIDTH >> 1), 1, 3);
                         if (this.position == SCREEN_WIDTH >> 1) {
                             this.outing = true;
-                            this.showCount = 45;
+                            this.showCount = GameTime.set(this, "showCount", 45);
                             this.changing = false;
                         }
                     }
@@ -1040,7 +1042,7 @@ public class GameState extends State {
     }
 
     private void gamePauseInit() {
-        this.pausecnt = 0;
+        this.pausecnt = GameTime.set(this, "pausecnt", 0);
         this.pause_saw_x = -50;
         this.pause_saw_y = 0;
         this.pause_saw_speed = 30;
@@ -1065,18 +1067,18 @@ public class GameState extends State {
     }
 
     private void gamePauseLogic() {
-        ++this.pausecnt;
+        this.pausecnt = GameTime.advance(this, "pausecnt", this.pausecnt, 1);
         if (this.pausecnt >= 5 && this.pausecnt <= 7) {
             if (this.pause_saw_x + this.pause_saw_speed > 0) {
                 this.pause_saw_x = 0;
             } else {
-                this.pause_saw_x += this.pause_saw_speed;
+                this.pause_saw_x = GameTime.advance(this, "pause_saw_x", this.pause_saw_x, this.pause_saw_speed);
             }
 
             if (this.pause_item_x + this.pause_item_speed < (SCREEN_WIDTH >> 1) - 40) {
                 this.pause_item_x = (SCREEN_WIDTH >> 1) - 40;
             } else {
-                this.pause_item_x += this.pause_item_speed;
+                this.pause_item_x = GameTime.advance(this, "pause_item_x", this.pause_item_x, this.pause_item_speed);
             }
         } else if (this.pausecnt > 7) {
             byte var1;
@@ -1105,8 +1107,8 @@ public class GameState extends State {
 
             if (this.pause_returnFlag) {
                 if (this.pausecnt > this.pause_returnframe && this.pausecnt <= this.pause_returnframe + 3) {
-                    this.pause_saw_x -= this.pause_saw_speed;
-                    this.pause_item_x -= this.pause_item_speed;
+                    this.pause_saw_x = GameTime.advance(this, "pause_saw_x", this.pause_saw_x, -(this.pause_saw_speed));
+                    this.pause_item_x = GameTime.advance(this, "pause_item_x", this.pause_item_x, -(this.pause_item_speed));
                 } else if (this.pausecnt > this.pause_returnframe + 3) {
                     this.BacktoGame();
                     isDrawTouchPad = true;
@@ -1208,7 +1210,7 @@ public class GameState extends State {
     }
 
     private void initStageIntroType1Conf() {
-        this.frameCount = 0;
+        this.frameCount = GameTime.set(this, "frameCount", 0);
         this.display[0][0] = -50;
         this.display[0][1] = 0;
         this.display[0][2] = 0;
@@ -1236,7 +1238,7 @@ public class GameState extends State {
     }
 
     private void initStageIntroType2Conf() {
-        this.frameCount = 0;
+        this.frameCount = GameTime.set(this, "frameCount", 0);
         this.display[0][0] = -50;
         this.display[0][1] = 0;
         this.display[0][2] = 0;
@@ -1329,7 +1331,7 @@ public class GameState extends State {
 
         MyAPI.initString();
         if (isLoadingSkipped == false && GlobalResource.loadingTipsConfig == 0) {
-            this.loadingStartTime = System.currentTimeMillis();
+            this.loadingStartTime = GameTime.milliseconds();
         }
 
         tipsForShow = null;
@@ -1370,7 +1372,7 @@ public class GameState extends State {
     }
 
     public static boolean loadingEnd() {
-        long var2 = System.currentTimeMillis();
+        long var2 = GameTime.milliseconds();
         boolean var1;
         if (var2 - loadingStartTime >= 10000L && StageManager.loadStageStep()) {
             var1 = true;
@@ -1637,8 +1639,8 @@ public class GameState extends State {
         var4.setActionId(var5 + 27);
         muiAniDrawer.draw(var1, (SCREEN_WIDTH >> 1) - 96, this.optionDrawOffsetY + 40 + this.optionslide_y + 96);
 
-        this.optionOffsetX -= 4;
-        this.optionOffsetX %= 100;
+        this.optionOffsetX = GameTime.advance(this, "optionOffsetX", this.optionOffsetX, -(4));
+        this.optionOffsetX = GameTime.wrap(this, "optionOffsetX", this.optionOffsetX, 100);
         muiAniDrawer.setActionId(51);
 
         for(var2 = this.optionOffsetX; var2 < SCREEN_WIDTH * 2; var2 += 100) {
@@ -1789,7 +1791,7 @@ public class GameState extends State {
                             this.optionDrawOffsetY = 0;
                             this.optionYDirect = 0;
                         } else {
-                            this.optionDrawOffsetY += var1;
+                            this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, var1);
                         }
                     } else if (this.optionDrawOffsetY < this.optionDrawOffsetBottomY) {
                         this.optionYDirect = 2;
@@ -1803,7 +1805,7 @@ public class GameState extends State {
                             this.optionDrawOffsetY = this.optionDrawOffsetBottomY;
                             this.optionYDirect = 0;
                         } else {
-                            this.optionDrawOffsetY += var1;
+                            this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, var1);
                         }
                     }
                 }
@@ -2062,7 +2064,7 @@ public class GameState extends State {
     }
 
     private void planeLogic() {
-        this.planeX -= 2;
+        this.planeX = GameTime.advance(this, "planeX", this.planeX, -(2));
         if (this.planeX < SCREEN_WIDTH >> 1) {
             this.planeX = SCREEN_WIDTH >> 1;
         }
@@ -2128,11 +2130,11 @@ public class GameState extends State {
 
     private void staffLogic() {
         if (this.showCount > 0) {
-            --this.showCount;
+            this.showCount = Math.max(0, GameTime.advance(this, "showCount", this.showCount, -(1)));
         }
 
         if (this.showCount > 0 && Key.repeatAnyKey()) {
-            this.showCount = 0;
+            this.showCount = GameTime.set(this, "showCount", 0);
         }
 
         if (this.showCount == 0 && this.stringCursor < STAFF_STR.length - 1) {
@@ -2144,7 +2146,7 @@ public class GameState extends State {
                 int var2 = this.position;
                 int var3 = SCREEN_WIDTH;
                 int var1 = SCREEN_WIDTH;
-                this.position = MyAPI.calNextPositionReverse(var2, var3 >> 1, var1 * 3 >> 1, 1, 3);
+                this.position = MyAPI.calNextPositionReverse(this, "position", var2, var3 >> 1, var1 * 3 >> 1, 1, 3);
                 if (this.position == SCREEN_WIDTH * 3 >> 1) {
                     this.outing = false;
                     this.position = -SCREEN_WIDTH >> 1;
@@ -2153,11 +2155,11 @@ public class GameState extends State {
                     this.colorCursor %= COLOR_SEQ.length;
                 }
             } else {
-                this.position = MyAPI.calNextPosition((double)this.position, (double)(SCREEN_WIDTH >> 1), 1, 3);
+                this.position = MyAPI.calNextPosition(this, "position", (double)this.position, (double)(SCREEN_WIDTH >> 1), 1, 3);
                 if (this.position == SCREEN_WIDTH >> 1) {
                     this.changing = false;
                     this.outing = true;
-                    this.showCount = 45;
+                    this.showCount = GameTime.set(this, "showCount", 45);
                 }
             }
         }
@@ -2174,8 +2176,8 @@ public class GameState extends State {
             StageManager.addStageID();
             SoundSystem.getInstance().stopBgm(false);
         } else if (PlayerObject.IsStarttoCnt) {
-            ++this.cnt;
-            if (this.cnt == 1) {
+            this.cnt = GameTime.advance(this, "cnt", this.cnt, 1);
+            if (GameTime.event(this, "cnt", "stagePassLogic:2180", GameTime.crosses(this, "cnt", this.cnt, 1))) {
                 if (PlayerObject.stageModeState == 1) {
                     GameObject.ObjectClear();
                 }
@@ -2183,12 +2185,12 @@ public class GameState extends State {
                 PlayerObject.isbarOut = true;
             }
 
-            if (this.cnt == 2) {
+            if (GameTime.event(this, "cnt", "stagePassLogic:2188", GameTime.crosses(this, "cnt", this.cnt, 2))) {
                 SoundSystem.getInstance().playSe(32, false);
             }
 
             if (this.cnt > 20) {
-                if (this.cnt == 21) {
+                if (GameTime.event(this, "cnt", "stagePassLogic:2193", GameTime.crosses(this, "cnt", this.cnt, 21))) {
                     if (PlayerObject.stageModeState == 0) {
                         GameObject.player.setStagePassRunOutofScreen();
                         if (GameObject.player2 != null) GameObject.player2.setStagePassRunOutofScreen();
@@ -2232,7 +2234,7 @@ public class GameState extends State {
                     }
                 }
 
-                if (this.cnt == this.racemode_cnt) {
+                if (GameTime.event(this, "cnt", "stagePassLogic:2237", GameTime.crosses(this, "cnt", this.cnt, this.racemode_cnt))) {
                     if (PlayerObject.stageModeState == 1) {
                         if (!ChargePlatform.isChargedByIndex(0)) {
                             MFDevice.setResponseInterruptFlag(false);
@@ -2694,9 +2696,9 @@ public class GameState extends State {
         }
 
         if (BP_items_num[currentBPItems[PlayerObject.cursor]] == 0) {
-            this.tooltipY = MyAPI.calNextPosition((double)this.tooltipY, (double)TOOL_TIP_Y_DES, 1, 3);
+            this.tooltipY = MyAPI.calNextPosition(this, "tooltipY", (double)this.tooltipY, (double)TOOL_TIP_Y_DES, 1, 3);
         } else {
-            this.tooltipY = MyAPI.calNextPositionReverse(this.tooltipY, TOOL_TIP_Y_DES, TOOL_TIP_Y_DES_2, 1, 3);
+            this.tooltipY = MyAPI.calNextPositionReverse(this, "tooltipY", this.tooltipY, TOOL_TIP_Y_DES, TOOL_TIP_Y_DES_2, 1, 3);
         }
 
         fillMenuRect(var1, TOOL_TIP_X, this.tooltipY, TOOL_TIP_WIDTH, TOOL_TIP_HEIGHT);
@@ -3072,7 +3074,7 @@ public class GameState extends State {
         var1.setColor(16777215);
         MyAPI.fillRect(var1, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         if (!GameObject.IsGamePause) {
-            ++MapManager.gameFrame;
+            MapManager.gameFrame = GameTime.advance(MapManager.class, "gameFrame", MapManager.gameFrame, 1);
         }
 
         BackGroundManager.frame = MapManager.gameFrame;
@@ -3357,7 +3359,7 @@ public class GameState extends State {
 
     public void gotoGameOver() {
         IsGameOver = true;
-        this.overcnt = 0;
+        this.overcnt = GameTime.set(this, "overcnt", 0);
         this.state = 28;
         this.overtitleID = 78;
         SoundSystem.getInstance().stopBgm(true);
@@ -3555,7 +3557,7 @@ public class GameState extends State {
 
                 if (!StageManager.isStagePass()) {
                     PlayerObject.initMovingBar();
-                    this.cnt = 0;
+                    this.cnt = GameTime.set(this, "cnt", 0);
                     PlayerObject.IsStarttoCnt = false;
                     StageManager.IsCalculateScore = true;
                     PlayerObject.IsDisplayRaceModeNewRecord = false;
@@ -3593,7 +3595,7 @@ public class GameState extends State {
                         }
 
                         IsTimeOver = true;
-                        this.overcnt = 0;
+                        this.overcnt = GameTime.set(this, "overcnt", 0);
                         this.state = 28;
                         this.movingTitleX = SCREEN_WIDTH + 56;
                         if (!StageManager.isStageGameover()) {
@@ -3639,7 +3641,7 @@ public class GameState extends State {
                     }
                     if (StageManager.isStageTimeover()) {
                         IsTimeOver = true;
-                        this.overcnt = 0;
+                        this.overcnt = GameTime.set(this, "overcnt", 0);
                         this.state = 28;
                         this.movingTitleX = SCREEN_WIDTH + 56;
                         if (!StageManager.isStageGameover()) {
@@ -3798,7 +3800,7 @@ public class GameState extends State {
                     fadeInit(0, 255);
                     this.state = 12;
                 } else {
-                    this.movingTitleX -= this.movingTitleSpeedX;
+                    this.movingTitleX = GameTime.advance(this, "movingTitleX", this.movingTitleX, -(this.movingTitleSpeedX));
                 }
                 break;
             case 12:
@@ -3812,13 +3814,13 @@ public class GameState extends State {
                         this.setStateWithFade(0);
                     }
 
-                    this.gameoverCnt = 0;
+                    this.gameoverCnt = GameTime.set(this, "gameoverCnt", 0);
                 }
                 break;
             case 13:
                 if (fadeChangeOver()) {
                     if (IsGameOver) {
-                        if (!SoundSystem.getInstance().bgmPlaying() && GlobalResource.soundSwitchConfig != 0 || GlobalResource.soundSwitchConfig == 0 && this.gameoverCnt == 128) {
+                        if (GameTime.event(this, "gameoverCnt", "logic:3823", !SoundSystem.getInstance().bgmPlaying() && GlobalResource.soundSwitchConfig != 0 || GlobalResource.soundSwitchConfig == 0 && GameTime.crosses(this, "gameoverCnt", this.gameoverCnt, 128))) {
                             if (PlayerObject.stageModeState == 0) {
                                 Standard2.splashinit(true);
                                 this.setStateWithFade(0);
@@ -3829,12 +3831,12 @@ public class GameState extends State {
                             Key.touchkeyboardClose();
                             Key.touchkeyboardInit();
                         } else {
-                            ++this.gameoverCnt;
+                            this.gameoverCnt = GameTime.advance(this, "gameoverCnt", this.gameoverCnt, 1);
                         }
                     }
 
                     if (IsTimeOver) {
-                        if (this.gameoverCnt == 128) {
+                        if (GameTime.event(this, "gameoverCnt", "logic:3839", GameTime.crosses(this, "gameoverCnt", this.gameoverCnt, 128))) {
                             this.state = 5;
                             loadingType = 0;
                             StageManager.setStageRestart();
@@ -3842,14 +3844,14 @@ public class GameState extends State {
                             fadeInit(255, 0);
                             this.initTips();
                         } else {
-                            ++this.gameoverCnt;
+                            this.gameoverCnt = GameTime.advance(this, "gameoverCnt", this.gameoverCnt, 1);
                         }
                     }
                 }
                 break;
             case 14:
                 if (fadeChangeOver()) {
-                    ++this.allclearFrame;
+                    this.allclearFrame = GameTime.advance(this, "allclearFrame", this.allclearFrame, 1);
                     if (this.allclearFrame > 20) {
                         this.stagePassLogic();
                     }
@@ -3857,7 +3859,7 @@ public class GameState extends State {
                 break;
             case 15:
                 if (this.frameCount < 10) {
-                    ++this.frameCount;
+                    this.frameCount = Math.min(10, GameTime.advance(this, "frameCount", this.frameCount, 1));
                 } else {
                     this.releaseTips();
                     this.state = 16;
@@ -3889,12 +3891,12 @@ public class GameState extends State {
                     this.display[5][2] = 0;
                 }
 
-                if (this.frameCount == 7) {
+                if (GameTime.event(this, "frameCount", "logic:3894", GameTime.crosses(this, "frameCount", this.frameCount, 7))) {
                     this.IsPlayerNameDrawable = true;
                     this.stageInfoPlayerNameDrawer.restart();
                 }
 
-                if (this.frameCount == 9) {
+                if (GameTime.event(this, "frameCount", "logic:3899", GameTime.crosses(this, "frameCount", this.frameCount, 9))) {
                     this.IsActNumDrawable = true;
                     this.stageInfoActNumDrawer.restart();
                 }
@@ -3903,40 +3905,40 @@ public class GameState extends State {
                     this.display[0][0] = 0;
                 } else {
                     var3 = this.display[0];
-                    var3[0] += this.display[0][2];
+                    var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[0][2]);
                 }
 
                 var3 = this.display[0];
-                var3[1] += this.display[0][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[0][3]);
                 var3 = this.display[1];
-                var3[0] += this.display[1][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[1][2]);
                 if (this.display[1][0] < 0) {
                     this.display[1][0] = 0;
                 }
 
                 var3 = this.display[1];
-                var3[1] += this.display[1][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[1][3]);
                 var3 = this.display[2];
 
-                for(var3[0] += this.display[2][2]; this.display[2][0] < 0; var3[0] += 224) {
+                for(var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[2][2]); this.display[2][0] < 0; var3[0] += 224) {
                     var3 = this.display[2];
                 }
 
                 var3 = this.display[2];
                 var3[0] %= 224;
                 var3 = this.display[2];
-                var3[1] += this.display[2][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[2][3]);
                 var3 = this.display[4];
-                var3[0] += this.display[4][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[4][2]);
                 if (this.display[5][0] + this.display[5][2] < SCREEN_WIDTH - 112) {
                     this.display[5][0] = SCREEN_WIDTH - 112;
                 } else {
                     var3 = this.display[5];
-                    var3[0] += this.display[5][2];
+                    var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[5][2]);
                 }
 
                 if (this.state == 16) {
-                    this.frameCount = 0;
+                    this.frameCount = GameTime.set(this, "frameCount", 0);
                 }
 
                 GameObject.setNoInput();
@@ -3944,7 +3946,7 @@ public class GameState extends State {
                 break;
             case 16:
                 if (this.frameCount < 48) {
-                    ++this.frameCount;
+                    this.frameCount = Math.min(48, GameTime.advance(this, "frameCount", this.frameCount, 1));
                 } else {
                     this.state = 17;
                     Key.clear();
@@ -3954,33 +3956,33 @@ public class GameState extends State {
                 this.display[2][2] = -7;
                 this.display[4][3] = 0;
                 var3 = this.display[0];
-                var3[0] += this.display[0][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[0][2]);
                 var3 = this.display[0];
-                var3[1] += this.display[0][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[0][3]);
                 var3 = this.display[1];
-                var3[0] += this.display[1][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[1][2]);
                 var3 = this.display[1];
-                var3[1] += this.display[1][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[1][3]);
                 var3 = this.display[2];
 
-                for(var3[0] += this.display[2][2]; this.display[2][0] < 0; var3[0] += 224) {
+                for(var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[2][2]); this.display[2][0] < 0; var3[0] += 224) {
                     var3 = this.display[2];
                 }
 
                 var3 = this.display[2];
                 var3[0] %= 224;
                 var3 = this.display[2];
-                var3[1] += this.display[2][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[2][3]);
                 var3 = this.display[3];
-                var3[0] += this.display[3][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[3][2]);
                 var3 = this.display[3];
-                var3[1] += this.display[3][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[3][3]);
                 var3 = this.display[4];
-                var3[0] += this.display[4][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[4][2]);
                 var3 = this.display[4];
-                var3[1] += this.display[4][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[4][3]);
                 var3 = this.display[5];
-                var3[0] += this.display[5][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[5][2]);
                 if (Key.press(Key.B_SEL | 16777216 | 8388608)) {
                     this.state = 17;
                     Key.clear();
@@ -3989,7 +3991,7 @@ public class GameState extends State {
                 }
 
                 if (this.state == 17) {
-                    this.frameCount = 0;
+                    this.frameCount = GameTime.set(this, "frameCount", 0);
                 }
 
                 GameObject.setNoInput();
@@ -3997,7 +3999,7 @@ public class GameState extends State {
                 break;
             case 17:
                 if (this.frameCount < 3) {
-                    ++this.frameCount;
+                    this.frameCount = Math.min(3, GameTime.advance(this, "frameCount", this.frameCount, 1));
                 } else {
                     PlayerObject.isNeedPlayWaterSE = true;
                     this.state = 0;
@@ -4011,30 +4013,30 @@ public class GameState extends State {
                 this.display[3][3] = -75;
                 this.display[4][3] = 45;
                 var3 = this.display[0];
-                var3[0] += this.display[0][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[0][2]);
                 var3 = this.display[0];
-                var3[1] += this.display[0][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[0][3]);
                 var3 = this.display[1];
-                var3[0] += this.display[1][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[1][2]);
                 var3 = this.display[1];
-                var3[1] += this.display[1][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[1][3]);
                 var3 = this.display[2];
-                var3[0] += this.display[2][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[2][2]);
                 var3 = this.display[5];
-                var3[0] += this.display[5][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[5][2]);
                 var3 = this.display[2];
-                var3[1] += this.display[2][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[2][3]);
                 var3 = this.display[3];
-                var3[0] += this.display[3][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[3][2]);
                 var3 = this.display[3];
-                var3[1] += this.display[3][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[3][3]);
                 var3 = this.display[4];
-                var3[0] += this.display[4][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[4][2]);
                 var3 = this.display[4];
-                var3[1] += this.display[4][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[4][3]);
                 if (this.state == 0) {
                     isDrawTouchPad = true;
-                    this.frameCount = 0;
+                    this.frameCount = GameTime.set(this, "frameCount", 0);
                     fadeInit(102, 0);
                     setFadeOver();
                 }
@@ -4047,7 +4049,7 @@ public class GameState extends State {
                 break;
             case 27:
                 if (this.frameCount < 18) {
-                    ++frameCount;
+                    frameCount = GameTime.advance(this, "frameCount", frameCount, 1);
                 } else {
                     this.releaseTips();
                     this.state = 16;
@@ -4079,12 +4081,12 @@ public class GameState extends State {
                     this.display[5][2] = 0;
                 }
 
-                if (this.frameCount == 15) {
+                if (GameTime.event(this, "frameCount", "logic:4084", GameTime.crosses(this, "frameCount", this.frameCount, 15))) {
                     this.IsPlayerNameDrawable = true;
                     this.stageInfoPlayerNameDrawer.restart();
                 }
 
-                if (this.frameCount == 17) {
+                if (GameTime.event(this, "frameCount", "logic:4089", GameTime.crosses(this, "frameCount", this.frameCount, 17))) {
                     this.IsActNumDrawable = true;
                     this.stageInfoActNumDrawer.restart();
                 }
@@ -4093,13 +4095,13 @@ public class GameState extends State {
                     this.display[0][0] = 0;
                 } else {
                     var3 = this.display[0];
-                    var3[0] += this.display[0][2];
+                    var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[0][2]);
                 }
 
                 var3 = this.display[0];
-                var3[1] += this.display[0][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[0][3]);
                 var3 = this.display[1];
-                var3[0] += this.display[1][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[1][2]);
                 if (this.display[1][0] < 0) {
                     this.display[1][0] = 0;
                 }
@@ -4108,46 +4110,46 @@ public class GameState extends State {
                     this.display[1][1] = (SCREEN_HEIGHT >> 1) + 48;
                 } else {
                     var3 = this.display[1];
-                    var3[1] += this.display[1][3];
+                    var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[1][3]);
                 }
 
                 var3 = this.display[2];
 
-                for(var3[0] += this.display[2][2]; this.display[2][0] < 0; var3[0] += 224) {
+                for(var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[2][2]); this.display[2][0] < 0; var3[0] += 224) {
                     var3 = this.display[2];
                 }
 
                 var3 = this.display[2];
                 var3[0] %= 224;
                 var3 = this.display[2];
-                var3[1] += this.display[2][3];
+                var3[1] = GameTime.advance(var3, String.valueOf(1), var3[1], this.display[2][3]);
                 var3 = this.display[4];
-                var3[0] += this.display[4][2];
+                var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[4][2]);
                 if (this.display[5][0] + this.display[5][2] < SCREEN_WIDTH - 112) {
                     this.display[5][0] = SCREEN_WIDTH - 112;
                 } else {
                     var3 = this.display[5];
-                    var3[0] += this.display[5][2];
+                    var3[0] = GameTime.advance(var3, String.valueOf(0), var3[0], this.display[5][2]);
                 }
 
                 if (this.state == 16) {
-                    this.frameCount = 0;
+                    this.frameCount = GameTime.set(this, "frameCount", 0);
                 }
 
                 GameObject.setNoInput();
                 GameObject.logicObjects();
                 break;
             case 28:
-                this.overcnt++;
-                if (this.overcnt == 20) {
+                this.overcnt = GameTime.advance(this, "overcnt", this.overcnt, 1);
+                if (GameTime.event(this, "overcnt", "logic:4144", GameTime.crosses(this, "overcnt", this.overcnt, 20))) {
                     isDrawTouchPad = false;
                 }
                 if (this.overtitleID == 78) {
-                    if (this.overcnt == 36) {
+                    if (GameTime.event(this, "overcnt", "logic:4148", GameTime.crosses(this, "overcnt", this.overcnt, 36))) {
                         initTouchkeyBoard();
                         if (!ChargePlatform.isChargedByIndex(0)) {
                             state = 11;
-                            this.continueFrame = 0;
+                            this.continueFrame = GameTime.set(this, "continueFrame", 0);
                             this.continueScale = 1.0f;
                             break;
                         } else {
@@ -4155,7 +4157,7 @@ public class GameState extends State {
                             break;
                         }
                     }
-                } else if (this.overtitleID == 136 && this.overcnt == 28) {
+                } else if (GameTime.event(this, "overcnt", "logic:4160", this.overtitleID == 136 && GameTime.crosses(this, "overcnt", this.overcnt, 28))) {
                     state = 11;
                     break;
                 }
@@ -4287,7 +4289,7 @@ public class GameState extends State {
                     this.exendBgImage = MFImage.createImage("/animation/ending/ed_ex_moon_bg.png");
                     this.exendBg1Image = MFImage.createImage("/animation/ending/ed_ex_forest.png");
                     SoundSystem.getInstance().stopBgm(false);
-                    this.allclearFrame = 0;
+                    this.allclearFrame = GameTime.set(this, "allclearFrame", 0);
                 }
                 break;
             case 41:
@@ -4296,18 +4298,18 @@ public class GameState extends State {
                     fadeInit(0, 102);
                     this.continueInit();
                 } else {
-                    this.movingTitleX -= this.movingTitleSpeedX;
+                    this.movingTitleX = GameTime.advance(this, "movingTitleX", this.movingTitleX, -(this.movingTitleSpeedX));
                 }
                 break;
             case 42:
                 if (this.continueFrame == 0) {
                 }
                 
-                ++this.continueFrame;
+                this.continueFrame = GameTime.advance(this, "continueFrame", this.continueFrame, 1);
                 if (this.continueFrame <= 5) {
-                    this.continueScale -= 0.2F;
+                    this.continueScale += (float) ((-(0.2F)) * GameTime.assetUnits());
                 } else if (this.continueFrame <= 10) {
-                    this.continueScale += 0.2F;
+                    this.continueScale += (float) ((0.2F) * GameTime.assetUnits());
                     if (this.continueScale > 1.0F) {
                         this.continueScale = 1.0F;
                     }
@@ -4315,12 +4317,12 @@ public class GameState extends State {
                     if (this.continueMoveBlackBarX + SCREEN_WIDTH / 6 > 0) {
                         this.continueMoveBlackBarX = 0;
                     } else {
-                        this.continueMoveBlackBarX += SCREEN_WIDTH / 6;
+                        this.continueMoveBlackBarX = GameTime.advance(this, "continueMoveBlackBarX", this.continueMoveBlackBarX, SCREEN_WIDTH / 6);
                     }
 
                     if (this.continueMoveBlackBarX == 0) {
                         if (this.continueNumberState == 0) {
-                            this.continueMoveNumberX += SCREEN_WIDTH / 12;
+                            this.continueMoveNumberX = GameTime.advance(this, "continueMoveNumberX", this.continueMoveNumberX, SCREEN_WIDTH / 12);
                             var1 = var2;
                             if (this.continueMoveNumberX >= SCREEN_WIDTH >> 1) {
                                 this.continueMoveNumberX = SCREEN_WIDTH >> 1;
@@ -4329,7 +4331,7 @@ public class GameState extends State {
                                 var1 = var2;
                             }
                         } else if (this.continueNumberState == 1) {
-                            this.continueNumberScale -= 0.125F;
+                            this.continueNumberScale += (float) ((-(0.125F)) * GameTime.assetUnits());
                             var1 = var2;
                             if (this.continueNumberScale <= 1.0F) {
                                 this.continueNumberScale = 1.0F;
@@ -4337,7 +4339,7 @@ public class GameState extends State {
                                 var1 = var2;
                             }
                         } else if (this.continueNumberState == 2) {
-                            this.continueMoveNumberX += SCREEN_WIDTH / 12;
+                            this.continueMoveNumberX = GameTime.advance(this, "continueMoveNumberX", this.continueMoveNumberX, SCREEN_WIDTH / 12);
                             var1 = var2;
                             if (this.continueMoveNumberX >= SCREEN_WIDTH + 30) {
                                 this.continueMoveNumberX = -30;
@@ -4350,7 +4352,7 @@ public class GameState extends State {
                                 }
                             }
                         } else if (this.continueNumberState == 3) {
-                            if (this.continueFrame == this.continueStartEndFrame + 3) {
+                            if (GameTime.event(this, "continueFrame", "logic:4355", GameTime.crosses(this, "continueFrame", this.continueFrame, this.continueStartEndFrame + 3))) {
                                 fadeInit(102, 255);
                                 var1 = var2;
                             } else {
@@ -4359,7 +4361,7 @@ public class GameState extends State {
                                     var1 = var2;
                                     if (fadeChangeOver()) {
                                         if (this.continueScale - 0.2F > 0.0F) {
-                                            this.continueScale -= 0.2F;
+                                            this.continueScale += (float) ((-(0.2F)) * GameTime.assetUnits());
                                         } else {
                                             this.continueScale = 0.0F;
                                         }
@@ -4374,7 +4376,7 @@ public class GameState extends State {
                                 }
                             }
                         } else if (this.continueNumberState == 4) {
-                            this.continueMoveNumberX += SCREEN_WIDTH / 12;
+                            this.continueMoveNumberX = GameTime.advance(this, "continueMoveNumberX", this.continueMoveNumberX, SCREEN_WIDTH / 12);
                             var1 = var2;
                             if (this.continueMoveNumberX >= SCREEN_WIDTH >> 1) {
                                 this.continueMoveNumberX = SCREEN_WIDTH >> 1;
@@ -4383,7 +4385,7 @@ public class GameState extends State {
                                 var1 = var2;
                             }
                         } else if (this.continueNumberState == 5) {
-                            this.continueNumberScale -= 0.125F;
+                            this.continueNumberScale += (float) ((-(0.125F)) * GameTime.assetUnits());
                             var1 = var2;
                             if (this.continueNumberScale <= 1.0F) {
                                 this.continueNumberScale = 1.0F;
@@ -4393,7 +4395,7 @@ public class GameState extends State {
                         } else {
                             var1 = var2;
                             if (this.continueNumberState == 6) {
-                                this.continueMoveNumberX += SCREEN_WIDTH / 12;
+                                this.continueMoveNumberX = GameTime.advance(this, "continueMoveNumberX", this.continueMoveNumberX, SCREEN_WIDTH / 12);
                                 var1 = var2;
                                 if (this.continueMoveNumberX >= SCREEN_WIDTH + 30) {
                                     this.state = 5;

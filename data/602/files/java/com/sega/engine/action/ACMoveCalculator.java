@@ -4,6 +4,7 @@
 package com.sega.engine.action;
 
 import com.sega.engine.lib.MyAPI;
+import GameEngine.time.GameTime;
 
 public class ACMoveCalculator {
     protected ACObject acObj;
@@ -92,6 +93,11 @@ public class ACMoveCalculator {
             this.moveDistanceY = 0;
         }
 
+    }
+
+    /** Integrate velocity once; actionLogic continues to accept a geometric displacement. */
+    public void moveVelocity(int x, int y) {
+        actionLogic(GameTime.distance(this, "moveX", GameTime.integratedVelocity(acObj, "velX", x)), GameTime.distance(this, "moveY", GameTime.integratedVelocity(acObj, "velY", y)));
     }
 
     public void actionLogic(int var1, int var2) {

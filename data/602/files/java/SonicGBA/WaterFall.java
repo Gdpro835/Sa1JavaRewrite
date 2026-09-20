@@ -3,6 +3,8 @@
 //
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import Lib.Animation;
@@ -99,7 +101,7 @@ public class WaterFall extends GimmickObject
                         WaterFall.frame = 0;
                     }
                     if (isFirstTouchedSandFall) {
-                        frame++;
+                        frame = GameTime.advanceOnce(WaterFall.class, "frame", frame, 1);
                         if (frame > 4 && !IsGamePause) {
                             soundInstance.playLoopSe(71);
                             frame = 0;
@@ -108,7 +110,7 @@ public class WaterFall extends GimmickObject
                 }
                 else if (StageManager.getCurrentZoneId() != 1) {
                     this.isActived = true;
-                    ++WaterFall.frame;
+                    WaterFall.frame = GameTime.advanceOnce(WaterFall.class, "frame", WaterFall.frame, 1);
                     WaterFall.frame %= 11;
                     if (!this.isTouchSand) {
                         this.isTouchSand = true;

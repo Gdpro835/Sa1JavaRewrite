@@ -3,6 +3,8 @@
 //
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -93,7 +95,7 @@ class WaterSlip extends GimmickObject {
     public void doWhileCollision(PlayerObject var1, int var2) {
         if (var1.collisionState == 0) {
             var1.setSlip();
-            ++frame;
+            frame = GameTime.advanceOnce(WaterSlip.class, "frame", frame, 1);
             this.isActive = true;
             if (this.iLeft == 0) {
                 player.fallinSandSlipState = 1;

@@ -3,6 +3,8 @@
 //
 package State;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import GameEngine.TouchKeyRange;
 import Lib.Animation;
@@ -469,7 +471,7 @@ public class TitleState extends State {
         this.pressDelay = 5;
         this.pressDelay2 = 1;
         this.rankingScore = new int[5];
-        this.timecount_ranking = 0;
+        this.timecount_ranking = GameTime.set(this, "timecount_ranking", 0);
         this.offset_flag = 0;
         this.RecordtimeScrollPosY = 0;
         this.logoX = LOGO_POSITION_X;
@@ -481,7 +483,7 @@ public class TitleState extends State {
         //this.multiMainNoMoreGameItems = new int[]{3, 19, 5, 7, 17, 9};
         this.isAtMainMenu = true;
         this.arrowPressState = 0;
-        this.timeAttackOffsetX = 0;
+        this.timeAttackOffsetX = GameTime.set(this, "timeAttackOffsetX", 0);
         this.stageselectslide_getprey = -1;
         this.stageselectslide_gety = -1;
         this.stageSelectReturnFlag = false;
@@ -508,7 +510,7 @@ public class TitleState extends State {
         this.pressDelay = 5;
         this.pressDelay2 = 1;
         this.rankingScore = new int[5];
-        this.timecount_ranking = 0;
+        this.timecount_ranking = GameTime.set(this, "timecount_ranking", 0);
         this.offset_flag = 0;
         this.RecordtimeScrollPosY = 0;
         this.logoX = LOGO_POSITION_X;
@@ -520,7 +522,7 @@ public class TitleState extends State {
         //this.multiMainNoMoreGameItems = new int[]{3, 19, 5, 7, 17, 9};
         this.isAtMainMenu = true;
         this.arrowPressState = 0;
-        this.timeAttackOffsetX = 0;
+        this.timeAttackOffsetX = GameTime.set(this, "timeAttackOffsetX", 0);
         this.stageselectslide_getprey = -1;
         this.stageselectslide_gety = -1;
         this.stageSelectReturnFlag = false;
@@ -627,26 +629,26 @@ public class TitleState extends State {
     }
 
     private void characterSelectLogic() {
-        ++this.character_sel_frame_cnt;
-        if (this.character_sel_frame_cnt == 1) {
+        this.character_sel_frame_cnt = GameTime.advance(this, "character_sel_frame_cnt", this.character_sel_frame_cnt, 1);
+        if (GameTime.event(this, "character_sel_frame_cnt", "characterSelectLogic:633", GameTime.crosses(this, "character_sel_frame_cnt", this.character_sel_frame_cnt, 1))) {
             this.charSelAniDrawer.setActionId(0);
             this.arrowPressState = 0;
             SoundSystem.getInstance().playBgm(2);
         }
 
-        if (this.character_sel_frame_cnt == 4) {
+        if (GameTime.event(this, "character_sel_frame_cnt", "characterSelectLogic:639", GameTime.crosses(this, "character_sel_frame_cnt", this.character_sel_frame_cnt, 4))) {
             this.charSelCaseDrawer.setLoop(false);
         }
 
-        if (this.character_sel_frame_cnt == 9) {
+        if (GameTime.event(this, "character_sel_frame_cnt", "characterSelectLogic:643", GameTime.crosses(this, "character_sel_frame_cnt", this.character_sel_frame_cnt, 9))) {
             this.charSelRoleDrawer.setLoop(false);
         }
 
-        if (this.character_sel_frame_cnt == 10) {
+        if (GameTime.event(this, "character_sel_frame_cnt", "characterSelectLogic:647", GameTime.crosses(this, "character_sel_frame_cnt", this.character_sel_frame_cnt, 10))) {
             this.charSelFilAniDrawer.setLoop(false);
         }
 
-        if (this.character_sel_frame_cnt == 16) {
+        if (GameTime.event(this, "character_sel_frame_cnt", "characterSelectLogic:651", GameTime.crosses(this, "character_sel_frame_cnt", this.character_sel_frame_cnt, 16))) {
             this.charSelCaseDrawer.setActionId(15);
             this.charSelRoleDrawer.setActionId(28);
         }
@@ -773,11 +775,11 @@ public class TitleState extends State {
                         this.character_offset_state = 0;
                         int var5;
                         if (this.arrowPressState == 0) {
-                            var5 = MyAPI.calNextPosition((double)this.character_sel_offset_x, 0.0, 1, 2);
+                            var5 = MyAPI.calNextPosition(this, "character_sel_offset_x", (double)this.character_sel_offset_x, 0.0, 1, 2);
                             this.character_sel_offset_x = var5;
                         } else {
                             if (this.arrowPressState == 1) {
-                                var5 = MyAPI.calNextPosition((double)this.character_sel_offset_x, 128.0, 1, 2);
+                                var5 = MyAPI.calNextPosition(this, "character_sel_offset_x", (double)this.character_sel_offset_x, 128.0, 1, 2);
                                 this.character_sel_offset_x = var5;
                                 if (this.character_sel_offset_x == 128) {
                                     --this.character_id;
@@ -794,7 +796,7 @@ public class TitleState extends State {
                             }
 
                             if (this.arrowPressState == 2) {
-                                var5 = MyAPI.calNextPosition((double)this.character_sel_offset_x, -128.0, 1, 2);
+                                var5 = MyAPI.calNextPosition(this, "character_sel_offset_x", (double)this.character_sel_offset_x, -128.0, 1, 2);
                                 this.character_sel_offset_x = var5;
                                 if (this.character_sel_offset_x == -128) {
                                     ++this.character_id;
@@ -988,7 +990,7 @@ public class TitleState extends State {
         muiDownArrowDrawer = (new Animation(var1.toString())).getDrawer(94, true, 0);
         Key.touchInstructionInit();
         SoundSystem.getInstance().playBgm(33);
-        this.arrowframecnt = 0;
+        this.arrowframecnt = GameTime.set(this, "arrowframecnt", 0);
         PageFrameCnt = 0;
         if (this.textBGImage == null) {
             this.textBGImage = MFImage.createImage("/animation/text_bg.png");
@@ -1018,36 +1020,36 @@ public class TitleState extends State {
         }
 
         if (Key.repeat(4) || Key.touchhelpuparrow.Isin()) {
-            ++this.arrowframecnt;
+            this.arrowframecnt = GameTime.advance(this, "arrowframecnt", this.arrowframecnt, 1);
             if (this.arrowframecnt <= 4 && !this.isArrowClicked) {
                 MyAPI.logicString(false, true);
                 this.isArrowClicked = true;
-            } else if (this.arrowframecnt > 4 && this.arrowframecnt % 2 == 0) {
+            } else if (this.arrowframecnt > 4 && GameTime.periodic(this, "arrowframecnt", "creditLogic:1027", this.arrowframecnt, 2, 0)) {
                 MyAPI.logicString(false, true);
             }
         } else if (Key.repeat(8) || Key.touchhelpdownarrow.Isin()) {
-            ++this.arrowframecnt;
+            this.arrowframecnt = GameTime.advance(this, "arrowframecnt", this.arrowframecnt, 1);
             if (this.arrowframecnt <= 4 && !this.isArrowClicked) {
                 MyAPI.logicString(true, false);
                 this.isArrowClicked = true;
-            } else if (this.arrowframecnt > 4 && this.arrowframecnt % 2 == 0) {
+            } else if (this.arrowframecnt > 4 && GameTime.periodic(this, "arrowframecnt", "creditLogic:1035", this.arrowframecnt, 2, 0)) {
                 MyAPI.logicString(true, false);
             }
         } else {
-            this.arrowframecnt = 0;
+            this.arrowframecnt = GameTime.set(this, "arrowframecnt", 0);
             this.isArrowClicked = false;
         }
 
     }
 
     private void degreeLogic() {
-        ++this.titleDegree;
+        this.titleDegree = GameTime.advance(this, "titleDegree", this.titleDegree, 1);
         this.titleDegree %= OFFSET_ARRAY.length;
     }
 
     private void drawCharacterMovingBG(MFGraphics var1, int var2) {
         this.recordAniDrawer.setActionId(var2);
-        this.characterRecordBGOffsetX_1 += 4;
+        this.characterRecordBGOffsetX_1 = GameTime.advance(this, "characterRecordBGOffsetX_1", this.characterRecordBGOffsetX_1, 4);
         this.characterRecordBGOffsetX_1 %= 128;
 
         int var3;
@@ -1057,7 +1059,7 @@ public class TitleState extends State {
             }
         }
 
-        this.characterRecordBGOffsetX_2 -= 4;
+        this.characterRecordBGOffsetX_2 = GameTime.advance(this, "characterRecordBGOffsetX_2", this.characterRecordBGOffsetX_2, -(4));
         this.characterRecordBGOffsetX_2 %= 128;
 
         for(var2 = this.characterRecordBGOffsetX_2 - 64; var2 < SCREEN_WIDTH * 3 / 2; var2 += 128) {
@@ -1102,10 +1104,8 @@ public class TitleState extends State {
         this.charSelAniDrawer.draw(var1, SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1);
         if (this.character_sel_frame_cnt > 4 && this.character_sel_frame_cnt <= 16) {
             this.charSelCaseDrawer.draw(var1, SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1);
-            if (this.character_sel_frame_cnt == 16) {
-                this.charSelCaseDrawer.setLoop(true);
-            }
         }
+        if (this.character_sel_frame_cnt >= 16) this.charSelCaseDrawer.setLoop(true);
 
         AnimationDrawer var5;
         if (this.character_sel_frame_cnt > 9) {
@@ -1175,7 +1175,7 @@ public class TitleState extends State {
             this.isAtMainMenu = false;
         }
 
-        this.degree = MyAPI.calNextPosition((double)this.degree, 0.0, 1, 3);
+        this.degree = MyAPI.calNextPosition(this, "degree", (double)this.degree, 0.0, 1, 3);
         if (this.degree == 0) {
             this.menuMoving = false;
         }
@@ -1313,9 +1313,9 @@ public class TitleState extends State {
 
     private void drawMenuSelection1(MFGraphics var1, int var2, int var3, int var4) {
         drawMenuBar(var1, 1, 0, var4);
-        this.selectMenuOffsetX += 8;
+        this.selectMenuOffsetX = GameTime.advance(this, "selectMenuOffsetX", this.selectMenuOffsetX, 8);
 
-        for(this.selectMenuOffsetX %= MOVE_DIRECTION; var3 - this.selectMenuOffsetX > 0; var3 -= MOVE_DIRECTION) {
+        for(this.selectMenuOffsetX = GameTime.wrap(this, "selectMenuOffsetX", this.selectMenuOffsetX, MOVE_DIRECTION); var3 - this.selectMenuOffsetX > 0; var3 -= MOVE_DIRECTION) {
         }
 
         for(int var5 = 0; var5 < 2; ++var5) {
@@ -1334,8 +1334,8 @@ public class TitleState extends State {
         this.timeAttAniDrawer.draw(var1, SCREEN_WIDTH, SCREEN_HEIGHT >> 1);
         int var2;
         if ((Key.touchproracemodestart.Isin() || this.isRaceModeItemsSelected) && this.cursor == 0) {
-            this.timeAttackOffsetX -= 2;
-            this.timeAttackOffsetX %= 128;
+            this.timeAttackOffsetX = GameTime.advance(this, "timeAttackOffsetX", this.timeAttackOffsetX, -(2));
+            this.timeAttackOffsetX = GameTime.wrap(this, "timeAttackOffsetX", this.timeAttackOffsetX, 128);
             this.timeAttAniDrawer.setActionId(2);
 
             for(var2 = this.timeAttackOffsetX; var2 < SCREEN_WIDTH * 3 / 2; var2 += 128) {
@@ -1344,8 +1344,8 @@ public class TitleState extends State {
 
             this.timeAttAniDrawer.draw(var1, this.timeAttackOffsetX - 128 + (SCREEN_WIDTH >> 1) - 8, SCREEN_HEIGHT >> 1);
         } else if ((Key.touchproracemoderecord.Isin() || this.isRaceModeItemsSelected) && this.cursor == 1) {
-            this.timeAttackOffsetX -= 2;
-            this.timeAttackOffsetX %= 128;
+            this.timeAttackOffsetX = GameTime.advance(this, "timeAttackOffsetX", this.timeAttackOffsetX, -(2));
+            this.timeAttackOffsetX = GameTime.wrap(this, "timeAttackOffsetX", this.timeAttackOffsetX, 128);
             this.timeAttAniDrawer.setActionId(3);
 
             for(var2 = this.timeAttackOffsetX; var2 < SCREEN_WIDTH * 3 / 2; var2 += 128) {
@@ -1354,7 +1354,7 @@ public class TitleState extends State {
 
             this.timeAttAniDrawer.draw(var1, this.timeAttackOffsetX - 128 + (SCREEN_WIDTH >> 1) - 8, SCREEN_HEIGHT >> 1);
         } else {
-            this.timeAttackOffsetX = 0;
+            this.timeAttackOffsetX = GameTime.set(this, "timeAttackOffsetX", 0);
         }
 
         if (muiAniDrawer == null) {
@@ -1378,7 +1378,7 @@ public class TitleState extends State {
     }
 
     private void drawRecordArrow(MFGraphics var1) {
-        ++this.recordArrowOffsetXID;
+        this.recordArrowOffsetXID = GameTime.advance(this, "recordArrowOffsetXID", this.recordArrowOffsetXID, 1);
         this.recordArrowOffsetXID %= this.recordArrowOffsetXArray.length;
         AnimationDrawer var3 = this.recordAniDrawer;
         int var2 = SCREEN_WIDTH;
@@ -1409,8 +1409,8 @@ public class TitleState extends State {
 
     private void drawRecordtimeScroll(MFGraphics var1, int var2, int var3, int var4, int var5, int var6) {
         drawBar(var1, 0, var3);
-        this.itemOffsetX += var5;
-        this.itemOffsetX %= var6;
+        this.itemOffsetX = GameTime.advance(this, "itemOffsetX", this.itemOffsetX, var5);
+        this.itemOffsetX = GameTime.wrap(this, "itemOffsetX", this.itemOffsetX, var6);
 
         for(var5 = 0; var5 - this.itemOffsetX > 0; var5 -= var6) {
         }
@@ -1426,8 +1426,8 @@ public class TitleState extends State {
     }
 
     private void drawScrollString(MFGraphics var1, String var2, int var3, int var4, int var5, int var6, int var7, int var8, int var9) {
-        this.itemOffsetX += var4;
-        this.itemOffsetX %= var5;
+        this.itemOffsetX = GameTime.advance(this, "itemOffsetX", this.itemOffsetX, var4);
+        this.itemOffsetX = GameTime.wrap(this, "itemOffsetX", this.itemOffsetX, var5);
 
         for(var4 = 0; var4 - this.itemOffsetX > 0; var4 -= var5) {
         }
@@ -1548,8 +1548,8 @@ public class TitleState extends State {
 
     private void drawStageNameinIntergradeRecord(MFGraphics var1) {
         this.recordAniDrawer.draw(var1, 26, SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1, false, 0);
-        this.intergradeRecordStageNameOffsetX -= 8;
-        this.intergradeRecordStageNameOffsetX %= 200;
+        this.intergradeRecordStageNameOffsetX = GameTime.advance(this, "intergradeRecordStageNameOffsetX", this.intergradeRecordStageNameOffsetX, -(8));
+        this.intergradeRecordStageNameOffsetX = GameTime.wrap(this, "intergradeRecordStageNameOffsetX", this.intergradeRecordStageNameOffsetX, 200);
         int var2;
         if (this.stage_characterRecord_ID < 10) {
             var2 = (this.stage_characterRecord_ID >> 1) + 27;
@@ -1715,7 +1715,7 @@ public class TitleState extends State {
     }
 
     private void drawTitle1(MFGraphics var1) {
-        this.copyOffsetX = MyAPI.calNextPosition((double)this.copyOffsetX, 0.0, 1, 2);
+        this.copyOffsetX = MyAPI.calNextPosition(this, "copyOffsetX", (double)this.copyOffsetX, 0.0, 1, 2);
         MFImage var5 = this.sonicBigImage;
         int var3 = this.sonicBigX;
         int var2 = this.cameraX;
@@ -1734,7 +1734,7 @@ public class TitleState extends State {
         var1.setColor(0);
         this.titleAniDrawer.setActionId(0);
         if (state == 1) {
-            if (System.currentTimeMillis() / 500L % 2L == 0L) {
+            if (GameTime.milliseconds() / 500L % 2L == 0L) {
                 this.titleAniDrawer.setActionId(2);
                 this.titleAniDrawer.draw(var1, SCREEN_WIDTH >> 1, (SCREEN_HEIGHT >> 1) + 33);
             }
@@ -1819,7 +1819,7 @@ public class TitleState extends State {
     }
 
     private void gameover_rankingLogic() {
-        ++this.timecount_ranking;
+        this.timecount_ranking = GameTime.advance(this, "timecount_ranking", this.timecount_ranking, 1);
         switch (this.comfirmLogic()) {
             case 400:
                 this.changeStateWithFade(2);
@@ -1943,7 +1943,7 @@ public class TitleState extends State {
         this.charSelArrowDrawer.restart();
         this.charSelTitleDrawer.restart();
         this.charSelFilAniDrawer.restart();
-        this.character_sel_frame_cnt = 0;
+        this.character_sel_frame_cnt = GameTime.set(this, "character_sel_frame_cnt", 0);
         this.character_id = 0;
         this.character_move = false;
         this.character_arrow_display = true;
@@ -1975,7 +1975,7 @@ public class TitleState extends State {
         this.characterRecordID = PlayerObject.getCharacterID();
         Key.touchCharacterRecordInit();
         Key.touchanykeyInit();
-        this.intergradeRecordtoGamecnt = 0;
+        this.intergradeRecordtoGamecnt = GameTime.set(this, "intergradeRecordtoGamecnt", 0);
     }
 
     private void initRecordRes() {
@@ -2098,7 +2098,7 @@ public class TitleState extends State {
                 this.titleAniDrawer = this.titleAni[0].getDrawer(0, true, 0);
             }
 
-            this.titleFrame = 0;
+            this.titleFrame = GameTime.set(this, "titleFrame", 0);
             Key.touchMainMenuInit2();
         }
 
@@ -2120,18 +2120,18 @@ public class TitleState extends State {
             this.titleAniDrawer = this.titleAni[0].getDrawer(0, true, 0);
         }
 
-        this.titleFrame = 5;
+        this.titleFrame = GameTime.set(this, "titleFrame", 5);
         Key.touchMainMenuInit2();
     }
 
     private void intergradeRecordLogic() {
-        ++this.intergradeRecordtoGamecnt;
+        this.intergradeRecordtoGamecnt = GameTime.advance(this, "intergradeRecordtoGamecnt", this.intergradeRecordtoGamecnt, 1);
         if (Key.press(Key.B_SEL | 16777216) && this.intergradeRecordtoGamecnt != 56) {
-            this.intergradeRecordtoGamecnt = 56;
+            this.intergradeRecordtoGamecnt = GameTime.set(this, "intergradeRecordtoGamecnt", 56);
             SoundSystem.getInstance().playSe(1);
         }
 
-        if (this.intergradeRecordtoGamecnt == 56) {
+        if (GameTime.event(this, "intergradeRecordtoGamecnt", "intergradeRecordLogic:2136", GameTime.crosses(this, "intergradeRecordtoGamecnt", this.intergradeRecordtoGamecnt, 56))) {
             StageManager.setStageID(this.stage_characterRecord_ID);
             SoundSystem.getInstance().stopBgm(false);
             setState(1);
@@ -2187,9 +2187,9 @@ public class TitleState extends State {
 
     private void mainMenuDraw(MFGraphics var1) {
         if (this.mainMenuBackFlag) {
-            this.degree = MyAPI.calNextPositionReverse(this.degree, 0, this.degreeDes, 1, 3);
+            this.degree = MyAPI.calNextPositionReverse(this, "degree", this.degree, 0, this.degreeDes, 1, 3);
         } else {
-            this.degree = MyAPI.calNextPosition((double)this.degree, (double)this.degreeDes, 1, 3);
+            this.degree = MyAPI.calNextPosition(this, "degree", (double)this.degree, (double)this.degreeDes, 1, 3);
         }
 
         if (this.degree == this.degreeDes) {
@@ -2216,7 +2216,7 @@ public class TitleState extends State {
 
     private void mainMenuDraw2(MFGraphics var1) {
         MENU_OFFSET_X = (SCREEN_WIDTH >> 1) + 16;
-        this.degree = MyAPI.calNextPosition((double)this.degree, 0.0, 1, 3);
+        this.degree = MyAPI.calNextPosition(this, "degree", (double)this.degree, 0.0, 1, 3);
         if (this.degree == 0) {
             this.menuMoving = false;
         }
@@ -2566,7 +2566,7 @@ public class TitleState extends State {
         }
 
         if (this.isItemsSelect) {
-            ++this.itemsselectframe;
+            this.itemsselectframe = GameTime.advance(this, "itemsselectframe", this.itemsselectframe, 1);
             if (this.itemsselectframe > 8) {
                 fadeInit(220, 102);
                 var1 = this.finalitemsselectcursor + 2;
@@ -2857,7 +2857,7 @@ public class TitleState extends State {
     private void openingInit() {
         fading = false;
         this.close();
-        this.openingFrame = 0;
+        this.openingFrame = GameTime.set(this, "openingFrame", 0);
         this.openingState = 0;
         int var1;
         if (this.openingAnimation == null) {
@@ -2872,9 +2872,9 @@ public class TitleState extends State {
             this.openingAnimation = Animation.getInstanceFromQi(var2.toString());
             this.openingDrawer = new AnimationDrawer[this.openingAnimation.length];
 
+            // Use the drawers' authored durations; the intro does not control render FPS.
             for(var1 = 0; var1 < this.openingDrawer.length; ++var1) {
                 this.openingDrawer[var1] = this.openingAnimation[var1].getDrawer(0, false, 0);
-                this.openingDrawer[var1].mustKeepFrameTime(MFLib.MainState.OpeningFPS());
             }
         } else {
             for(var1 = 0; var1 < this.openingDrawer.length; ++var1) {
@@ -2891,7 +2891,7 @@ public class TitleState extends State {
     }
 
     private boolean openingLogic() {
-        ++this.openingFrame;
+        this.openingFrame = GameTime.advance(this, "openingFrame", this.openingFrame, 1);
         boolean var1;
         if (Key.touchopeningskip.Isin() && Key.touchopening.IsClick()) {
             this.opengingCursor = 0;
@@ -2906,7 +2906,7 @@ public class TitleState extends State {
         }
 
         if (this.openingCount != 0) {
-            --this.openingCount;
+            this.openingCount = GameTime.advance(this, "openingCount", this.openingCount, -(1));
         }
 
         switch (this.openingState) {
@@ -2976,7 +2976,7 @@ public class TitleState extends State {
                 }
                 break;
             case 6:
-                this.openingFrame = 0;
+                this.openingFrame = GameTime.set(this, "openingFrame", 0);
                 var1 = true;
                 return var1;
         }
@@ -3341,8 +3341,8 @@ public class TitleState extends State {
             this.optionArrowDownDrawer.draw(var1, (SCREEN_WIDTH >> 1) - 115, (SCREEN_HEIGHT >> 1) + 25);
         }
 
-        this.optionOffsetX -= 4;
-        this.optionOffsetX %= 100;
+        this.optionOffsetX = GameTime.advance(this, "optionOffsetX", this.optionOffsetX, -(4));
+        this.optionOffsetX = GameTime.wrap(this, "optionOffsetX", this.optionOffsetX, 100);
         muiAniDrawer.setActionId(51);
 
         for(var2 = this.optionOffsetX; var2 < SCREEN_WIDTH * 2; var2 += 100) {
@@ -3539,17 +3539,17 @@ public class TitleState extends State {
                 this.optionArrowDriveOffsetY = -2;
             }
 
-            this.optionArrowDriveY += this.optionArrowDriveOffsetY;
+            this.optionArrowDriveY = GameTime.advance(this, "optionArrowDriveY", this.optionArrowDriveY, this.optionArrowDriveOffsetY);
             if (this.optionArrowDriveOffsetY > 0) {
                 if (this.optionArrowDriveY >= 24) {
                     this.optionArrowDriveY = 24;
-                    this.optionDrawOffsetY += this.optionArrowDriveY;
+                    this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, this.optionArrowDriveY);
                     this.optionArrowDriveY = 0;
                     this.optionArrowMoveable = false;
                 }
             } else if (this.optionArrowDriveOffsetY < 0 && this.optionArrowDriveY <= -24) {
                 this.optionArrowDriveY = -24;
-                this.optionDrawOffsetY += this.optionArrowDriveY;
+                this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, this.optionArrowDriveY);
                 this.optionArrowDriveY = 0;
                 this.optionArrowMoveable = false;
             }
@@ -3592,7 +3592,7 @@ public class TitleState extends State {
                         this.optionDrawOffsetY = 0;
                         this.optionYDirect = 0;
                     } else {
-                        this.optionDrawOffsetY += var1;
+                        this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, var1);
                     }
                 } else if (this.optionDrawOffsetY < this.optionDrawOffsetBottomY) {
                     this.optionYDirect = 2;
@@ -3606,7 +3606,7 @@ public class TitleState extends State {
                         this.optionDrawOffsetY = this.optionDrawOffsetBottomY;
                         this.optionYDirect = 0;
                     } else {
-                        this.optionDrawOffsetY += var1;
+                        this.optionDrawOffsetY = GameTime.advance(this, "optionDrawOffsetY", this.optionDrawOffsetY, var1);
                     }
                 }
             }
@@ -3888,7 +3888,7 @@ public class TitleState extends State {
             if (this.offsetY[0] - this.vY[0] > 0) {
                 for(var1 = 0; var1 < this.STAGE_TOTAL_NUM; ++var1) {
                     int[] var4 = this.offsetY;
-                    var4[var1] -= this.vY[var1];
+                    var4[var1] = GameTime.advance(var4, String.valueOf(var1), var4[var1], -(this.vY[var1]));
                 }
             } else {
                 for(var1 = 0; var1 < this.STAGE_TOTAL_NUM; ++var1) {
@@ -3945,17 +3945,17 @@ public class TitleState extends State {
                     this.stageSelectArrowDriveOffsetY = -2;
                 }
 
-                this.stageSelectArrowDriveY += this.stageSelectArrowDriveOffsetY;
+                this.stageSelectArrowDriveY = GameTime.advance(this, "stageSelectArrowDriveY", this.stageSelectArrowDriveY, this.stageSelectArrowDriveOffsetY);
                 if (this.stageSelectArrowDriveOffsetY > 0) {
                     if (this.stageSelectArrowDriveY >= 24) {
                         this.stageSelectArrowDriveY = 24;
-                        this.stageDrawOffsetY += this.stageSelectArrowDriveY;
+                        this.stageDrawOffsetY = GameTime.advance(this, "stageDrawOffsetY", this.stageDrawOffsetY, this.stageSelectArrowDriveY);
                         this.stageSelectArrowDriveY = 0;
                         this.stageSelectArrowMoveable = false;
                     }
                 } else if (this.stageSelectArrowDriveOffsetY < 0 && this.stageSelectArrowDriveY <= -24) {
                     this.stageSelectArrowDriveY = -24;
-                    this.stageDrawOffsetY += this.stageSelectArrowDriveY;
+                    this.stageDrawOffsetY = GameTime.advance(this, "stageDrawOffsetY", this.stageDrawOffsetY, this.stageSelectArrowDriveY);
                     this.stageSelectArrowDriveY = 0;
                     this.stageSelectArrowMoveable = false;
                 }
@@ -3968,7 +3968,7 @@ public class TitleState extends State {
             } else if (this.stageselectslide_gety != -1 && this.stageselectslide_getprey == -1) {
                 this.stageselectslidefirsty = this.stageselectslide_gety;
                 this.firstStageSelectSlidePointY = this.stageselectslidefirsty;
-                this.stageSelectSlideFrame = 0;
+                this.stageSelectSlideFrame = GameTime.set(this, "stageSelectSlideFrame", 0);
             } else if (this.stageselectslide_gety != -1 && this.stageselectslide_getprey != -1) {
                 this.stageselectslide_y = this.stageselectslide_gety - this.stageselectslidefirsty;
             } else if (this.stageselectslide_gety == -1 && this.stageselectslide_getprey != -1) {
@@ -3979,20 +3979,20 @@ public class TitleState extends State {
             if (!Key.slidesensorstagesel.isSliding()) {
                 if (this.stageYDirect == 0) {
                     if (this.gestureSlideSpeed > 0) {
-                        this.gestureSlideSpeed -= 3;
+                        this.gestureSlideSpeed = GameTime.advance(this, "gestureSlideSpeed", this.gestureSlideSpeed, -(3));
                         if (this.gestureSlideSpeed < 2) {
                             this.gestureSlideSpeed = 0;
                         }
                     }
 
                     if (this.gestureSlideSpeed < 0) {
-                        this.gestureSlideSpeed += 3;
+                        this.gestureSlideSpeed = GameTime.advance(this, "gestureSlideSpeed", this.gestureSlideSpeed, 3);
                         if (this.gestureSlideSpeed > -2) {
                             this.gestureSlideSpeed = 0;
                         }
                     }
 
-                    this.stageDrawOffsetY += this.gestureSlideSpeed;
+                    this.stageDrawOffsetY = GameTime.advance(this, "stageDrawOffsetY", this.stageDrawOffsetY, this.gestureSlideSpeed);
                     if (this.stageDrawOffsetY + this.gestureSlideSpeed > 0) {
                         this.stageDrawOffsetY = 0;
                         this.gestureSlideSpeed = 0;
@@ -4004,10 +4004,10 @@ public class TitleState extends State {
             } else {
                 this.currentStageSelectSlidePointY = this.stageselectslide_y;
                 if (this.currentStageSelectSlidePointY - this.preStageSelectSlidePointY < 2 && this.currentStageSelectSlidePointY - this.preStageSelectSlidePointY > -2) {
-                    this.stageSelectSlideFrame = 0;
+                    this.stageSelectSlideFrame = GameTime.set(this, "stageSelectSlideFrame", 0);
                     this.firstStageSelectSlidePointY = this.currentStageSelectSlidePointY;
                 } else {
-                    ++this.stageSelectSlideFrame;
+                    this.stageSelectSlideFrame = GameTime.advance(this, "stageSelectSlideFrame", this.stageSelectSlideFrame, 1);
                 }
 
                 this.preStageSelectSlidePointY = this.currentStageSelectSlidePointY;
@@ -4073,7 +4073,7 @@ public class TitleState extends State {
                             this.stage_select_press_state = 0;
                             this.stageYDirect = 0;
                         } else {
-                            this.stageDrawOffsetY += var1;
+                            this.stageDrawOffsetY = GameTime.advance(this, "stageDrawOffsetY", this.stageDrawOffsetY, var1);
                         }
                     } else if (this.stageDrawOffsetY < this.stageDrawOffsetBottomY) {
                         this.stageYDirect = 2;
@@ -4088,7 +4088,7 @@ public class TitleState extends State {
                             this.stage_select_press_state = 0;
                             this.stageYDirect = 0;
                         } else {
-                            this.stageDrawOffsetY += var1;
+                            this.stageDrawOffsetY = GameTime.advance(this, "stageDrawOffsetY", this.stageDrawOffsetY, var1);
                         }
                     }
                 }
@@ -4209,7 +4209,7 @@ public class TitleState extends State {
 
         Key.touchStartGameInit();
         this.startgamecursor = -1;
-        this.startgameframe = 0;
+        this.startgameframe = GameTime.set(this, "startgameframe", 0);
         this.startgameensureFlag = false;
         fadeInit(102, 220);
         StageManager.isContinueGame = false;
@@ -4230,7 +4230,7 @@ public class TitleState extends State {
             // || Key.buttonPress(8)
             if (Key.touchstartgamecontinue.IsButtonPress() && this.startgamecursor == 0) {
                 this.startgameensureFlag = true;
-                this.startgameframe = 0;
+                this.startgameframe = GameTime.set(this, "startgameframe", 0);
                 StageManager.loadStageRecord();
                 PlayerObject.setCharacter(StageManager.characterFromGame);
                 StageManager.setStageID(StageManager.stageIDFromGame);
@@ -4238,7 +4238,7 @@ public class TitleState extends State {
                 SoundSystem.getInstance().playSe(1);
             } else if (Key.touchstartgamenew.IsButtonPress() && this.startgamecursor == 1) {
                 this.startgameensureFlag = true;
-                this.startgameframe = 0;
+                this.startgameframe = GameTime.set(this, "startgameframe", 0);
                 PlayerObject.setScore(0);
                 PlayerObject.setLife(2);
                 fadeInit(102, 255);
@@ -4262,8 +4262,8 @@ public class TitleState extends State {
                 this.returnCursor = 0;
             }
         } else {
-            ++this.startgameframe;
-            if (this.startgameframe == 12) {
+            this.startgameframe = GameTime.advance(this, "startgameframe", this.startgameframe, 1);
+            if (GameTime.event(this, "startgameframe", "startGameLogic:4268", GameTime.crosses(this, "startgameframe", this.startgameframe, 12))) {
                 if (this.startgamecursor == 0) {
                     StageManager.isContinueGame = true;
                     fadeInit(255, 0);
@@ -4560,7 +4560,7 @@ public class TitleState extends State {
             case 21:
                 this.titleBgDraw0(var1);
                 this.drawTitle1(var1);
-                if (state == 1 && System.currentTimeMillis() / 500L % 2L == 0L) {
+                if (state == 1 && GameTime.milliseconds() / 500L % 2L == 0L) {
                 }
 
                 this.drawTitle2(var1);
@@ -4716,7 +4716,7 @@ public class TitleState extends State {
         } catch (Exception var2) {
         }
 
-        this.count = 50;
+        this.count = GameTime.set(this, "count", 50);
         initMenuFont();
         if (state == 0) {
             this.openingInit();
@@ -4872,7 +4872,7 @@ public class TitleState extends State {
 
     public void logic() {
         if (this.count > 0) {
-            --this.count;
+            this.count = Math.max(0, GameTime.advance(this, "count", this.count, -(1)));
         }
 
         if (Key.press(536870912)) {
@@ -4927,7 +4927,7 @@ public class TitleState extends State {
                         return;
                 }
             case 1:
-                ++this.titleFrame;
+                this.titleFrame = GameTime.advance(this, "titleFrame", this.titleFrame, 1);
                 if (this.titleFrame > 212) {
                     state = 0;
                     this.openingInit();
@@ -4959,14 +4959,14 @@ public class TitleState extends State {
                             this.quitFlag = 1;
                         } else {
                             if (!MFMain.cheat && MFMain.tapCount < 7) {
-                                MFMain.tapCount++;
+                                MFMain.tapCount = MFMain.tapCount + (1);
                                 break;
                             } else {
                                 if (!MFMain.cheat) {
                                     SoundSystem.getInstance().playSe(12);
                                 }
                                 MFMain.cheat = true;
-                                MFMain.tapCount = 0;
+                                MFMain.tapCount = GameTime.set(MFMain.class, "tapCount", 0);
                                 break;
                             }
                         }
@@ -5080,7 +5080,7 @@ public class TitleState extends State {
                 var6 = LOGO_POSITION_X;
                 var8 = SCREEN_WIDTH;
                 var7 = SCREEN_WIDTH;
-                this.logoX = MyAPI.calNextPositionReverse(var5, var6, var8 + (var7 >> 1), 1, 2);
+                this.logoX = MyAPI.calNextPositionReverse(this, "logoX", var5, var6, var8 + (var7 >> 1), 1, 2);
                 if (this.logoX == SCREEN_WIDTH + (SCREEN_WIDTH >> 1)) {
                     this.logoX = -(SCREEN_WIDTH >> 1);
                     state = 2;
@@ -5091,7 +5091,7 @@ public class TitleState extends State {
             case 19:
                 var1 = (double)this.logoX;
                 var3 = (double)LOGO_POSITION_X;
-                this.logoX = MyAPI.calNextPosition(var1, var3, 1, 2);
+                this.logoX = MyAPI.calNextPosition(this, "logoX", var1, var3, 1, 2);
                 if (this.logoX == LOGO_POSITION_X) {
                     state = 2;
                     this.nextState = 2;
@@ -5102,7 +5102,7 @@ public class TitleState extends State {
                 var6 = LOGO_POSITION_X;
                 var8 = SCREEN_WIDTH;
                 var7 = SCREEN_WIDTH;
-                this.logoX = MyAPI.calNextPositionReverse(var5, var6, var8 + (var7 >> 1), 1, 2);
+                this.logoX = MyAPI.calNextPositionReverse(this, "logoX", var5, var6, var8 + (var7 >> 1), 1, 2);
                 if (this.logoX == SCREEN_WIDTH + (SCREEN_WIDTH >> 1)) {
                     this.logoX = -(SCREEN_WIDTH >> 1);
                     state = 21;
@@ -5117,7 +5117,7 @@ public class TitleState extends State {
             case 21:
                 var1 = (double)this.logoX;
                 var3 = (double)LOGO_POSITION_X;
-                this.logoX = MyAPI.calNextPosition(var1, var3, 1, 2);
+                this.logoX = MyAPI.calNextPosition(this, "logoX", var1, var3, 1, 2);
                 if (this.logoX == LOGO_POSITION_X) {
                     state = 1;
                     this.nextState = 1;
@@ -5332,7 +5332,7 @@ public class TitleState extends State {
         this.menuBgDraw(var1);
         double var3 = (double)this.stageDrawOffsetY;
         double var5 = (double)(-this.stageStartIndex * ITEM_SPACE);
-        this.stageDrawOffsetY = MyAPI.calNextPosition(var3, var5, 1, 2);
+        this.stageDrawOffsetY = MyAPI.calNextPosition(this, "stageDrawOffsetY", var3, var5, 1, 2);
         int var7;
         int var8;
         int var9;

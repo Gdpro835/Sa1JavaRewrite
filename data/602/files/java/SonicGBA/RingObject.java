@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.MyAPI;
 import Lib.crlFP32;
@@ -213,7 +215,7 @@ public class RingObject extends GameObject {
 
    public void ringMoveLogic() {
       if (this.beAttractive) {
-         this.velocity += 300;
+         this.velocity = GameTime.advance(this, "velocity", this.velocity, 300);
          if (this.velocity > 4200) {
             this.velocity = 4200;
          }
@@ -237,8 +239,8 @@ public class RingObject extends GameObject {
                var2 = var3;
             }
 
-            this.posX += var1;
-            this.posY += var2;
+            this.posX = GameTime.advance(this, "posX", this.posX, var1);
+            this.posY = GameTime.advance(this, "posY", this.posY, var2);
             this.refreshCollisionRect(this.posX, this.posY);
             if (this.collisionChkWithObject(player)) {
                this.doWhileCollision(player, 4);

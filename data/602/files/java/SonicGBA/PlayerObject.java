@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Common.NumberDrawer;
 import GameEngine.Key;
 import Lib.Animation;
@@ -611,7 +613,7 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
       NUM_DISTANCE = var0;
       isStartStageEndFlag = false;
       isOnlyBarOut = false;
-      onlyBarOutCnt = 0;
+      onlyBarOutCnt = GameTime.set(PlayerObject.class, "onlyBarOutCnt", 0);
       onlyBarOutCntMax = 80;
       cursorMax = 5;
       var0 = FONT_WIDTH;
@@ -639,7 +641,7 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
       this.effectID = -1;
       this.collisionLayer = 0;
       this.dashRolling = false;
-      this.hurtCount = 0;
+      this.hurtCount = GameTime.set(this, "hurtCount", 0);
       this.hurtNoControl = false;
       this.visible = true;
       this.outOfControl = false;
@@ -659,7 +661,7 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
       this.leftStopped = false;
       this.rightStopped = false;
       this.focusMovingState = 0;
-      this.lookCount = 32;
+      this.lookCount = GameTime.set(this, "lookCount", 32);
       this.footOffsetX = 0;
       this.justLeaveLand = false;
       this.justLeaveCount = 2;
@@ -682,7 +684,7 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
       this.bankwalking = false;
       this.transing = false;
       this.ducting = false;
-      this.ductingCount = 0;
+      this.ductingCount = GameTime.set(this, "ductingCount", 0);
       this.pushOnce = false;
       this.squeezeFlag = true;
       this.orgGravity = false;
@@ -896,7 +898,7 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
    public static boolean clipMoveLogic() {
       boolean var0;
       if (clipstartw < clipendw) {
-         clipstartw += clipspeed;
+         clipstartw = GameTime.advance(PlayerObject.class, "clipstartw", clipstartw, clipspeed);
          var0 = false;
       } else {
          clipstartw = clipendw;
@@ -914,12 +916,12 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
       int var2 = this.totalVelocity;
       int var1 = this.getRetPower();
       if (this.totalVelocity > 0) {
-         this.totalVelocity -= var1;
+         this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(var1));
          if (this.totalVelocity < 0) {
             this.totalVelocity = 0;
          }
       } else if (this.totalVelocity < 0) {
-         this.totalVelocity += var1;
+         this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, var1);
          if (this.totalVelocity > 0) {
             this.totalVelocity = 0;
          }
@@ -948,7 +950,7 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
    }
 
    public static void drawFadeBase(MFGraphics var0, int var1) {
-      fadeAlpha = MyAPI.calNextPosition((double)fadeAlpha, (double)fadeToValue, 1, var1, 3.0D);
+      fadeAlpha = MyAPI.calNextPosition(PlayerObject.class, "fadeAlpha", (double)fadeAlpha, (double)fadeToValue, 1, var1, 3.0D);
       if (fadeAlpha != 0) {
          int var2;
          if (preFadeAlpha != fadeAlpha) {
@@ -1294,8 +1296,8 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
 
    private static void drawStagePassInfoScroll(MFGraphics var0, int var1, int var2, int var3) {
       State.drawBar(var0, 2, var1);
-      itemOffsetX -= var2;
-      itemOffsetX %= var3;
+      itemOffsetX = GameTime.advance(PlayerObject.class, "itemOffsetX", itemOffsetX, -(var2));
+      itemOffsetX = GameTime.wrap(PlayerObject.class, "itemOffsetX", itemOffsetX, var3);
 
       for(var2 = itemOffsetX - 294; var2 < SCREEN_WIDTH * 2; var2 += var3) {
          GameState.stageInfoAniDrawer.draw(var0, getCharacterID() + 29, var2, var1 - 10 + 2, false, 0);
@@ -1315,8 +1317,8 @@ public abstract class PlayerObject extends MoveObject implements Focusable, ACWo
       }
 
       if (var1 == 0) {
-         itemOffsetX -= var3;
-         itemOffsetX %= var4;
+         itemOffsetX = GameTime.advance(PlayerObject.class, "itemOffsetX", itemOffsetX, -(var3));
+         itemOffsetX = GameTime.wrap(PlayerObject.class, "itemOffsetX", itemOffsetX, var4);
       }
 
       for(var3 = itemOffsetX - 294; var3 < SCREEN_WIDTH * 2; var3 += var4) {
@@ -1657,7 +1659,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       }
 
       ringNum = var0;
-      timeCount = var2;
+      timeCount = GameTime.set(PlayerObject.class, "timeCount", var2);
       lastTimeCount = timeCount;
    }
 
@@ -1667,7 +1669,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       speedCount = 0;
       SoundSystem.getInstance().setSoundSpeed(1.0F);
       shieldType = 0;
-      timeCount = 0;
+      timeCount = GameTime.set(PlayerObject.class, "timeCount", 0);
       lastTimeCount = timeCount;
       timeStopped = false;
       raceScoreNum = 0;
@@ -1726,20 +1728,20 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                }
             }
 
-            this.degreeForDraw = MyAPI.calNextPosition((double)this.degreeForDraw, (double)var1, 1, 3);
+            this.degreeForDraw = MyAPI.calNextPosition(this, "degreeForDraw", (double)this.degreeForDraw, (double)var1, 1, 3);
             break;
          case 1:
-            this.degreeForDraw += 24;
+            this.degreeForDraw = GameTime.advance(this, "degreeForDraw", this.degreeForDraw, 24);
             break;
          case 2:
-            this.degreeForDraw -= 24;
+            this.degreeForDraw = GameTime.advance(this, "degreeForDraw", this.degreeForDraw, -(24));
          }
 
          while(this.degreeForDraw < 0) {
             this.degreeForDraw += 360;
          }
 
-         this.degreeForDraw %= 360;
+         this.degreeForDraw = GameTime.wrap(this, "degreeForDraw", this.degreeForDraw, 360);
       }
 
       if (this.animationID == 8) {
@@ -1750,7 +1752,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
          boolean var5;
          if ((Key.repeat(Key.gLeft) || this.isCelebrate && !this.faceDirection) && !this.ducting) {
             if (this.velX > -this.maxVelocity) {
-               this.velX -= this.movePowerInAir;
+               this.velX = GameTime.advance(this, "velX", this.velX, -(this.movePowerInAir));
                if (this.velX < -this.maxVelocity) {
                   this.velX = -this.maxVelocity;
                }
@@ -1767,7 +1769,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             }
          } else if ((Key.repeat(Key.gRight) || isTerminal || this.isCelebrate && this.faceDirection) && !this.ducting) {
             if (this.velX < this.maxVelocity) {
-               this.velX += this.movePowerInAir;
+               this.velX = GameTime.advance(this, "velX", this.velX, this.movePowerInAir);
                if (this.velX > this.maxVelocity) {
                   this.velX = this.maxVelocity;
                }
@@ -1790,31 +1792,12 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       }
 
       if (this.velY >= -768 - this.getGravity()) {
-         var2 = this.velX << 5;
-         var3 = var2 * 3 / JUMP_REVERSE_POWER;
-         if (var2 > 0) {
-            var2 -= var3;
-            var1 = var2;
-            if (var2 < 0) {
-               var1 = 0;
-            }
-         } else {
-            var1 = var2;
-            if (var2 < 0) {
-               var2 -= var3;
-               var1 = var2;
-               if (var2 > 0) {
-                  var1 = 0;
-               }
-            }
-         }
-
-         this.velX = var1 >> 5;
+         this.velX = GameTime.damp(this, "airDragX", this.velX, 1.0 - 3.0 / JUMP_REVERSE_POWER);
       }
 
       byte var6;
       if (this.smallJumpCount > 0) {
-         --this.smallJumpCount;
+         this.smallJumpCount = Math.max(0, GameTime.advance(this, "smallJumpCount", this.smallJumpCount, -(1)));
          if (!this.noVelMinus && !Key.repeat(16777216)) {
             var2 = this.velY;
             if (this.isAntiGravity) {
@@ -1823,7 +1806,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                var6 = 1;
             }
 
-            this.velY = var2 + var6 * (this.getGravity() >> 1);
+            this.velY = GameTime.advance(this, "velY", var2, var6 * (this.getGravity() >> 1));
             var2 = this.velY;
             if (this.isAntiGravity) {
                var6 = -1;
@@ -1831,7 +1814,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                var6 = 1;
             }
 
-            this.velY = var2 + var6 * (this.getGravity() >> 2);
+            this.velY = GameTime.advance(this, "velY", var2, var6 * (this.getGravity() >> 2));
          }
       }
 
@@ -1842,7 +1825,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
          var6 = 1;
       }
 
-      this.velY = var2 + var6 * this.getGravity();
+      this.velY = GameTime.advance(this, "velY", var2, var6 * this.getGravity());
       if (this.animationID == 14 && (this.velY > -200 && !this.isAntiGravity || this.velY < 200 && this.isAntiGravity)) {
          this.animationID = 42;
       }
@@ -1871,9 +1854,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             this.faceDirection = var3;
             if (this.velX <= 0) {
                if (this.animationID != 4) {
-                  this.velX -= var1;
+                  this.velX = GameTime.advance(this, "velX", this.velX, -(var1));
                   if (this.velX < -var2) {
-                     this.velX += var1;
+                     this.velX = GameTime.advance(this, "velX", this.velX, var1);
                      if (this.velX > -var2) {
                         this.velX = -var2;
                      }
@@ -1886,7 +1869,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   var1 = this.movePowerReverse;
                }
 
-               this.velX -= var1;
+               this.velX = GameTime.advance(this, "velX", this.velX, -(var1));
                if (this.velX < 0) {
                   this.velX = 0 - var1 >> 2;
                } else {
@@ -1907,9 +1890,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             this.faceDirection = var3;
             if (this.velX >= 0) {
                if (this.animationID != 4) {
-                  this.velX += var1;
+                  this.velX = GameTime.advance(this, "velX", this.velX, var1);
                   if (this.velX > var2) {
-                     this.velX -= var1;
+                     this.velX = GameTime.advance(this, "velX", this.velX, -(var1));
                      if (this.velX < var2) {
                         this.velX = var2;
                      }
@@ -1922,7 +1905,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   var1 = this.movePowerReverse;
                }
 
-               this.velX += var1;
+               this.velX = GameTime.advance(this, "velX", this.velX, var1);
                if (this.velX > -1) {
                   this.velX = var1 >> 2;
                } else {
@@ -1982,12 +1965,12 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       if (this.needRetPower() && this.collisionState == 2) {
          var1 = this.getRetPower();
          if (this.velX > 0) {
-            this.velX -= var1;
+            this.velX = GameTime.advance(this, "velX", this.velX, -(var1));
             if (this.velX < 0) {
                this.velX = 0;
             }
          } else if (this.velX < 0) {
-            this.velX += var1;
+            this.velX = GameTime.advance(this, "velX", this.velX, var1);
             if (this.velX > 0) {
                this.velX = 0;
             }
@@ -2002,7 +1985,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
          var4 = 1;
       }
 
-      this.velY = var2 + var4 * this.getGravity();
+      this.velY = GameTime.advance(this, "velY", var2, var4 * this.getGravity());
       this.waitingChk();
    }
 
@@ -2013,10 +1996,10 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       if (this.velY > 0 && !this.sandStanding) {
          this.sandStanding = true;
       }
-      ++this.sandFrame;
+      this.sandFrame = GameTime.advance(this, "sandFrame", this.sandFrame, 1);
       if (this.velX == 0) {
-         this.sandFrame = 0;
-      } else if (this.sandFrame == 1) {
+         this.sandFrame = GameTime.set(this, "sandFrame", 0);
+      } else if (GameTime.event(this, "sandFrame", "inputLogicSand:2002", GameTime.crosses(this, "sandFrame", this.sandFrame, 1))) {
          soundInstance.playSe(70);
       } else if (this.sandFrame > 2) {
          soundInstance.playSequenceSe(71);
@@ -2029,9 +2012,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             this.faceDirection = false;
             if (this.velX <= 0) {
                if (this.animationID != 4) {
-                  this.velX -= var2;
+                  this.velX = GameTime.advance(this, "velX", this.velX, -(var2));
                   if (this.velX < -var3) {
-                     this.velX += var2;
+                     this.velX = GameTime.advance(this, "velX", this.velX, var2);
                      if (this.velX > -var3) {
                         this.velX = -var3;
                      }
@@ -2044,7 +2027,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   var1 = this.movePowerReverseInSand;
                }
 
-               this.velX -= var1;
+               this.velX = GameTime.advance(this, "velX", this.velX, -(var1));
                if (this.velX < 0) {
                   this.velX = 0 - var1 >> 2;
                } else {
@@ -2055,9 +2038,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             this.faceDirection = true;
             if (this.velX >= 0) {
                if (this.animationID != 4) {
-                  this.velX += var2;
+                  this.velX = GameTime.advance(this, "velX", this.velX, var2);
                   if (this.velX > var3) {
-                     this.velX -= var2;
+                     this.velX = GameTime.advance(this, "velX", this.velX, -(var2));
                      if (this.velX < var3) {
                         this.velX = var3;
                      }
@@ -2070,7 +2053,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   var1 = this.movePowerReverseInSand;
                }
 
-               this.velX += var1;
+               this.velX = GameTime.advance(this, "velX", this.velX, var1);
                if (this.velX > -1) {
                   this.velX = var1 >> 2;
                } else {
@@ -2110,9 +2093,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                if (this.faceDirection) {
                   if (this.velX >= 0) {
                      if (this.animationID != 4) {
-                        this.velX += var1;
+                        this.velX = this.velX + (var1);
                         if (this.velX > var3) {
-                           this.velX -= var1;
+                           this.velX = this.velX + (-(var1));
                            if (this.velX < var3) {
                               this.velX = var3;
                            }
@@ -2125,7 +2108,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                         var1 = this.movePowerReverseInSand;
                      }
 
-                     this.velX += var1;
+                     this.velX = this.velX + (var1);
                      if (this.velX > -1) {
                         this.velX = var1 >> 2;
                      } else {
@@ -2134,9 +2117,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   }
                } else if (this.velX <= 0) {
                   if (this.animationID != 4) {
-                     this.velX -= var1;
+                     this.velX = this.velX + (-(var1));
                      if (this.velX < -var3) {
-                        this.velX += var1;
+                        this.velX = this.velX + (var1);
                         if (this.velX > -var3) {
                            this.velX = -var3;
                         }
@@ -2149,7 +2132,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                      var1 = this.movePowerReverseInSand;
                   }
 
-                  this.velX -= var1;
+                  this.velX = this.velX + (-(var1));
                   if (this.velX < 0) {
                      this.velX = 0 - var1 >> 2;
                   } else {
@@ -2180,7 +2163,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                }
 
                this.doJump();
-               this.velY -= this.getGravity();
+               this.velY = this.velY + (-(this.getGravity()));
                this.sandStanding = false;
             }
          }
@@ -2193,12 +2176,12 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             }
 
             if (this.velX > 0) {
-               this.velX -= var1;
+               this.velX = GameTime.advance(this, "velX", this.velX, -(var1));
                if (this.velX < 0) {
                   this.velX = 0;
                }
             } else if (this.velX < 0) {
-               this.velX += var1;
+               this.velX = GameTime.advance(this, "velX", this.velX, var1);
                if (this.velX > 0) {
                   this.velX = 0;
                }
@@ -2263,7 +2246,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             }
          }
 
-         this.totalVelocity += var2;
+         this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, var2);
          if (this.totalVelocity * var3 <= 0 && this.animationID == 4) {
             this.animationID = 0;
             if (var3 > 0) {
@@ -2290,9 +2273,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                if (this.fallTime == 0) {
                   if (this.totalVelocity >= 0 && !this.doBrake()) {
                      if (this.animationID != 4) {
-                        this.totalVelocity += this.movePower;
+                        this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, this.movePower);
                         if (this.totalVelocity > this.maxVelocity) {
-                           this.totalVelocity -= this.movePower;
+                           this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(this.movePower));
                            if (this.totalVelocity < this.maxVelocity) {
                               this.totalVelocity = this.maxVelocity;
                            }
@@ -2305,7 +2288,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                         var6 = this.movePowerReverse;
                      }
 
-                     this.totalVelocity += var6;
+                     this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, var6);
                      if (this.totalVelocity > -1) {
                         if (this.onBank) {
                            this.totalVelocity = 0;
@@ -2338,9 +2321,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             if (this.fallTime == 0) {
                if (this.totalVelocity <= 0 && !this.doBrake()) {
                   if (this.animationID != 4) {
-                     this.totalVelocity -= this.movePower;
+                     this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(this.movePower));
                      if (this.totalVelocity < -this.maxVelocity) {
-                        this.totalVelocity += this.movePower;
+                        this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, this.movePower);
                         if (this.totalVelocity > -this.maxVelocity) {
                            this.totalVelocity = -this.maxVelocity;
                         }
@@ -2353,7 +2336,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                      var6 = this.movePowerReverse;
                   }
 
-                  this.totalVelocity -= var6;
+                  this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(var6));
                   if (this.totalVelocity < 0) {
                      if (this.onBank) {
                         this.totalVelocity = 0;
@@ -2503,12 +2486,12 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             var6 = this.totalVelocity;
             var2 = this.getRetPower();
             if (this.totalVelocity > 0) {
-               this.totalVelocity -= var2;
+               this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(var2));
                if (this.totalVelocity < 0) {
                   this.totalVelocity = 0;
                }
             } else if (this.totalVelocity < 0) {
-               this.totalVelocity += var2;
+               this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, var2);
                if (this.totalVelocity > 0) {
                   this.totalVelocity = 0;
                }
@@ -2535,7 +2518,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                var1 = 1;
             }
 
-            this.velY = var2 + var1 * this.getGravity();
+            this.velY = GameTime.advance(this, "velY", var2, var1 * this.getGravity());
          }
       }
 
@@ -2616,7 +2599,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       if (offsetx <= 0) {
          offsetx = 0;
       } else {
-         offsetx -= movespeedx;
+         offsetx = GameTime.advance(PlayerObject.class, "offsetx", offsetx, -(movespeedx));
          if (offsetx == SCREEN_WIDTH - movespeedx) {
             if (stageModeState == 1) {
                if (isRaceModeNewRecord()) {
@@ -2646,7 +2629,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             offsety = (SCREEN_HEIGHT >> 1) - 36;
             var0 = true;
          } else {
-            offsety -= movespeedy;
+            offsety = GameTime.advance(PlayerObject.class, "offsety", offsety, -(movespeedy));
             var0 = false;
          }
       } else {
@@ -2724,12 +2707,12 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    }
 
    public static void setTimeCount(int var0) {
-      timeCount = var0;
+      timeCount = GameTime.set(PlayerObject.class, "timeCount", var0);
       lastTimeCount = timeCount;
    }
 
    public static void setTimeCount(int var0, int var1, int var2) {
-      timeCount = var0 * 60 * 1000 + var1 * 1000 + var2;
+      timeCount = GameTime.set(PlayerObject.class, "timeCount", var0 * 60 * 1000 + var1 * 1000 + var2);
       lastTimeCount = timeCount;
    }
 
@@ -2753,7 +2736,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                drawMovingbar(var0, STAGE_PASS_STR_SPACE);
                stagePassResultOutOffsetX = 0;
                isStartStageEndFlag = false;
-               stageEndFrameCnt = 0;
+               stageEndFrameCnt = GameTime.set(PlayerObject.class, "stageEndFrameCnt", 0);
                isOnlyBarOut = false;
             } else {
                drawStagePassInfoScroll(var0, stagePassResultOutOffsetX, (SCREEN_HEIGHT >> 1) - 36, 8, 256);
@@ -2776,13 +2759,13 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                var1 = SCREEN_WIDTH;
                var2.draw(var0, 7, stagePassResultOutOffsetX + ((var1 >> 1) - 70), (SCREEN_HEIGHT >> 1) + MENU_SPACE - 6, false, 0);
                if (stageModeState == 1) {
-                  raceScoreNum = MyAPI.calNextPosition((double)raceScoreNum, (double)totalPlusscore, 1, 5);
+                  raceScoreNum = MyAPI.calNextPosition(PlayerObject.class, "raceScoreNum", (double)raceScoreNum, (double)totalPlusscore, 1, 5);
                } else {
-                  scoreNum = MyAPI.calNextPosition((double)scoreNum, (double)totalPlusscore, 1, 5);
+                  scoreNum = MyAPI.calNextPosition(PlayerObject.class, "scoreNum", (double)scoreNum, (double)totalPlusscore, 1, 5);
                }
 
-               score1 = MyAPI.calNextPosition((double)score1, 0.0D, 1, 5);
-               score2 = MyAPI.calNextPosition((double)score2, 0.0D, 1, 5);
+               score1 = MyAPI.calNextPosition(PlayerObject.class, "score1", (double)score1, 0.0D, 1, 5);
+               score2 = MyAPI.calNextPosition(PlayerObject.class, "score2", (double)score2, 0.0D, 1, 5);
                drawNum(var0, score1, (SCREEN_WIDTH >> 1) + NUM_DISTANCE + stagePassResultOutOffsetX, SCREEN_HEIGHT >> 1, 2, 0);
                drawNum(var0, score2, (SCREEN_WIDTH >> 1) + NUM_DISTANCE + stagePassResultOutOffsetX, (SCREEN_HEIGHT >> 1) + MENU_SPACE, 2, 0);
                if (scoreNum == totalPlusscore) {
@@ -2798,20 +2781,20 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             }
 
             if (isStartStageEndFlag) {
-               ++stageEndFrameCnt;
-               if (stageEndFrameCnt == 2) {
+               stageEndFrameCnt = GameTime.advance(PlayerObject.class, "stageEndFrameCnt", stageEndFrameCnt, 1);
+               if (GameTime.event(PlayerObject.class, "stageEndFrameCnt", "stagePassDraw:2785", GameTime.crosses(PlayerObject.class, "stageEndFrameCnt", stageEndFrameCnt, 2))) {
                   SoundSystem.getInstance().playSe(32);
                }
             }
 
             if (isOnlyBarOut) {
-               ++onlyBarOutCnt;
-               if (onlyBarOutCnt == 2) {
+               onlyBarOutCnt = GameTime.advance(PlayerObject.class, "onlyBarOutCnt", onlyBarOutCnt, 1);
+               if (GameTime.event(PlayerObject.class, "onlyBarOutCnt", "stagePassDraw:2792", GameTime.crosses(PlayerObject.class, "onlyBarOutCnt", onlyBarOutCnt, 2))) {
                   SoundSystem.getInstance().playSe(32);
                }
 
                if (onlyBarOutCnt > onlyBarOutCntMax) {
-                  stagePassResultOutOffsetX -= 96;
+                  stagePassResultOutOffsetX = GameTime.advance(PlayerObject.class, "stagePassResultOutOffsetX", stagePassResultOutOffsetX, -(96));
                }
 
                if (stagePassResultOutOffsetX < -1000) {
@@ -2927,9 +2910,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    public static void timeLogic() {
       if (!timeStopped) {
          if (overTime > timeCount) {
-            timeCount += 60;
+            timeCount = GameTime.milliseconds(PlayerObject.class, "timeCount", timeCount, 1);
             if (timeCount > overTime) {
-               timeCount = overTime;
+               timeCount = GameTime.set(PlayerObject.class, "timeCount", overTime);
             }
 
             if (GlobalResource.timeIsLimit()) {
@@ -2941,7 +2924,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   preTimeCount = timeCount / 1000;
                }
 
-               if (timeCount == overTime && player != null) {
+               if (GameTime.event(PlayerObject.class, "timeCount", "timeLogic:2927", GameTime.crosses(PlayerObject.class, "timeCount", timeCount, overTime) && player != null)) {
                   if (stageModeState == 1) {
                      for (int i = 0; i < myPlayerStatic.length; i++) {
                      if (myPlayerStatic[i] != null) myPlayerStatic[i].setDie(false);
@@ -2971,7 +2954,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   preTimeCount = timeCount / 1000;
                }
 
-               if (timeCount == overTime && player != null) {
+               if (GameTime.event(PlayerObject.class, "timeCount", "timeLogic:2957", GameTime.crosses(PlayerObject.class, "timeCount", timeCount, overTime) && player != null)) {
                   if (stageModeState == 1) {
                      for (int i = 0; i < myPlayerStatic.length; i++) {
                      if (myPlayerStatic[i] != null) myPlayerStatic[i].setDie(false);
@@ -2994,9 +2977,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                }
             }
          } else if (overTime < timeCount) {
-            timeCount -= 60;
+            timeCount = GameTime.milliseconds(PlayerObject.class, "timeCount", timeCount, -1);
             if (timeCount < overTime) {
-               timeCount = overTime;
+               timeCount = GameTime.set(PlayerObject.class, "timeCount", overTime);
             }
 
             if (GlobalResource.timeIsLimit()) {
@@ -3008,7 +2991,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   preTimeCount = timeCount / 1000;
                }
 
-               if (timeCount == overTime && player != null) {
+               if (GameTime.event(PlayerObject.class, "timeCount", "timeLogic:2994", GameTime.crosses(PlayerObject.class, "timeCount", timeCount, overTime) && player != null)) {
                   if (stageModeState == 1) {
                      for (int i = 0; i < myPlayerStatic.length; i++) {
                      if (myPlayerStatic[i] != null) myPlayerStatic[i].setDie(false);
@@ -3038,7 +3021,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   preTimeCount = timeCount / 1000;
                }
 
-               if (timeCount == overTime && player != null) {
+               if (GameTime.event(PlayerObject.class, "timeCount", "timeLogic:3024", GameTime.crosses(PlayerObject.class, "timeCount", timeCount, overTime) && player != null)) {
                   if (stageModeState == 1) {
                      for (int i = 0; i < myPlayerStatic.length; i++) {
                      if (myPlayerStatic[i] != null) myPlayerStatic[i].setDie(false);
@@ -3111,7 +3094,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             this.velY = 0;
             int var1 = getPlayerObj().getFootPositionX();
             int var2 = getPlayerObj().getFootPositionY();
-            this.footPointX += this.velX;
+            this.footPointX = GameTime.advancePosition(this, "footPointX", this.footPointX, "velX", this.velX);
             int var3 = this.footPointX;
             var3 = MyAPI.dCos((var3 - 660480) * 5760 / 11264 >> 6) * 3072 / 100;
             this.decelerate();
@@ -3867,7 +3850,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
 
    public void beWaterFall() {
       this.waterFalling = true;
-      this.velY += GRAVITY / 10;
+      this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY / 10);
    }
 
    public void calDivideVelocity() {
@@ -4108,11 +4091,11 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             if (this.collisionState == 2) {
                this.collisionLogicOnObject();
             } else if (this.isInWater) {
-               this.worldCal.actionLogic(this.velX >> 1, this.velY >> 1, (int)((float)this.totalVelocity * 5.0F / 9.0F));
+               this.worldCal.moveVelocity(this.velX >> 1, this.velY >> 1, (int)((float)this.totalVelocity * 5.0F / 9.0F));
             } else if (this.movedSpeedX != 0) {
-               this.worldCal.actionLogic(this.movedSpeedX, this.velY);
+               this.worldCal.moveVelocity(this.movedSpeedX, this.velY);
             } else {
-               this.worldCal.actionLogic(this.velX, this.velY, this.totalVelocity);
+               this.worldCal.moveVelocity(this.velX, this.velY, this.totalVelocity);
             }
 
             this.footPointX = this.posX;
@@ -4129,9 +4112,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       this.footObjectLogic = false;
       this.worldCal.actionState = 1;
       if (this.isInWater) {
-         this.worldCal.actionLogic(this.velX >> 1, this.velY);
+         this.worldCal.moveVelocity(this.velX >> 1, this.velY);
       } else {
-         this.worldCal.actionLogic(this.velX, this.velY);
+         this.worldCal.moveVelocity(this.velX, this.velY);
       }
 
       if (this.worldCal.actionState == 0) {
@@ -4160,18 +4143,18 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
          this.animationID = 7;
       } else {
          if (Key.press(16777216)) {
-            this.spinDownWaitCount = 0;
-            this.spinCount = 12;
+            this.spinDownWaitCount = GameTime.set(this, "spinDownWaitCount", 0);
+            this.spinCount = GameTime.set(this, "spinCount", 12);
             this.animationID = 7;
-            this.spinKeyCount = 20;
+            this.spinKeyCount = GameTime.set(this, "spinKeyCount", 20);
             this.drawer.restart();
             if (characterID != 3) {
                soundInstance.playSe(4);
             }
          } else if (Key.repeat(2097152 | Key.B_7 | Key.B_9) && this.spinKeyCount == 0) {
-            this.spinCount = 12;
+            this.spinCount = GameTime.set(this, "spinCount", 12);
             this.animationID = 7;
-            this.spinKeyCount = 20;
+            this.spinKeyCount = GameTime.set(this, "spinKeyCount", 20);
             this.drawer.restart();
             if (characterID != 3) {
                soundInstance.playSe(4);
@@ -4179,20 +4162,20 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
          }
 
          if (this.spinCount == 0 && this.spinKeyCount > 0) {
-            --this.spinKeyCount;
+            this.spinKeyCount = GameTime.advance(this, "spinKeyCount", this.spinKeyCount, -(1));
          }
       }
 
       if (this.spinCount > 0) {
          if (this.spinDownWaitCount < 12) {
-            ++this.spinDownWaitCount;
+            this.spinDownWaitCount = Math.min(12, GameTime.advance(this, "spinDownWaitCount", this.spinDownWaitCount, 1));
          } else {
-            this.spinDownWaitCount = 12;
+            this.spinDownWaitCount = GameTime.set(this, "spinDownWaitCount", 12);
          }
       }
 
       if (this.spinCount > 0) {
-         --this.spinCount;
+         this.spinCount = Math.max(0, GameTime.advance(this, "spinCount", this.spinCount, -(1)));
          this.effectID = 1;
       } else {
          this.effectID = 0;
@@ -4259,7 +4242,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             }
          }
 
-         this.spinCount = 0;
+         this.spinCount = GameTime.set(this, "spinCount", 0);
          this.animationID = 4;
          this.dashRolling = false;
          this.ignoreFirstTouch = true;
@@ -4279,7 +4262,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             var1 = 1;
          }
 
-         this.velY = var2 + var1 * this.getGravity();
+         this.velY = GameTime.advance(this, "velY", var2, var1 * this.getGravity());
          break;
       case 3:
          this.velY = 100;
@@ -4446,7 +4429,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
          this.outOfControlObject = null;
       }
 
-      this.hurtCount = 48;
+      this.hurtCount = GameTime.set(this, "hurtCount", 48);
       byte var1;
       if (this.velX == 0) {
          if (this.faceDirection) {
@@ -4586,7 +4569,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
 
       this.animationID = 4;
       soundInstance.playSe(11);
-      this.smallJumpCount = 4;
+      this.smallJumpCount = GameTime.set(this, "smallJumpCount", 4);
       this.onBank = false;
       this.attackAnimationID = 0;
       this.attackCount = 0;
@@ -4617,7 +4600,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
 
       this.animationID = 4;
       soundInstance.playSe(11);
-      this.smallJumpCount = 4;
+      this.smallJumpCount = GameTime.set(this, "smallJumpCount", 4);
       this.onBank = false;
       this.attackAnimationID = 0;
       this.attackCount = 0;
@@ -4644,7 +4627,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       this.setVelY(var1);
       this.animationID = 4;
       soundInstance.playSe(11);
-      this.smallJumpCount = 4;
+      this.smallJumpCount = GameTime.set(this, "smallJumpCount", 4);
       this.onBank = false;
       this.attackAnimationID = 0;
       this.attackCount = 0;
@@ -4660,7 +4643,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       this.setVelY(var1);
       this.animationID = 4;
       soundInstance.playSe(11);
-      this.smallJumpCount = 4;
+      this.smallJumpCount = GameTime.set(this, "smallJumpCount", 4);
       this.onBank = false;
       this.attackAnimationID = 0;
       this.attackCount = 0;
@@ -4910,7 +4893,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             if (characterID == 3) {
                if (this.animationID == 4 && !IsGamePause) {
                   if (this.ducting) {
-                     if (this.ductingCount % 2 == 0) {
+                     if (GameTime.periodic(this, "ductingCount", "draw:4896", this.ductingCount, 2, 0)) {
                         soundInstance.stopLoopSe();
                         soundInstance.playLoopSe(25);
                      }
@@ -5043,9 +5026,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                var8 = 1;
             }
 
-            this.velY = var3 + var8 * this.getGravity();
-            this.footPointX += this.velX;
-            this.footPointY += this.velY;
+            this.velY = GameTime.advance(this, "velY", var3, var8 * this.getGravity());
+            this.footPointX = GameTime.advancePosition(this, "footPointX", this.footPointX, "velX", this.velX);
+            this.footPointY = GameTime.advancePosition(this, "footPointY", this.footPointY, "velY", this.velY);
          }
 
          if (this.isInWater && this.breatheNumCount >= 0 && this.breatheNumCount < 6) {
@@ -5060,7 +5043,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             }
 
             MyAPI.drawRegion(var1, var9, var4 * 16, 0, 16, 16, 0, (var5 >> 6) - var3, var2, 33);
-            --this.breatheNumY;
+            this.breatheNumY = GameTime.advance(this, "breatheNumY", this.breatheNumY, -(1));
          }
       }
 
@@ -5075,9 +5058,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             var2 = (MOON_STAR_DES_X_1 - MOON_STAR_ORI_X_1) * this.moonStarFrame1 / 207;
             var4 = this.moonStarFrame1 * 8 / 207;
             var7.draw(var1, 0, var2 + var3, var4 + 18, true, 0);
-            ++this.moonStarFrame1;
+            this.moonStarFrame1 = GameTime.advance(this, "moonStarFrame1", this.moonStarFrame1, 1);
          } else {
-            this.moonStarFrame1 = 0;
+            this.moonStarFrame1 = GameTime.set(this, "moonStarFrame1", 0);
          }
 
          if (terminalState == 7) {
@@ -5086,9 +5069,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             var2 = (MOON_STAR_DES_X_1 - MOON_STAR_ORI_X_1) * this.moonStarFrame2 / 120;
             var3 = this.moonStarFrame2 * 8 / 120;
             var7.draw(var1, 1, var2 + var4, var3 + 18, true, 0);
-            ++this.moonStarFrame2;
+            this.moonStarFrame2 = GameTime.advance(this, "moonStarFrame2", this.moonStarFrame2, 1);
          } else {
-            this.moonStarFrame2 = 0;
+            this.moonStarFrame2 = GameTime.set(this, "moonStarFrame2", 0);
          }
       }
 
@@ -5143,13 +5126,13 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    public void ductIn() {
       this.ducting = true;
       this.pushOnce = true;
-      this.ductingCount = 0;
+      this.ductingCount = GameTime.set(this, "ductingCount", 0);
    }
 
    public void ductOut() {
       this.ducting = false;
       this.pushOnce = false;
-      this.ductingCount = 0;
+      this.ductingCount = GameTime.set(this, "ductingCount", 0);
    }
 
    protected void extraInputLogic() {
@@ -5166,18 +5149,18 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
 
    public void fallChk() {
       if (this.fallTime > 0) {
-         --this.fallTime;
+         this.fallTime = Math.max(0, GameTime.advance(this, "fallTime", this.fallTime, -(1)));
          if (this.animationID == 0) {
             this.animationID = 1;
          }
       } else if ((!this.isAntiGravity && this.faceDegree >= 45 && this.faceDegree <= 315 || this.isAntiGravity && (this.faceDegree <= 135 || this.faceDegree >= 225)) && Math.abs(this.totalVelocity) < 474) {
          if (this.totalVelocity == 0) {
             this.calDivideVelocity();
-            this.velY += this.getGravity();
+            this.velY = GameTime.advance(this, "velY", this.velY, this.getGravity());
             this.calTotalVelocity();
          }
 
-         this.fallTime = 7;
+         this.fallTime = GameTime.set(this, "fallTime", 7);
       }
 
    }
@@ -5313,7 +5296,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    public int getFocusY() {
       if (FOCUS_MAX_OFFSET > 10) {
          if (this.focusMovingState == 0) {
-            this.lookCount = 32;
+            this.lookCount = GameTime.set(this, "lookCount", 32);
          }
 
          if (this.lookCount == 0) {
@@ -5335,7 +5318,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                }
             }
          } else {
-            --this.lookCount;
+            this.lookCount = Math.max(0, GameTime.advance(this, "lookCount", this.lookCount, -(1)));
             if (this.focusOffsetY > 0) {
                this.focusOffsetY -= 15;
                if (this.focusOffsetY < 0) {
@@ -5562,7 +5545,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       int var2;
       for(var2 = 0; var2 < DEGREE_DIVIDE.length; ++var2) {
          if (var1 < DEGREE_DIVIDE[var2]) {
-            var2 %= 8;
+            var2 = GameTime.wrap(this, "velY", var2, 8);
             break;
          }
       }
@@ -5835,7 +5818,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             if (PlayerObject.itemVec[i][0] >= 0) {
                 if (PlayerObject.itemVec[i][1] > 0) {
                     final int[] array = PlayerObject.itemVec[i];
-                    --array[1];
+                    array[1] = GameTime.advance(array, String.valueOf(1), array[1], -(1));
                 }
                 if (PlayerObject.itemVec[i][1] == 0) {
                     this.getItem(PlayerObject.itemVec[i][0]);
@@ -5858,10 +5841,10 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             this.enteringSP = false;
         }
         if (this.hurtCount > 0) {
-            --this.hurtCount;
+            this.hurtCount = Math.max(0, GameTime.advance(this, "hurtCount", this.hurtCount, -(1)));
         }
         if (PlayerObject.invincibleCount > 0) {
-            --PlayerObject.invincibleCount;
+            PlayerObject.invincibleCount = Math.max(0, GameTime.advanceOnce(PlayerObject.class, "invincibleCount", PlayerObject.invincibleCount, -(1)));
             if (PlayerObject.invincibleCount == 0) {
                 final int playingBGMIndex = SoundSystem.getInstance().getPlayingBGMIndex();
                 SoundSystem.getInstance();
@@ -5920,8 +5903,8 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
         }
         if (this.isDead) {
             if (this.isInWater && this.breatheNumCount >= 6) {
-                ++this.drownCnt;
-                if (this.drownCnt % 2 == 0) {
+                this.drownCnt = GameTime.advance(this, "drownCnt", this.drownCnt, 1);
+                if (GameTime.periodic(this, "drownCnt", "logic:5907", this.drownCnt, 2, 0)) {
                     addGameObject((GameObject)new DrownBubble(41, this.footPointX, this.footPointY - 1536, 0, 0, 0, 0));
                 }
             }
@@ -5982,10 +5965,10 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                     }
                     if (this.isInWater) {
                         if (!PlayerObject.IsGamePause) {
-                            this.breatheCount += 63;
+                            this.breatheCount = GameTime.milliseconds(this, "breatheCount", this.breatheCount, 1);
                             this.breatheNumCount = -1;
                             if (PlayerObject.characterID == 2 && this.collisionState == 4 && this.getNewPointY(this.posY, 0, -this.collisionRect.getHeight(), this.faceDegree) + 256 < waterLevel << 6) {
-                                this.breatheCount = 0;
+                                this.breatheCount = GameTime.set(this, "breatheCount", 0);
                                 final int playingBGMIndex3 = SoundSystem.getInstance().getPlayingBGMIndex();
                                 SoundSystem.getInstance();
                                 if (playingBGMIndex3 == 21) {
@@ -6108,9 +6091,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                                 this.waterSprayX = this.posX;
                                 PlayerObject.waterSprayDrawer.restart();
                             }
-                            ++this.breatheFrame;
-                            this.breatheFrame %= 51;
-                            if (this.breatheFrame == MyRandom.nextInt(1, 8) * 6) {
+                            this.breatheFrame = GameTime.advance(this, "breatheFrame", this.breatheFrame, 1);
+                            this.breatheFrame = GameTime.wrap(this, "breatheFrame", this.breatheFrame, 51);
+                            if (GameTime.periodic(this, "breatheFrame", "airBubble", this.breatheFrame, 6, 0) && MyRandom.nextInt(8) == 0) {
                                 final int footPositionX = PlayerObject.player.getFootPositionX();
                                 int n5;
                                 if (this.faceDirection) {
@@ -6124,7 +6107,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                         }
                     }
                     else if (PlayerObject.waterSprayDrawer != null) {
-                        this.breatheCount = 0;
+                        this.breatheCount = GameTime.set(this, "breatheCount", 0);
                         this.breatheNumCount = -1;
                         this.preBreatheNumCount = -1;
                         if (this.getNewPointY(this.posY, 0, -this.collisionRect.getHeight() >> 1, this.faceDegree) - 256 >= waterLevel << 6) {
@@ -6139,7 +6122,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                     }
                 }
                 if (PlayerObject.speedCount > 0) {
-                    --PlayerObject.speedCount;
+                    PlayerObject.speedCount = Math.max(0, GameTime.advanceOnce(PlayerObject.class, "speedCount", PlayerObject.speedCount, -(1)));
                     this.movePower = PlayerObject.MOVE_POWER << 1;
                     this.movePowerInAir = PlayerObject.MOVE_POWER_IN_AIR << 1;
                     this.movePowerReverse = PlayerObject.MOVE_POWER_REVERSE << 1;
@@ -6185,8 +6168,10 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                 if (this.railing) {
                     this.setNoKey();
                     if (this.railLine == null) {
-                        this.velY += this.getGravity();
-                        this.checkWithObject(this.footPointX, this.footPointY, this.footPointX + this.velX, this.footPointY + this.velY);
+                        this.velY = GameTime.advance(this, "velY", this.velY, this.getGravity());
+                        this.checkWithObject(this.footPointX, this.footPointY,
+                                GameTime.advancePosition(this, "footPointX", this.footPointX, "velX", this.velX),
+                                GameTime.advancePosition(this, "footPointY", this.footPointY, "velY", this.velY));
                     }
                     else {
                         final int footPointX = this.footPointX;
@@ -6198,8 +6183,8 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                         }
                         if (sin != 0) {
                            final Direction oneDirection = this.railLine.getOneDirection();
-                           this.totalVelocity += sin;
-                           this.checkWithObject(this.footPointX, this.footPointY, this.footPointX + oneDirection.getValueX(this.railLine.cos(this.totalVelocity)), this.footPointY + oneDirection.getValueY(this.railLine.sin(this.totalVelocity)));
+                           this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, sin);
+                           this.checkWithObject(this.footPointX, this.footPointY, this.footPointX + this.railDisplacement(true, oneDirection.getValueX(1)), this.footPointY + this.railDisplacement(false, oneDirection.getValueY(1)));
                         }
                         else {
                            final int footPointX2 = this.footPointX;
@@ -6212,7 +6197,6 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                            else {
                               n7 = 1;
                            }
-                           final int cos = this.railLine.cos(this.totalVelocity);
                            final int footPointY3 = this.footPointY;
                            int n8;
                            if (this.totalVelocity < 0) {
@@ -6221,19 +6205,11 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                            else {
                               n8 = 1;
                            }
-                           this.checkWithObject(footPointX2, footPointY2, footPointX3 + n7 * cos, footPointY3 + n8 * this.railLine.sin(this.totalVelocity));
+                           this.checkWithObject(footPointX2, footPointY2, footPointX3 + this.railDisplacement(true, n7), footPointY3 + this.railDisplacement(false, n8));
                         }
                         if (!this.railOut && this.railLine != null) {
-                            this.velX = this.footPointX - footPointX;
-                            this.velY = this.footPointY - footPointY;
-                        }
-                    }
-                    if (this.railOut && this.velY == this.getGravity() - 1200) {
-                        if (PlayerObject.characterID == 3) {
-                           soundInstance.playSe(25);
-                        }
-                        else {
-                           soundInstance.playSe(37);
+                            this.velX = GameTime.velocityFromDisplacement(this.footPointX - footPointX);
+                            this.velY = GameTime.velocityFromDisplacement(this.footPointY - footPointY);
                         }
                     }
                     if (this.railOut && this.velY > 0) {
@@ -6249,25 +6225,25 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                         switch (this.pipeState) {
                             case 0: {
                                 if (this.footPointX < this.pipeDesX) {
-                                    this.footPointX += 250;
+                                    this.footPointX = GameTime.advance(this, "footPointX", this.footPointX, 250);
                                     if (this.footPointX >= this.pipeDesX) {
                                         this.footPointX = this.pipeDesX;
                                     }
                                 }
                                 else if (this.footPointX > this.pipeDesX) {
-                                    this.footPointX -= 250;
+                                    this.footPointX = GameTime.advance(this, "footPointX", this.footPointX, -(250));
                                     if (this.footPointX <= this.pipeDesX) {
                                         this.footPointX = this.pipeDesX;
                                     }
                                 }
                                 if (this.footPointY < this.pipeDesY) {
-                                    this.footPointY += 250;
+                                    this.footPointY = GameTime.advance(this, "footPointY", this.footPointY, 250);
                                     if (this.footPointY >= this.pipeDesY) {
                                         this.footPointY = this.pipeDesY;
                                     }
                                 }
                                 else if (this.footPointY > this.pipeDesY) {
-                                    this.footPointY -= 250;
+                                    this.footPointY = GameTime.advance(this, "footPointY", this.footPointY, -(250));
                                     if (this.footPointY <= this.pipeDesY) {
                                         this.footPointY = this.pipeDesY;
                                     }
@@ -6281,13 +6257,13 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                                 break;
                             }
                             case 1: {
-                                this.footPointX += this.velX;
-                                this.footPointY += this.velY;
+                                this.footPointX = GameTime.advancePosition(this, "footPointX", this.footPointX, "velX", this.velX);
+                                this.footPointY = GameTime.advancePosition(this, "footPointY", this.footPointY, "velY", this.velY);
                                 break;
                             }
                             case 2: {
-                                this.footPointX += this.velX;
-                                this.footPointY += this.velY;
+                                this.footPointX = GameTime.advancePosition(this, "footPointX", this.footPointX, "velX", this.velX);
+                                this.footPointY = GameTime.advancePosition(this, "footPointY", this.footPointY, "velY", this.velY);
                                 if (this.velX != 0) {
                                     if (this.velX > 0 && this.footPointX > this.pipeDesX) {
                                         this.footPointX = this.pipeDesX;
@@ -6323,16 +6299,16 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                     }
                     if (PlayerObject.isTerminal) {
                         if (this.terminalCount > 0) {
-                            --this.terminalCount;
+                            this.terminalCount = Math.max(0, GameTime.advance(this, "terminalCount", this.terminalCount, -(1)));
                         }
                         if (this.animationID == 4) {
-                            this.totalVelocity -= PlayerObject.MOVE_POWER_REVERSE_BALL;
+                            this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(PlayerObject.MOVE_POWER_REVERSE_BALL));
                             if (this.totalVelocity < 0) {
                                 this.totalVelocity = 0;
                             }
                         }
                         else if (this.totalVelocity > PlayerObject.MAX_VELOCITY) {
-                            this.totalVelocity -= PlayerObject.MOVE_POWER_REVERSE_BALL;
+                            this.totalVelocity = GameTime.advance(this, "totalVelocity", this.totalVelocity, -(PlayerObject.MOVE_POWER_REVERSE_BALL));
                             if (this.totalVelocity <= PlayerObject.MAX_VELOCITY) {
                                 this.totalVelocity = PlayerObject.MAX_VELOCITY;
                             }
@@ -6354,11 +6330,11 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                         if (!PlayerObject.isFirstTouchedWind && this.animationID == 29) {
                             PlayerObject.soundInstance.playSe(68);
                             PlayerObject.isFirstTouchedWind = true;
-                            this.frameCnt = 0;
+                            this.frameCnt = GameTime.set(this, "frameCnt", 0);
                         }
                         if (PlayerObject.isFirstTouchedWind) {
                             if (this.animationID == 29) {
-                                ++this.frameCnt;
+                                this.frameCnt = GameTime.advance(this, "frameCnt", this.frameCnt, 1);
                                 if (this.frameCnt > 4 && !PlayerObject.IsGamePause) {
                                     PlayerObject.soundInstance.playLoopSe(69);
                                 }
@@ -6374,11 +6350,11 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                     if (StageManager.getCurrentZoneId() == 5) {
                         if (!PlayerObject.isFirstTouchedSandSlip && this.animationID == 30) {
                             PlayerObject.isFirstTouchedSandSlip = true;
-                            this.frameCnt = 0;
+                            this.frameCnt = GameTime.set(this, "frameCnt", 0);
                         }
                         if (PlayerObject.isFirstTouchedSandSlip) {
                             if (this.animationID == 30 && this.collisionState == 0) {
-                                ++this.frameCnt;
+                                this.frameCnt = GameTime.advance(this, "frameCnt", this.frameCnt, 1);
                                 if (this.frameCnt > 2 && !PlayerObject.IsGamePause) {
                                     PlayerObject.soundInstance.playLoopSe(71);
                                 }
@@ -6392,7 +6368,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                         }
                     }
                     if (this.ducting) {
-                        ++this.ductingCount;
+                        this.ductingCount = GameTime.advance(this, "ductingCount", this.ductingCount, 1);
                         this.noKeyFlag = true;
                         this.animationID = 4;
                         this.attackAnimationID = this.animationID;
@@ -6727,6 +6703,12 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       this.refreshCollisionRectWrap();
    }
 
+   private int railDisplacement(boolean horizontal, int direction) {
+      int projection = horizontal ? railLine.cos(1024) : railLine.sin(1024);
+      double speed = Math.abs(GameTime.integratedVelocity(this, "totalVelocity", totalVelocity));
+      return GameTime.distance(this, horizontal ? "railX" : "railY", direction * projection * speed / 1024.0);
+   }
+
    public void railIn(int var1, int var2) {
       this.railLine = null;
       this.velY = 0;
@@ -6748,6 +6730,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
 
    public void railOut(int var1, int var2) {
       if (this.railing) {
+         if (!this.railOut) soundInstance.playSe(characterID == 3 ? 25 : 37);
          this.railOut = true;
          this.railLine = null;
          this.velY = -1200;
@@ -6797,7 +6780,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    }
 
    public void resetBreatheCount() {
-      this.breatheCount = 0;
+      this.breatheCount = GameTime.set(this, "breatheCount", 0);
       this.breatheNumCount = -1;
       this.preBreatheNumCount = -1;
    }
@@ -6824,7 +6807,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       invincibleCount = 240;
       preScoreNum = scoreNum;
       preLifeNum = lifeNum;
-      timeCount = 0;
+      timeCount = GameTime.set(PlayerObject.class, "timeCount", 0);
       lastTimeCount = timeCount;
    }
 
@@ -7038,13 +7021,13 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       this.worldCal.stopMove();
       this.collisionChkBreak = true;
       }
-      this.hurtCount = 0;
+      this.hurtCount = GameTime.set(this, "hurtCount", 0);
       this.dashRolling = false;
       if (this.effectID == 0 || this.effectID == 1) {
          this.effectID = -1;
       }
 
-      this.drownCnt = 0;
+      this.drownCnt = GameTime.set(this, "drownCnt", 0);
       if (GameObject.player.isDead) {
       if (stageModeState == 1 && StageManager.getStageID() == 10) {
          RocketSeparateEffect.clearInstance();
@@ -7213,7 +7196,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    public void setTerminal(int var1) {
       this.terminalOffset = 0;
       terminalType = var1;
-      this.terminalCount = 10;
+      this.terminalCount = GameTime.set(this, "terminalCount", 10);
       isTerminal = true;
       timeStopped = true;
       switch(terminalType) {
@@ -7241,7 +7224,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
 
    public void setTerminalSingle(int var1) {
       terminalType = var1;
-      this.terminalCount = 10;
+      this.terminalCount = GameTime.set(this, "terminalCount", 10);
       isTerminal = true;
       timeStopped = true;
    }
@@ -7314,14 +7297,14 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                if (this.collisionState == 3) {
                   if (this instanceof PlayerAmy) {
                      this.dashRolling = true;
-                     this.spinDownWaitCount = 0;
+                     this.spinDownWaitCount = GameTime.set(this, "spinDownWaitCount", 0);
                      if (characterID != 3) {
                         soundInstance.playSe(4);
                      }
                   }
                } else if (Key.press(16777216)) {
                   this.dashRolling = true;
-                  this.spinDownWaitCount = 0;
+                  this.spinDownWaitCount = GameTime.set(this, "spinDownWaitCount", 0);
                   if (characterID != 3) {
                      soundInstance.playSe(4);
                   }
@@ -7349,26 +7332,26 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                soundInstance.playSe(4);
             }
 
-            this.spinCount = 12;
-            this.spinKeyCount = 20;
+            this.spinCount = GameTime.set(this, "spinCount", 12);
+            this.spinKeyCount = GameTime.set(this, "spinKeyCount", 20);
          } else if (Key.press(Key.B_7)) {
             this.faceDirection = false;
             this.dashRolling = true;
-            this.spinKeyCount = 20;
+            this.spinKeyCount = GameTime.set(this, "spinKeyCount", 20);
             if (characterID != 3) {
                soundInstance.playSe(4);
             }
 
-            this.spinCount = 12;
+            this.spinCount = GameTime.set(this, "spinCount", 12);
          } else if (Key.press(Key.B_9)) {
             this.faceDirection = true;
             this.dashRolling = true;
-            this.spinKeyCount = 20;
+            this.spinKeyCount = GameTime.set(this, "spinKeyCount", 20);
             if (characterID != 3) {
                soundInstance.playSe(4);
             }
 
-            this.spinCount = 12;
+            this.spinCount = GameTime.set(this, "spinCount", 12);
          }
       }
 
@@ -7392,7 +7375,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    public boolean stagePassRunOutofScreenLogic() {
       boolean var1;
       if (!StageManager.isOnlyScoreCal && this.footPointX + 512 > camera.x + SCREEN_WIDTH + 800 << 6 || isStartStageEndFlag && stageEndFrameCnt > 80) {
-         stagePassResultOutOffsetX -= 96;
+         stagePassResultOutOffsetX = GameTime.advance(PlayerObject.class, "stagePassResultOutOffsetX", stagePassResultOutOffsetX, -(96));
          if (stagePassResultOutOffsetX < -1000) {
             var1 = true;
          } else {
@@ -7420,7 +7403,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
          case 1:
             if (this.totalVelocity == 0 && this.animationID == 0) {
                terminalState = 2;
-               this.terminalCount = 10;
+               this.terminalCount = GameTime.set(this, "terminalCount", 10);
             }
             break;
          case 2:
@@ -7448,20 +7431,20 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             }
             break;
          case 4:
-            this.velY += this.getGravity();
+            this.velY = GameTime.advance(this, "velY", this.velY, this.getGravity());
             this.collisionState = 4;
             if (this.posY <= 25280) {
                this.velY = -100;
                terminalState = 5;
-               this.terminalCount = 60;
+               this.terminalCount = GameTime.set(this, "terminalCount", 60);
             }
             break;
          case 5:
             this.collisionState = 4;
             if (this.posY <= 25280) {
-               this.velY += 30;
+               this.velY = GameTime.advance(this, "velY", this.velY, 30);
             } else {
-               this.velY -= 30;
+               this.velY = GameTime.advance(this, "velY", this.velY, -(30));
             }
 
             if (this.terminalCount == 0) {
@@ -7469,7 +7452,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                this.velX = 0;
                MapManager.setCameraRightLimit(MapManager.getPixelWidth());
                MapManager.setFocusObj((Focusable)null);
-               this.terminalCount = 30;
+               this.terminalCount = GameTime.set(this, "terminalCount", 30);
                terminalState = 6;
                this.posY -= 2112;
                this.footPointY = this.posY;
@@ -7477,9 +7460,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
             break;
          case 6:
             this.collisionState = 4;
-            this.terminalOffset += 1600;
+            this.terminalOffset = GameTime.advance(this, "terminalOffset", this.terminalOffset, 1600);
             if (this.terminalCount == 0) {
-               this.terminalCount = 100;
+               this.terminalCount = GameTime.set(this, "terminalCount", 100);
                terminalState = 7;
             }
             break;
@@ -7494,11 +7477,11 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
 
    public void waitingChk() {
       if (Key.repeat(Key.gSelect | 8388608 | Key.gLeft | Key.gRight | Key.gDown | Key.gUp | 16777216 | 33554432) || this.animationID != 0 && this.animationID != 50 && this.animationID != 51) {
-         this.waitingCount = 0;
+         this.waitingCount = GameTime.set(this, "waitingCount", 0);
          this.waitingLevel = 0;
          this.isResetWaitAni = true;
       } else {
-         ++this.waitingCount;
+         this.waitingCount = GameTime.advance(this, "waitingCount", this.waitingCount, 1);
          if (this.waitingCount > 96) {
             if (this.waitingLevel == 0) {
                this.animationID = 50;

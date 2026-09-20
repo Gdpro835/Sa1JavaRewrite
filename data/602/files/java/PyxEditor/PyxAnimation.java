@@ -1,5 +1,7 @@
 package PyxEditor;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -13,6 +15,15 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 public class PyxAnimation {
+    private static final java.util.WeakHashMap<PyxAnimation, Boolean> active =
+            new java.util.WeakHashMap<PyxAnimation, Boolean>();
+    public static void updateAll() {
+        if (pauseFlag || AnimationDrawer.isAllPause()) return;
+        for (PyxAnimation animation : active.keySet()) {
+            if (animation.currentAction >= 0 && animation.actionArray != null)
+                animation.actionArray[animation.currentAction].moveOn();
+        }
+    }
     public static final int ZOOM = 6;
     private static boolean pauseFlag = false;
     private Action[] actionArray;
@@ -35,6 +46,7 @@ public class PyxAnimation {
     }
 
     public PyxAnimation(String str, Animation[] animationArr) {
+        active.put(this, Boolean.TRUE);
         this.animationArray = animationArr;
         this.currentAction = -1;
         this.nodeStack = new Stack();
@@ -84,6 +96,7 @@ public class PyxAnimation {
     }
 
     public void close() {
+        active.remove(this);
         for (Node close : this.nodeArray) {
             close.close();
         }
@@ -103,9 +116,7 @@ public class PyxAnimation {
         for (Node draw : this.nodeArray) {
             draw.draw(mFGraphics, i2, i3);
         }
-        if (!pauseFlag) {
-            this.actionArray[this.currentAction].moveOn();
-        }
+
     }
 
     public void drawAction(MFGraphics mFGraphics, int i, int i2) {
@@ -114,9 +125,7 @@ public class PyxAnimation {
             for (Node draw : this.nodeArray) {
                 draw.draw(mFGraphics, i, i2);
             }
-            if (!pauseFlag) {
-                this.actionArray[this.currentAction].moveOn();
-            }
+
         }
     }
 
@@ -466,6 +475,7 @@ public class PyxAnimation {
 
     class Action {
         private int frame;
+        private long lastAdvanceFrame = Long.MIN_VALUE;
         private String label;
         final PyxAnimation this$0;
         private int timeLimit;
@@ -501,21 +511,27 @@ public class PyxAnimation {
 
         public void reset() {
             this.frame = 0;
+            GameTime.reset(this, "frame");
+            lastAdvanceFrame = Long.MIN_VALUE;
             setNodeProperty();
         }
 
         public void reset(int i) {
             this.frame = i << 6;
+            GameTime.reset(this, "frame");
+            lastAdvanceFrame = Long.MIN_VALUE;
             setNodeProperty();
         }
 
         public void moveOn() {
-            this.frame += this.this$0.speed;
+            if (lastAdvanceFrame == GameTime.frameId()) return;
+            lastAdvanceFrame = GameTime.frameId();
+            this.frame = GameTime.advance(this, "frame", this.frame, this.this$0.speed);
             if (this.frame >= (this.timeLimit << 6)) {
                 if (!this.this$0.loop) {
                     this.frame = (this.timeLimit << 6) - 1;
                 } else {
-                    this.frame -= this.timeLimit << 6;
+                    this.frame = GameTime.wrap(this, "frame", this.frame, Math.max(1, this.timeLimit << 6));
                 }
             }
             setNodeProperty();

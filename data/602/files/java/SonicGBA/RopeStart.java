@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import Lib.SoundSystem;
 import Lib.crlFP32;
@@ -118,23 +120,23 @@ class RopeStart extends GimmickObject {
             this.initFlag = false;
          }
       } else if (player.outOfControl && player.outOfControlObject == this) {
-         this.velocity += GRAVITY * MyAPI.dSin(this.degree) / 100;
+         this.velocity = GameTime.advance(this, "velocity", this.velocity, GRAVITY * MyAPI.dSin(this.degree) / 100);
          if (this.velocity > 0) {
-            this.velocity -= 30;
+            this.velocity = GameTime.advance(this, "velocity", this.velocity, -(30));
             if (this.velocity < 0) {
                this.velocity = 0;
             }
          }
 
          if (this.velocity < 0) {
-            this.velocity += 30;
+            this.velocity = GameTime.advance(this, "velocity", this.velocity, 30);
             if (this.velocity > 0) {
                this.velocity = 0;
             }
          }
 
-         this.posX += this.velocity * MyAPI.dCos(this.degree) / 100;
-         this.posY += this.velocity * MyAPI.dSin(this.degree) / 100;
+         this.posX = GameTime.advance(this, "posX", this.posX, this.velocity * MyAPI.dCos(this.degree) / 100);
+         this.posY = GameTime.advance(this, "posY", this.posY, this.velocity * MyAPI.dSin(this.degree) / 100);
          this.refreshCollisionRect(this.posX, this.posY);
          if (player.outOfControl) {
             int var3 = player.getFootPositionX();

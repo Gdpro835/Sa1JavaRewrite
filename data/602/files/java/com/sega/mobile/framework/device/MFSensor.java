@@ -22,11 +22,11 @@ public class MFSensor {
     };
     private static SensorManager mManager;
     /* access modifiers changed from: private */
-    public static float x;
+    public static volatile float x;
     /* access modifiers changed from: private */
-    public static float y;
+    public static volatile float y;
     /* access modifiers changed from: private */
-    public static float z;
+    public static volatile float z;
 
     public static float getAccX() {
         return x;
@@ -40,7 +40,13 @@ public class MFSensor {
         return z;
     }
 
+    public static void release() {
+        if (mManager != null) mManager.unregisterListener(listener);
+        mManager = null;
+    }
+
     public static void init() {
+        release();
         mManager = (SensorManager) MFMain.getInstance().getSystemService("sensor");
         List<Sensor> sensors = mManager.getSensorList(1);
         if (sensors.size() > 0) {

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -59,13 +61,13 @@ class Bat extends EnemyObject {
          switch(this.state) {
          case 0:
             if (this.velocity > 0) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                if (this.posX >= this.limitRightX) {
                   this.posX = this.limitRightX;
                   this.velocity = -this.velocity;
                }
             } else {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                if (this.posX <= this.limitLeftX) {
                   this.posX = this.limitLeftX;
                   this.velocity = -this.velocity;
@@ -73,13 +75,13 @@ class Bat extends EnemyObject {
             }
 
             if (this.offsety > 0) {
-               this.posY += this.offsety;
+               this.posY = GameTime.advance(this, "posY", this.posY, this.offsety);
                if (this.posY >= this.limitBottomY) {
                   this.posY = this.limitBottomY;
                   this.offsety = -this.offsety;
                }
             } else {
-               this.posY += this.offsety;
+               this.posY = GameTime.advance(this, "posY", this.posY, this.offsety);
                if (this.posY <= this.limitTopY) {
                   this.posY = this.limitTopY;
                   this.offsety = -this.offsety;
@@ -91,7 +93,7 @@ class Bat extends EnemyObject {
                if (this.attack_cnt >= this.attack_cnt_max) {
                   this.state = 1;
                } else {
-                  ++this.attack_cnt;
+                  this.attack_cnt = GameTime.advance(this, "attack_cnt", this.attack_cnt, 1);
                }
             }
 
@@ -105,7 +107,7 @@ class Bat extends EnemyObject {
                this.state = 0;
                this.drawer.setActionId(0);
                this.drawer.setLoop(true);
-               this.attack_cnt = 0;
+               this.attack_cnt = GameTime.set(this, "attack_cnt", 0);
             }
 
             this.checkWithPlayer(var1, var3, this.posX, this.posY);

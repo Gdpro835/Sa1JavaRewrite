@@ -85,9 +85,9 @@ import android.os.SystemClock;
 public abstract class MFMain extends Activity {
     private static MFMain instance;
     public static Canvas mCanvas;
-    private static boolean mCreated = false;
+    private Canvas ownedCanvas;
     private Handler mHandler = new Handler();
-    public static boolean browser = false;
+    public static volatile boolean browser = false;
     public static int tails = 0;
     //public static boolean fatest = false;
     public static boolean notification = false;
@@ -102,9 +102,9 @@ public abstract class MFMain extends Activity {
     public static int tapCount3 = 0;
     public static int tapCount4 = 0;
     private long lastTapTime = 0;
-    public static boolean multiplayer = false;
+    public static volatile boolean multiplayer = false;
     public FrameLayout layout;
-    public static PlayerObject playermulti;
+    public static volatile PlayerObject playermulti;
     public static boolean cheat;
 
     public static void switchPlayerFocus() {
@@ -226,7 +226,7 @@ public abstract class MFMain extends Activity {
     public void notifyDestroyed() {
         finish();
         MFDevice.openUrl();
-        System.exit(0);
+        // GLSurfaceView and Activity own shutdown; never terminate the VM.
     }
 
     public void platformRequest(final String url) {
@@ -306,7 +306,7 @@ public abstract class MFMain extends Activity {
     }
 });
 
-            if (url != null || !url.isEmpty()) {
+            if (url != null && !url.isEmpty()) {
                 webView.loadUrl(url);
             }
 
@@ -467,21 +467,26 @@ private void showNotification(String title, String text, int notificationId) {
             getWindow().setFlags(512, 512);
             getWindow().getDecorView().setSystemUiVisibility(4098);
         }
-        if (!mCreated) {
-            mCreated = true;
-            getWindow().setFlags(1024, 1024);
-            setVolumeControlStream(3);
-            if (instance == null) {
-                instance = this;
-                mCanvas = (Canvas) MFDevice.getSystemDisplayable();
-                //getInstance().setContentView(mCanvas);
-                layout = new FrameLayout(this);
-                layout.addView(mCanvas);
-                setContentView(layout);
-            }
+        getWindow().setFlags(1024, 1024);
+        setVolumeControlStream(3);
+        android.app.ActivityManager manager = (android.app.ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (manager.getDeviceConfigurationInfo().reqGlEsVersion < 0x20000) {
+            new android.app.AlertDialog.Builder(this).setTitle("OpenGL ES 2.0 required")
+                .setMessage("This device does not support the GPU renderer.")
+                .setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) { finish(); }
+                }).show();
+            return;
         }
+        instance = this;
+        ownedCanvas = MFDevice.attach(this);
+        mCanvas = ownedCanvas;
+        layout = new FrameLayout(this);
+        layout.addView(ownedCanvas);
+        setContentView(layout);
     }
     
+
     boolean isGamepadKey(int keyCode) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BUTTON_A:
@@ -512,63 +517,49 @@ private void showNotification(String title, String text, int notificationId) {
         }
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        MFGamePad.pressVisualKey(decodeGamepadKey(keyCode));
-        int source = event.getSource();
-        if (StageManager.loadStep == 0 && (isGamepadKey(keyCode) || (source & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK || (source & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD)) {
-            State.releaseTouchkeyBoard();
-            return true;
-        } else if (StageManager.loadStep == 0) {
-            State.initTouchkeyBoard();
-        }
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (browser) {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                browser = false;
-                TitleState.state = 1;
-                getInstance().setContentView(layout);
-            }
-        }
-        if (keyCode == 24) {
-            MFDevice.notifyKeyPressed(keyCode);
-            if (MFDevice.getEnableVolumeKey()) {
-                return false;
-            }
-            return true;
-        } else if (keyCode == 25) {
-            MFDevice.notifyKeyPressed(keyCode);
-            if (MFDevice.getEnableVolumeKey()) {
-                return false;
-            }
-            return true;
-        } else if (keyCode == 4) {
-            if (!MFDevice.getEnableCustomBack()) {
-                showExitConfirm();
-            } else if (event.getAction() == 0) {
-                mCanvas.keyPressed(keyCode);
-            }
-            return true;
-        } else {
-            mCanvas.keyDown(keyCode, event);
-            if (keyCode != 84 && keyCode != 82) {
-                return false;
-            }
-            MFDevice.notifyKeyPressed(keyCode);
+    public boolean onKeyDown(final int keyCode, KeyEvent event) {
+        if (ownedCanvas == null) return super.onKeyDown(keyCode, event);
+        if (keyCode == KeyEvent.KEYCODE_BACK && browser) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            browser = false;
+            setContentView(layout);
+            ownedCanvas.showNotify();
             return true;
         }
+        if (keyCode == KeyEvent.KEYCODE_BACK && !MFDevice.getEnableCustomBack()) {
+            showExitConfirm();
+            return true;
+        }
+        final int source = event.getSource();
+        ownedCanvas.queueEvent(new Runnable() {
+            public void run() {
+                if (!ownedCanvas.initialized() || !MFDevice.isCurrentCanvas(ownedCanvas)) return;
+                MFGamePad.pressVisualKey(decodeGamepadKey(keyCode));
+                if (StageManager.loadStep == 0) {
+                    if (isGamepadKey(keyCode) || (source & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK
+                            || (source & InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD) State.releaseTouchkeyBoard();
+                    else State.initTouchkeyBoard();
+                }
+                ownedCanvas.keyPressed(keyCode);
+                if (keyCode == 24 || keyCode == 25 || keyCode == 82 || keyCode == 84) MFDevice.notifyKeyPressed(keyCode);
+            }
+        });
+        return (keyCode != 24 && keyCode != 25) || !MFDevice.getEnableVolumeKey();
     }
 
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        mCanvas.keyUp(keyCode, event);
-        MFGamePad.releaseVisualKey(decodeGamepadKey(keyCode));
-        if (keyCode == 84 || keyCode == 82) {
-            return true;
-        }
-        return false;
+    public boolean onKeyUp(final int keyCode, KeyEvent event) {
+        if (ownedCanvas == null) return super.onKeyUp(keyCode, event);
+        ownedCanvas.queueEvent(new Runnable() {
+            public void run() {
+                ownedCanvas.keyReleased(keyCode);
+                MFGamePad.releaseVisualKey(decodeGamepadKey(keyCode));
+            }
+        });
+        return keyCode != 24 && keyCode != 25;
     }
 
     public boolean onTouchEvent(MotionEvent event) {
-        mCanvas.touchEvent(event);
+        if (ownedCanvas != null) ownedCanvas.touchEvent(event);
         return true;
     }
 
@@ -707,26 +698,34 @@ private float getCenteredAxis(MotionEvent event, int axis) {
 //     }
 // }
 
-    public void onDestroy() {
-        //System.exit(0);
+    @Override public void onDestroy() {
+        if (ownedCanvas != null) {
+            if (isFinishing() && MFDevice.isCurrentCanvas(ownedCanvas)) {
+                // Wait for the GL worker before terminal cleanup. Do not enqueue cleanup
+                // behind view detachment or clear the Activity while save/close still runs.
+                ownedCanvas.pauseGame();
+                MFDevice.shutdown();
+            }
+            ownedCanvas.dispose();
+        }
+        // Do not clear the newer Activity when an old one is being destroyed.
+        if (mCanvas == ownedCanvas) mCanvas = null;
+        if (instance == this) instance = null;
+        if (com.sega.mobile.platform.ChargePlatform.mContext == this)
+            com.sega.mobile.platform.ChargePlatform.mContext = null;
+        if (PlatformStandard.Standard2.activity == this) PlatformStandard.Standard2.activity = null;
         super.onDestroy();
     }
-    public void onPause() {
+    @Override public void onPause() {
+        if (ownedCanvas != null) ownedCanvas.pauseGame();
         super.onPause();
-        MFDevice.isPaused = true;
-        mCanvas.hideNotify();
     }
-    public void onStop() {
-        super.onStop();
-        //MFDevice.Pause();
-    }
-    public void onResume() {
+    @Override public void onStop() { super.onStop(); }
+    @Override public void onResume() {
         super.onResume();
-        mCanvas.setFocusable(true);
-        mCanvas.showNotify();
-        MFDevice.isPaused = false;
+        if (ownedCanvas != null) ownedCanvas.resumeGame();
     }
-    
+
     public void initMultiplayer() {
     /*Key.touchMainMenuReset2();
     Key.touchkeyboardClose();
@@ -1005,7 +1004,9 @@ try {
 
     public void stopTask() {
         running = false;
-        TitleState.state = 1;
+        if (mCanvas != null) mCanvas.queueEvent(new Runnable() {
+            public void run() { TitleState.state = 1; }
+        });
         MFMain.multiplayer = false;
         try {
             socket.close();

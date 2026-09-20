@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -21,9 +23,11 @@ class MiraBullet extends BulletObject {
    }
 
    public void bulletLogic() {
-      this.checkWithPlayer(this.posX, this.posY, this.posX + this.velX, this.posY);
-      this.posX += this.velX;
-      this.posY += this.velY;
+      int nextX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+      int nextY = this.posY;
+      this.checkWithPlayer(this.posX, this.posY, nextX, nextY);
+      this.posX = nextX;
+      this.posY = nextY;
    }
 
    public boolean chkDestroy() {

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -129,8 +131,8 @@ class Boss4 extends BossObject {
 
       this.escapefacedrawer = escapefaceAni.getDrawer(4, true, 0);
       this.state = 0;
-      this.wait_cn = 0;
-      this.attack_cn = 0;
+      this.wait_cn = GameTime.set(this, "wait_cn", 0);
+      this.attack_cn = GameTime.set(this, "attack_cn", 0);
       this.isNoneIce = false;
       this.setBossHP();
    }
@@ -227,7 +229,7 @@ class Boss4 extends BossObject {
 
       this.posStartX = this.posX;
       this.attack_step = 1;
-      this.wait_cn = 0;
+      this.wait_cn = GameTime.set(this, "wait_cn", 0);
    }
 
    public void close() {
@@ -411,16 +413,16 @@ class Boss4 extends BossObject {
             switch(this.show_step) {
             case 0:
                if (this.posX > 556544) {
-                  this.posX -= 256;
+                  this.posX = GameTime.advance(this, "posX", this.posX, -(256));
                } else {
                   this.show_step = 1;
                   this.setAniState(4, 1);
-                  this.laugh_cn = 0;
+                  this.laugh_cn = GameTime.set(this, "laugh_cn", 0);
                }
                break label229;
             case 1:
                if (this.laugh_cn < 16) {
-                  ++this.laugh_cn;
+                  this.laugh_cn = Math.min(16, GameTime.advance(this, "laugh_cn", this.laugh_cn, 1));
                } else {
                   this.show_step = 2;
                   this.setAniState(this.faceDrawer, 0);
@@ -429,7 +431,7 @@ class Boss4 extends BossObject {
             case 2:
                this.state = 2;
                this.attack_step = 0;
-               this.wait_cn = 0;
+               this.wait_cn = GameTime.set(this, "wait_cn", 0);
                MapManager.setCameraDownLimit(1808);
             default:
                break label229;
@@ -441,28 +443,28 @@ class Boss4 extends BossObject {
 
             if (this.face_state != 0) {
                if (this.face_cnt < 30) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(30, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                } else {
                   this.setAniState(this.faceDrawer, 0);
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
             if (this.machine_state != 0 && this.machine_state != 2 && this.machine_state != 4) {
                this.pro_machine_state2 = this.machine_state;
                if (this.machine_cnt < 30) {
-                  ++this.machine_cnt;
+                  this.machine_cnt = Math.min(30, GameTime.advance(this, "machine_cnt", this.machine_cnt, 1));
                } else {
                   this.machine_state = this.pro_machine_state2 - 1;
                   this.setAniState(this.machineDrawer, this.machine_state);
-                  this.machine_cnt = 0;
+                  this.machine_cnt = GameTime.set(this, "machine_cnt", 0);
                }
             }
 
             switch(this.attack_step) {
             case 0:
                if (this.wait_cn < 8) {
-                  ++this.wait_cn;
+                  this.wait_cn = Math.min(8, GameTime.advance(this, "wait_cn", this.wait_cn, 1));
                } else {
                   this.direct = false;
                   if (MyRandom.nextInt(0, 100) <= 95) {
@@ -485,7 +487,7 @@ class Boss4 extends BossObject {
                      this.attack_step = 2;
                      this.setAniState(this.machineDrawer, 4);
                   } else {
-                     this.posX += this.move_velX;
+                     this.posX = GameTime.advancePosition(this, "posX", this.posX, "move_velX", this.move_velX);
                   }
                } else {
                   if (this.posStartX > 553984) {
@@ -504,21 +506,21 @@ class Boss4 extends BossObject {
                   this.setAniState(this.machineDrawer, 4);
                }
 
-               this.wait_cn = 0;
+               this.wait_cn = GameTime.set(this, "wait_cn", 0);
                break label229;
             case 2:
                if (this.move_distance != 1) {
                   if (this.wait_cn < 8) {
-                     ++this.wait_cn;
+                     this.wait_cn = Math.min(8, GameTime.advance(this, "wait_cn", this.wait_cn, 1));
                   } else {
                      this.attack_step = 3;
                      this.setAniState(this.machineDrawer, 2);
-                     this.attack_cn = 0;
-                     this.wait_cn = 0;
+                     this.attack_cn = GameTime.set(this, "attack_cn", 0);
+                     this.wait_cn = GameTime.set(this, "wait_cn", 0);
                      MapManager.setShake(16);
                   }
                } else if (this.wait_cn < 16) {
-                  ++this.wait_cn;
+                  this.wait_cn = GameTime.advance(this, "wait_cn", this.wait_cn, 1);
                } else {
                   this.direct = false;
                   if (MyRandom.nextInt(0, 100) >= 50) {
@@ -532,10 +534,11 @@ class Boss4 extends BossObject {
                break label229;
             case 3:
                if (this.attack_cn < 32) {
-                  ++this.attack_cn;
+                  this.attack_cn = Math.min(32, GameTime.advance(this, "attack_cn", this.attack_cn, 1));
                   Boss4Ice var7;
                   if (this.HP > 4) {
-                     switch(this.attack_cn) {
+                     for (int eventTime : GameTime.steps(this, "attack_cn", "ice:19915", this.attack_cn)) {
+                     switch(eventTime) {
                      case 6:
                      case 22:
                         var1 = MyRandom.nextInt(16);
@@ -544,8 +547,10 @@ class Boss4 extends BossObject {
                         GameObject.addGameObject(var7);
                         SoundSystem.getInstance().playSe(36);
                      }
+                     }
                   } else if (this.HP > 2) {
-                     switch(this.attack_cn) {
+                     for (int eventTime : GameTime.steps(this, "attack_cn", "ice:20411", this.attack_cn)) {
+                     switch(eventTime) {
                      case 6:
                      case 16:
                      case 25:
@@ -555,8 +560,10 @@ class Boss4 extends BossObject {
                         GameObject.addGameObject(var7);
                         SoundSystem.getInstance().playSe(36);
                      }
+                     }
                   } else {
-                     switch(this.attack_cn) {
+                     for (int eventTime : GameTime.steps(this, "attack_cn", "ice:20920", this.attack_cn)) {
+                     switch(eventTime) {
                      case 6:
                      case 13:
                      case 22:
@@ -567,32 +574,33 @@ class Boss4 extends BossObject {
                         GameObject.addGameObject(var7);
                         SoundSystem.getInstance().playSe(36);
                      }
+                     }
                   }
                } else {
                   this.attack_step = 0;
                   this.setAniState(this.machineDrawer, 4);
-                  this.attack_cn = 0;
-                  this.wait_cn = 0;
+                  this.attack_cn = GameTime.set(this, "attack_cn", 0);
+                  this.wait_cn = GameTime.set(this, "wait_cn", 0);
                }
             default:
                break label229;
             }
          case 3:
-            this.water_level += 2;
+            this.water_level = GameTime.advance(this, "water_level", this.water_level, 2);
             StageManager.setWaterLevel(this.water_level);
 
             for(var1 = 0; var1 < 3; ++var1) {
                int[] var6 = this.parts_pos[var1];
-               var6[0] += this.parts_v[var1][0];
+               var6[0] = GameTime.advance(var6, String.valueOf(0), var6[0], this.parts_v[var1][0]);
                var6 = this.parts_v[var1];
-               var6[1] += GRAVITY;
+               var6[1] = GameTime.advance(var6, String.valueOf(1), var6[1], GRAVITY);
                var6 = this.parts_pos[var1];
-               var6[1] += this.parts_v[var1][1];
+               var6[1] = GameTime.advance(var6, String.valueOf(1), var6[1], this.parts_v[var1][1]);
             }
 
             if (this.posY >= this.getGroundY(this.posX, this.posY) - 1280) {
                this.posY = this.getGroundY(this.posX, this.posY) - 1280;
-               ++this.touch_bottom_cnt;
+               this.touch_bottom_cnt = GameTime.advance(this, "touch_bottom_cnt", this.touch_bottom_cnt, 1);
                if (this.touch_bottom_cnt > 20) {
                   this.state = 4;
                   bossFighting = false;
@@ -605,9 +613,9 @@ class Boss4 extends BossObject {
             this.bossbroken.logicBoom(this.posX, this.posY);
             break;
          case 4:
-            ++this.wait_cnt;
+            this.wait_cnt = GameTime.advance(this, "wait_cnt", this.wait_cnt, 1);
             if (this.wait_cnt >= this.wait_cnt_max && this.posY >= this.fly_top - this.fly_top_range) {
-               this.posY -= this.escape_v;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(this.escape_v));
             }
 
             if (this.posY <= this.fly_top - this.fly_top_range && this.WaitCnt == 0) {
@@ -636,7 +644,7 @@ class Boss4 extends BossObject {
             }
 
             if (this.WaitCnt == 3 || this.WaitCnt == 4) {
-               this.posX += this.escape_v;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.escape_v);
             }
 
             if (this.posX - this.fly_end > this.fly_top_range && this.WaitCnt == 3) {

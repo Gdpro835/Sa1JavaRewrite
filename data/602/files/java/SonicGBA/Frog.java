@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -179,8 +181,8 @@ class Frog extends EnemyObject {
             this.checkWithPlayer(var2, var1, this.posX, this.posY);
             break;
          case 1:
-            this.posX += this.velocity;
-            if (this.posY + this.velY > this.getGroundY(this.posX, this.posY)) {
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
+            if (this.posY + GameTime.displacement(GameTime.integratedVelocity(this, "velY", this.velY)) > this.getGroundY(this.posX, this.posY)) {
                this.posY = this.getGroundY(this.posX, this.posY);
                this.state = 0;
                if (this.posX < player.getCheckPositionX()) {
@@ -193,8 +195,8 @@ class Frog extends EnemyObject {
                   this.drawer.setLoop(false);
                }
             } else {
-               this.velY += DRIP_ACC;
-               this.posY += this.velY;
+               this.velY = GameTime.advance(this, "velY", this.velY, DRIP_ACC);
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
             }
 
             if (this.drawer.checkEnd()) {

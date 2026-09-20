@@ -11,8 +11,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.io.FileNotFoundException;
+import GameEngine.time.GameTime;
+import GameEngine.time.AnimationTimeline;
 
 public class Animation {
+    private static final java.util.WeakHashMap<Action, Boolean> playingActions =
+            new java.util.WeakHashMap<Action, Boolean>();
+    public static void updateAll() {
+        for (Action action : playingActions.keySet()) action.advance();
+    }
     private static final boolean SEPERATE_PNG = false;
     private static Animation[] animationInstance;
     public static boolean isFrameWanted;
@@ -91,6 +98,7 @@ public class Animation {
     }
 
     protected void close() {
+        if (m_Actions != null) for (Action action : m_Actions) playingActions.remove(action);
         if (this.imageInfo != null) {
             for (int i = 0; i < this.imageInfo.length; i++) {
                 if (this.imageInfo[i] != null) {
@@ -490,6 +498,10 @@ if (in == null) {
         return this.m_nActions;
     }
 
+    public int getFrameDuration(int actionId, int frame) {
+        return this.m_Actions[actionId].m_FrameInfo[frame][1] & 255;
+    }
+
     public int getFrameNum() {
         return this.m_Actions[this.m_CurAni].getFrameNum();
     }
@@ -550,9 +562,14 @@ if (in == null) {
     private boolean m_bPause;
     private short m_nFrames;
     final Animation thisimageIdArray;
-    private short m_Timer = 0;
+    private final AnimationTimeline timeline = new AnimationTimeline();
+    private long lastAdvanceFrame = Long.MIN_VALUE;
+    private final AnimationTimeline.Durations durations = new AnimationTimeline.Durations() {
+        public int frameCount() { return m_nFrames; }
+        public double seconds(int frame) { return Math.max(1, m_FrameInfo[frame][1] & 255) * GameTime.ASSET_TIME_UNIT_SECONDS; }
+    };
+    private boolean started;
     private short m_CurFrame = 0;
-    private byte m_OldFrame = 0;
     private boolean m_bLoop = true;
 
     public Action(Animation animation, Animation ani) {
@@ -595,9 +612,10 @@ if (in == null) {
     }
 
     public void JumpFrame(byte frame) {
-        if (frame < this.m_nFrames) {
-            this.m_Timer = (short) 0;
-            this.m_CurFrame = frame;
+        int target = frame & 255;
+        if (target < this.m_nFrames) {
+            this.m_CurFrame = (short) target;
+            timeline.seek(target);
         }
     }
 
@@ -647,7 +665,7 @@ if (in == null) {
         if (this.m_bLoop) {
             return false;
         }
-        return this.m_Timer >= this.m_FrameInfo[this.m_CurFrame][1] && this.m_CurFrame == this.m_nFrames - 1;
+        return timeline.ended();
     }
 
     public void SetFrames(Animation.Frame[] frames) {
@@ -658,31 +676,23 @@ if (in == null) {
         this.m_bPause = pause;
     }
 
-    public void Draw(MFGraphics g, int x, int y, short attr) {
-        if (this.m_nFrames != 0) {
-            int i = this.m_FrameInfo[this.m_CurFrame][0];
-            if (i < 0) {
-                i += 256;
-            }
-            this.thisimageIdArray.m_Frames[i].Draw(g, x, y, attr);
-            if (!this.m_bPause) {
-                this.m_Timer = (short) (this.m_Timer + 1);
-                if (this.m_Timer >= this.m_FrameInfo[this.m_CurFrame][1]) {
-                    this.m_CurFrame = (short) (this.m_CurFrame + 1);
-                    if (this.m_CurFrame >= this.m_nFrames) {
-                        if (this.m_bLoop) {
-                            this.m_Timer = (short) 0;
-                            this.m_CurFrame = (short) 0;
-                            return;
-                        } else {
-                            this.m_CurFrame = (byte) (this.m_nFrames - 1);
-                            return;
-                        }
-                    }
-                    this.m_Timer = (short) 0;
-                }
-            }
+    private void advance() {
+        if (m_nFrames <= 0 || m_Ani.imageInfo == null || m_Ani.m_Actions[m_Ani.m_CurAni] != this) return;
+        if (!m_bPause && !AnimationDrawer.isAllPause() && lastAdvanceFrame != GameTime.frameId()) {
+            lastAdvanceFrame = GameTime.frameId();
+            timeline.advance(GameTime.deltaSeconds(), m_bLoop, durations);
+            m_CurFrame = (short) timeline.frame();
         }
+    }
+
+    public void Draw(MFGraphics g, int x, int y, short attr) {
+        if (m_nFrames <= 0) return;
+        if (!started) {
+            started = true;
+            timeline.seek(m_CurFrame);
+            playingActions.put(this, Boolean.TRUE);
+        }
+        thisimageIdArray.m_Frames[m_FrameInfo[m_CurFrame][0] & 255].Draw(g, x, y, attr);
     }
 
     public void Draw(MFGraphics g, short frame, int x, int y, short attr) {
@@ -704,8 +714,9 @@ if (in == null) {
     }
 
     public void SetFrame(short frame) {
-        if (frame < this.m_nFrames) {
+        if (frame >= 0 && frame < this.m_nFrames) {
             this.m_CurFrame = frame;
+            timeline.seek(frame);
         }
     }
 

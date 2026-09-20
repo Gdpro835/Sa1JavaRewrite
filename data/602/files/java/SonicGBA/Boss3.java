@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -327,7 +329,7 @@ class Boss3 extends BossObject {
 
       this.drawCollisionRect(var1);
       int var2;
-      if (this.state != 4 && this.show_pipe_cnt == 19 && !this.IsPipeOut) {
+      if (this.state != 4 && this.show_pipe_cnt >= 19 && !this.IsPipeOut) {
          for(var2 = 0; var2 < this.pipe.length; ++var2) {
             this.pipe[var2].setisDraw(true);
          }
@@ -390,25 +392,25 @@ class Boss3 extends BossObject {
             switch(this.show_step) {
             case 0:
                if (this.show_pipe_cnt < 19) {
-                  ++this.show_pipe_cnt;
+                  this.show_pipe_cnt = Math.min(19, GameTime.advance(this, "show_pipe_cnt", this.show_pipe_cnt, 1));
                } else if (this.pipe_offset < 16) {
-                  ++this.pipe_offset;
+                  this.pipe_offset = GameTime.advance(this, "pipe_offset", this.pipe_offset, 1);
                   var7 = this.pipepos[0];
-                  var7[0] -= this.pipe_vel_h;
+                  var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], -(this.pipe_vel_h));
                   var7 = this.pipepos[1];
-                  var7[0] -= this.pipe_vel_h;
+                  var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], -(this.pipe_vel_h));
                   var7 = this.pipepos[2];
-                  var7[0] += this.pipe_vel_h;
+                  var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], this.pipe_vel_h);
                   var7 = this.pipepos[3];
-                  var7[0] += this.pipe_vel_h;
+                  var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], this.pipe_vel_h);
                   var7 = this.pipepos[4];
-                  var7[1] += this.pipe_vel_v;
+                  var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], this.pipe_vel_v);
                   var7 = this.pipepos[5];
-                  var7[1] += this.pipe_vel_v;
+                  var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], this.pipe_vel_v);
                   var7 = this.pipepos[6];
-                  var7[1] -= this.pipe_vel_v;
+                  var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], -(this.pipe_vel_v));
                   var7 = this.pipepos[7];
-                  var7[1] -= this.pipe_vel_v;
+                  var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], -(this.pipe_vel_v));
                } else {
                   this.show_step = 1;
                   this.pipepos[0][0] = 490496;
@@ -433,7 +435,7 @@ class Boss3 extends BossObject {
                break label338;
             case 1:
                if (this.posY > this.boss_show_top) {
-                  this.posY -= this.boss_v;
+                  this.posY = GameTime.advance(this, "posY", this.posY, -(this.boss_v));
                } else {
                   this.posY = this.boss_show_top;
                   this.show_step = 2;
@@ -441,26 +443,26 @@ class Boss3 extends BossObject {
                break label338;
             case 2:
                if (this.boss_wait_cnt < 16) {
-                  ++this.boss_wait_cnt;
-               } else if (this.boss_wait_cnt == 16) {
-                  ++this.boss_wait_cnt;
+                  this.boss_wait_cnt = Math.min(16, GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1));
+               } else if (GameTime.event(this, "boss_wait_cnt", "logic:447", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 16))) {
+                  this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
                   this.facedrawer.setActionId(1);
                   this.facedrawer.setLoop(true);
                } else if (this.boss_wait_cnt > 16 && this.boss_wait_cnt < 26) {
-                  ++this.boss_wait_cnt;
-               } else if (this.boss_wait_cnt == 26) {
-                  ++this.boss_wait_cnt;
+                  this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
+               } else if (GameTime.event(this, "boss_wait_cnt", "logic:453", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 26))) {
+                  this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
                   this.facedrawer.setActionId(0);
                   this.facedrawer.setLoop(true);
                } else if (this.boss_wait_cnt > 26 && this.boss_wait_cnt < 42) {
-                  ++this.boss_wait_cnt;
-               } else if (this.boss_wait_cnt == 42) {
+                  this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
+               } else if (GameTime.event(this, "boss_wait_cnt", "logic:459", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 42))) {
                   this.show_step = 3;
                }
                break label338;
             case 3:
                if (this.posY > this.pipepos[5][1]) {
-                  this.posY -= this.boss_v;
+                  this.posY = GameTime.advance(this, "posY", this.posY, -(this.boss_v));
                } else {
                   this.posY = this.pipepos[5][1];
                   this.state = 2;
@@ -478,20 +480,20 @@ class Boss3 extends BossObject {
 
             if (this.face_state != 0) {
                if (this.face_cnt < 8) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                } else {
                   this.face_state = 0;
                   this.shadow.setShadowHurt(0);
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
             if (this.boat_state == 1) {
                if (this.boat_cnt < 8) {
-                  ++this.boat_cnt;
+                  this.boat_cnt = Math.min(8, GameTime.advance(this, "boat_cnt", this.boat_cnt, 1));
                } else {
                   this.boat_state = 0;
-                  this.boat_cnt = 0;
+                  this.boat_cnt = GameTime.set(this, "boat_cnt", 0);
                }
             }
 
@@ -499,7 +501,7 @@ class Boss3 extends BossObject {
             case 0:
                this.IsStartAttack = false;
                if (this.release_cnt < 25) {
-                  ++this.release_cnt;
+                  this.release_cnt = Math.min(25, GameTime.advance(this, "release_cnt", this.release_cnt, 1));
                } else {
                   if (this.HP >= 6) {
                      this.BossV_x = 458;
@@ -656,7 +658,7 @@ class Boss3 extends BossObject {
                   }
 
                   this.pro_step = 1;
-                  this.release_cnt = 0;
+                  this.release_cnt = GameTime.set(this, "release_cnt", 0);
                }
                break;
             case 1:
@@ -674,10 +676,10 @@ class Boss3 extends BossObject {
                }
 
                if (this.posX + this.BossVX >= this.pipeposend[1] && this.posX + this.BossVX <= this.pipeposend[0] && this.ShadowPosX + this.ShadowVX >= this.pipeposend[1] && this.ShadowPosX + this.ShadowVX <= this.pipeposend[0] && this.posY + this.BossVY >= this.pipeposend[2] && this.posY + this.BossVY <= this.pipeposend[3] && this.ShadowPosY + this.ShadowVY >= this.pipeposend[2] && this.ShadowPosY + this.ShadowVY <= this.pipeposend[3]) {
-                  this.posX += this.BossVX;
-                  this.posY += this.BossVY;
-                  this.ShadowPosX += this.ShadowVX;
-                  this.ShadowPosY += this.ShadowVY;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.BossVX);
+                  this.posY = GameTime.advance(this, "posY", this.posY, this.BossVY);
+                  this.ShadowPosX = GameTime.advance(this, "ShadowPosX", this.ShadowPosX, this.ShadowVX);
+                  this.ShadowPosY = GameTime.advance(this, "ShadowPosY", this.ShadowPosY, this.ShadowVY);
                } else {
                   this.pro_step = 0;
                }
@@ -692,23 +694,23 @@ class Boss3 extends BossObject {
             this.shadow.IsOver = true;
             this.bossbroken.logicBoom(this.posX, this.posY);
             if (this.pipe_offset < 16) {
-               ++this.pipe_offset;
+               this.pipe_offset = GameTime.advance(this, "pipe_offset", this.pipe_offset, 1);
                var7 = this.pipepos[0];
-               var7[0] += this.pipe_vel_h;
+               var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], this.pipe_vel_h);
                var7 = this.pipepos[1];
-               var7[0] += this.pipe_vel_h;
+               var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], this.pipe_vel_h);
                var7 = this.pipepos[2];
-               var7[0] -= this.pipe_vel_h;
+               var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], -(this.pipe_vel_h));
                var7 = this.pipepos[3];
-               var7[0] -= this.pipe_vel_h;
+               var7[0] = GameTime.advance(var7, String.valueOf(0), var7[0], -(this.pipe_vel_h));
                var7 = this.pipepos[4];
-               var7[1] -= this.pipe_vel_v;
+               var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], -(this.pipe_vel_v));
                var7 = this.pipepos[5];
-               var7[1] -= this.pipe_vel_v;
+               var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], -(this.pipe_vel_v));
                var7 = this.pipepos[6];
-               var7[1] += this.pipe_vel_v;
+               var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], this.pipe_vel_v);
                var7 = this.pipepos[7];
-               var7[1] += this.pipe_vel_v;
+               var7[1] = GameTime.advance(var7, String.valueOf(1), var7[1], this.pipe_vel_v);
             } else {
                this.IsPipeOut = true;
             }
@@ -743,9 +745,9 @@ class Boss3 extends BossObject {
                this.partvx = -1600;
                this.partvy = -320;
             } else {
-               this.posX += this.BossVX;
-               this.BossVY += GRAVITY;
-               this.posY += this.BossVY;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.BossVX);
+               this.BossVY = GameTime.advance(this, "BossVY", this.BossVY, GRAVITY);
+               this.posY = GameTime.advance(this, "posY", this.posY, this.BossVY);
             }
 
             var1 = this.ShadowPosY;
@@ -767,9 +769,9 @@ class Boss3 extends BossObject {
                   if (var1 + var2 + 1600 > this.getGroundY(this.ShadowPosX, this.ShadowPosY) && this.shadow_drip_cnt == 2) {
                      this.ShadowPosY = this.getGroundY(this.ShadowPosX, this.ShadowPosY) - 1600;
                   } else {
-                     this.ShadowPosX += this.BossVX * 3;
-                     this.ShadowVY += GRAVITY;
-                     this.ShadowPosY += this.ShadowVY;
+                     this.ShadowPosX = GameTime.advance(this, "ShadowPosX", this.ShadowPosX, this.BossVX * 3);
+                     this.ShadowVY = GameTime.advance(this, "ShadowVY", this.ShadowVY, GRAVITY);
+                     this.ShadowPosY = GameTime.advance(this, "ShadowPosY", this.ShadowPosY, this.ShadowVY);
                   }
                }
             }
@@ -778,7 +780,7 @@ class Boss3 extends BossObject {
                this.state = 4;
                this.StartEscape = false;
                this.WaitCnt = 0;
-               this.wait_cnt = 0;
+               this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
                this.fly_top = this.posY - 3072;
                this.fly_end = this.side_right;
                bossFighting = false;
@@ -791,15 +793,15 @@ class Boss3 extends BossObject {
                this.party = this.getGroundY(this.partx, this.party);
                this.StartEscape = true;
             } else {
-               this.partx += this.partvx;
-               this.partvy += GRAVITY;
-               this.party += this.partvy;
+               this.partx = GameTime.advance(this, "partx", this.partx, this.partvx);
+               this.partvy = GameTime.advance(this, "partvy", this.partvy, GRAVITY);
+               this.party = GameTime.advance(this, "party", this.party, this.partvy);
             }
 
             if (this.StartEscape) {
-               ++this.wait_cnt;
+               this.wait_cnt = GameTime.advance(this, "wait_cnt", this.wait_cnt, 1);
                if (this.wait_cnt >= this.wait_cnt_max && this.posY >= this.fly_top - this.fly_top_range) {
-                  this.posY -= this.escape_v;
+                  this.posY = GameTime.advance(this, "posY", this.posY, -(this.escape_v));
                }
 
                if (this.posY <= this.fly_top - this.fly_top_range && this.WaitCnt == 0) {
@@ -828,7 +830,7 @@ class Boss3 extends BossObject {
                }
 
                if (this.WaitCnt == 3 || this.WaitCnt == 4) {
-                  this.posX += this.escape_v;
+                  this.posX = GameTime.advance(this, "posX", this.posX, this.escape_v);
                }
 
                if (this.posX - this.fly_end > this.fly_top_range && this.WaitCnt == 3) {

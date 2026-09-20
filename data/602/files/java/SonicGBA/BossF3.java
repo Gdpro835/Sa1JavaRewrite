@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -143,7 +145,7 @@ class BossF3 extends BossObject {
       super(var1, var2, var3, var4, var5, var6, var7);
       this.posX = 167680;
       this.posY = 32128;
-      this.enter_cn = 0;
+      this.enter_cn = GameTime.set(this, "enter_cn", 0);
       this.armStartPosY = 0;
       this.armDegreeLock = false;
       if (cabinAni == null) {
@@ -188,11 +190,11 @@ class BossF3 extends BossObject {
       if (var1 <= 85) {
          this.pro_state = 0;
          this.wait_frame_max = MyRandom.nextInt(0, 10) * 4 + 32;
-         this.wait_frame_cn = 0;
+         this.wait_frame_cn = GameTime.set(this, "wait_frame_cn", 0);
       } else {
          this.pro_state = 1;
          this.wait_frame_max = MyRandom.nextInt(0, 10) * 4 + 32;
-         this.wait_frame_cn = 0;
+         this.wait_frame_cn = GameTime.set(this, "wait_frame_cn", 0);
       }
 
    }
@@ -231,7 +233,7 @@ class BossF3 extends BossObject {
                var3 = 240;
             }
 
-            this.circleOffsetY = var2 + var3;
+            this.circleOffsetY = GameTime.advance(this, "circleOffsetY", var2, var3);
             if (this.circleOffsetY >= 0) {
                this.circleOffsetY = 0;
             }
@@ -245,7 +247,7 @@ class BossF3 extends BossObject {
                var3 = 240;
             }
 
-            this.circleOffsetY = var2 - var3;
+            this.circleOffsetY = GameTime.advance(this, "circleOffsetY", var2, -(var3));
             if (this.circleOffsetY <= -1536) {
                this.circleOffsetY = -1536;
             }
@@ -410,18 +412,18 @@ class BossF3 extends BossObject {
    private int shakeOffsetY() {
       int var1;
       if (this.isMachineShake && !IsGamePause) {
-         ++this.shakeFrame;
+         this.shakeFrame = GameTime.advance(this, "shakeFrame", this.shakeFrame, 1);
          if (this.shakeFrame >= 0 && this.shakeFrame < 8) {
-            this.shakeOffsetY -= 32;
+            this.shakeOffsetY = GameTime.advance(this, "shakeOffsetY", this.shakeOffsetY, -(32));
          } else if (this.shakeFrame != 8 && this.shakeFrame != 9) {
             if (this.shakeFrame < 24) {
-               this.shakeOffsetY += 32;
+               this.shakeOffsetY = GameTime.advance(this, "shakeOffsetY", this.shakeOffsetY, 32);
             } else if (this.shakeFrame != 24 && this.shakeFrame != 25) {
                if (this.shakeFrame < 34) {
-                  this.shakeOffsetY -= 32;
-               } else if (this.shakeFrame == 34) {
+                  this.shakeOffsetY = GameTime.advance(this, "shakeOffsetY", this.shakeOffsetY, -(32));
+               } else if (GameTime.event(this, "shakeFrame", "shakeOffsetY:424", GameTime.crosses(this, "shakeFrame", this.shakeFrame, 34))) {
                   this.shakeOffsetY = 0;
-                  this.shakeFrame = 0;
+                  this.shakeFrame = GameTime.set(this, "shakeFrame", 0);
                }
             } else {
                this.shakeOffsetY = 256;
@@ -459,7 +461,7 @@ class BossF3 extends BossObject {
 
          if (this.HP > 0) {
             this.face_state = 3;
-            this.face_cnt = 0;
+            this.face_cnt = GameTime.set(this, "face_cnt", 0);
          } else {
             this.state = 3;
             this.arm_drop_vely = 0;
@@ -486,7 +488,7 @@ class BossF3 extends BossObject {
                this.circle_state = 5;
             }
 
-            this.brokenFrame = 0;
+            this.brokenFrame = GameTime.set(this, "brokenFrame", 0);
          }
 
          if (this.HP == 0) {
@@ -512,7 +514,7 @@ class BossF3 extends BossObject {
 
                if (this.HP > 0) {
                   this.face_state = 3;
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                } else {
                   this.state = 3;
                   this.arm_drop_vely = 0;
@@ -539,7 +541,7 @@ class BossF3 extends BossObject {
                      this.circle_state = 5;
                   }
 
-                  this.brokenFrame = 0;
+                  this.brokenFrame = GameTime.set(this, "brokenFrame", 0);
                }
 
                if (this.HP == 0) {
@@ -630,7 +632,7 @@ class BossF3 extends BossObject {
                MapManager.setCameraDownLimit(440);
                MapManager.setCameraLeftLimit(2360);
                MapManager.setCameraRightLimit(2648);
-               this.enter_cn = 0;
+               this.enter_cn = GameTime.set(this, "enter_cn", 0);
                this.isMachineShake = false;
                this.circleState = 0;
                if (!this.IsPlayBossBattleBGM) {
@@ -642,44 +644,44 @@ class BossF3 extends BossObject {
             }
             break;
          case 1:
-            ++this.enter_cn;
-            if (this.enter_cn == 11) {
+            this.enter_cn = GameTime.advance(this, "enter_cn", this.enter_cn, 1);
+            if (GameTime.event(this, "enter_cn", "logic:648", GameTime.crosses(this, "enter_cn", this.enter_cn, 11))) {
                MapManager.setShake(30);
             }
 
-            if (this.enter_cn == 13) {
+            if (GameTime.event(this, "enter_cn", "logic:652", GameTime.crosses(this, "enter_cn", this.enter_cn, 13))) {
                this.displayFlag = true;
             }
 
             if (this.enter_cn >= 20) {
-               this.posY -= 240;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(240));
                if (this.posY <= 24768) {
                   this.posY = 24768;
                }
             }
 
-            if (this.enter_cn == 44) {
+            if (GameTime.event(this, "enter_cn", "logic:663", GameTime.crosses(this, "enter_cn", this.enter_cn, 44))) {
                this.isMachineShake = true;
             }
 
-            if (this.enter_cn == 56) {
+            if (GameTime.event(this, "enter_cn", "logic:667", GameTime.crosses(this, "enter_cn", this.enter_cn, 56))) {
                this.circle_state = 5;
             }
 
-            if (this.enter_cn == 66) {
+            if (GameTime.event(this, "enter_cn", "logic:671", GameTime.crosses(this, "enter_cn", this.enter_cn, 66))) {
                this.circleState = 1;
             }
 
-            if (this.enter_cn == 76) {
+            if (GameTime.event(this, "enter_cn", "logic:675", GameTime.crosses(this, "enter_cn", this.enter_cn, 76))) {
                this.face_state = 1;
             }
 
-            if (this.enter_cn == 92) {
+            if (GameTime.event(this, "enter_cn", "logic:679", GameTime.crosses(this, "enter_cn", this.enter_cn, 92))) {
                this.face_state = 0;
                this.circleState = 2;
             }
 
-            if (this.enter_cn == 97) {
+            if (GameTime.event(this, "enter_cn", "logic:684", GameTime.crosses(this, "enter_cn", this.enter_cn, 97))) {
                this.circle_state = 0;
                this.state = 2;
                this.actionInit();
@@ -688,7 +690,7 @@ class BossF3 extends BossObject {
          case 2:
             if (this.face_state != 0) {
                if (this.face_cnt < 8) {
-                  ++this.face_cnt;
+                  this.face_cnt = Math.min(8, GameTime.advance(this, "face_cnt", this.face_cnt, 1));
                   if (this.circle_state != 0) {
                      if (this.pro_state == 2) {
                         this.circle_state = 2;
@@ -715,7 +717,7 @@ class BossF3 extends BossObject {
                      this.arm.setAvaliable(false);
                   }
 
-                  this.face_cnt = 0;
+                  this.face_cnt = GameTime.set(this, "face_cnt", 0);
                }
             }
 
@@ -725,22 +727,22 @@ class BossF3 extends BossObject {
             case 0:
                this.isMachineShake = true;
                if (this.wait_frame_cn < this.wait_frame_max) {
-                  ++this.wait_frame_cn;
-                  if (this.wait_frame_cn == 18) {
+                  this.wait_frame_cn = Math.min(this.wait_frame_max, GameTime.advance(this, "wait_frame_cn", this.wait_frame_cn, 1));
+                  if (GameTime.event(this, "wait_frame_cn", "logic:731", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 18))) {
                      this.setActionMode();
                   }
                } else {
-                  this.wait_frame_cn = 0;
+                  this.wait_frame_cn = GameTime.set(this, "wait_frame_cn", 0);
                   this.pro_state = this.attack_state;
                }
                break;
             case 1:
-               ++this.wait_frame_cn;
-               if (this.wait_frame_cn == 25) {
+               this.wait_frame_cn = GameTime.advance(this, "wait_frame_cn", this.wait_frame_cn, 1);
+               if (GameTime.event(this, "wait_frame_cn", "logic:741", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 25))) {
                   this.circleState = 1;
                }
 
-               if (this.wait_frame_cn == 31) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:745", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 31))) {
                   if (this.posX == 152832) {
                      this.velocity = 720;
                   } else if (this.posX == 167680) {
@@ -749,7 +751,7 @@ class BossF3 extends BossObject {
                }
 
                if (this.wait_frame_cn > 31 && Math.abs(this.velocity) != 480) {
-                  this.posX += this.velocity;
+                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                }
 
                if (this.wait_frame_cn > 31) {
@@ -765,37 +767,37 @@ class BossF3 extends BossObject {
 
                   if (this.velocity == -480) {
                      if (this.posX + this.velocity > 167680) {
-                        this.posX += this.velocity;
+                        this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                      } else {
                         this.posX = 167680;
                         this.pro_state = 0;
                         this.wait_frame_max = MyRandom.nextInt(0, 10) * 4 + 32;
-                        this.wait_frame_cn = 0;
+                        this.wait_frame_cn = GameTime.set(this, "wait_frame_cn", 0);
                         this.circleState = 2;
                      }
                   }
 
                   if (this.velocity == 480) {
                      if (this.posX + this.velocity < 152832) {
-                        this.posX += this.velocity;
+                        this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                      } else {
                         this.posX = 152832;
                         this.pro_state = 0;
                         this.wait_frame_max = MyRandom.nextInt(0, 10) * 4 + 32;
-                        this.wait_frame_cn = 0;
+                        this.wait_frame_cn = GameTime.set(this, "wait_frame_cn", 0);
                         this.circleState = 2;
                      }
                   }
                }
                break;
             case 2:
-               ++this.wait_frame_cn;
-               if (this.wait_frame_cn == 3) {
+               this.wait_frame_cn = GameTime.advance(this, "wait_frame_cn", this.wait_frame_cn, 1);
+               if (GameTime.event(this, "wait_frame_cn", "logic:795", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 3))) {
                   this.circle_state = 2;
                   this.circleState = 1;
                }
 
-               if (this.wait_frame_cn == 9) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:800", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 9))) {
                   this.circle_state = 3;
                   this.isMachineShake = false;
                   this.rayOffsetY = 256;
@@ -818,35 +820,35 @@ class BossF3 extends BossObject {
                   BulletObject.addBullet(21, var3 + var10, var6 + 0 + 384 + var7, var13, 0);
                }
 
-               if (this.wait_frame_cn == 17) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:823", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 17))) {
                   this.isMachineShake = true;
                   this.circle_state = 2;
                   this.rayOffsetY = 0;
                }
 
-               if (this.wait_frame_cn == 20) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:829", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 20))) {
                   this.circle_state = 0;
                   this.circleState = 2;
                }
 
-               if (this.wait_frame_cn == 23) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:834", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 23))) {
                   this.actionInit();
                }
                break;
             case 3:
-               ++this.wait_frame_cn;
-               if (this.wait_frame_cn == 3) {
+               this.wait_frame_cn = GameTime.advance(this, "wait_frame_cn", this.wait_frame_cn, 1);
+               if (GameTime.event(this, "wait_frame_cn", "logic:840", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 3))) {
                   this.circle_state = 5;
                   this.circleState = 1;
                   this.recoil_offsetx = 0;
                }
 
-               if (this.wait_frame_cn == 13) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:846", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 13))) {
                   this.isMachineShake = false;
                   this.circle_state = 6;
                }
 
-               if (this.wait_frame_cn == 14) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:851", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 14))) {
                   var6 = this.posX;
                   if (this.posX == 152832) {
                      var10 = 2048;
@@ -880,7 +882,7 @@ class BossF3 extends BossObject {
                      var10 = 128;
                   }
 
-                  this.recoil_offsetx = var2 + var10;
+                  this.recoil_offsetx = GameTime.advance(this, "recoil_offsetx", var2, var10);
                }
 
                if (this.wait_frame_cn >= 16 && this.wait_frame_cn < 18) {
@@ -891,31 +893,31 @@ class BossF3 extends BossObject {
                      var10 = -128;
                   }
 
-                  this.recoil_offsetx = var2 - var10;
+                  this.recoil_offsetx = GameTime.advance(this, "recoil_offsetx", var2, -(var10));
                }
 
-               if (this.wait_frame_cn == 16) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:899", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 16))) {
                   this.isMachineShake = true;
                   this.circle_state = 5;
                }
 
-               if (this.wait_frame_cn == 21) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:904", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 21))) {
                   this.recoil_offsetx = 0;
                   this.circleState = 2;
                }
 
-               if (this.wait_frame_cn == 24) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:909", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 24))) {
                   this.actionInit();
                   this.circle_state = 0;
                }
                break;
             case 4:
-               ++this.wait_frame_cn;
+               this.wait_frame_cn = GameTime.advance(this, "wait_frame_cn", this.wait_frame_cn, 1);
                if (player.isDead) {
                   return;
                }
 
-               if (this.wait_frame_cn == 3) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:920", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 3))) {
                   this.circle_state = 8;
                   this.circleState = 1;
                   this.isinArmRange = false;
@@ -932,7 +934,7 @@ class BossF3 extends BossObject {
                }
 
                byte var9;
-               if (this.wait_frame_cn == 9) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:937", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 9))) {
                   this.arm_posx = 0;
                   this.arm_posy = 0;
                   var3 = this.posX;
@@ -964,17 +966,17 @@ class BossF3 extends BossObject {
                         this.arm_posx = this.arm_velx * 4;
                         this.armDegreeLock = false;
                      } else {
-                        this.arm_posx += this.arm_velx;
+                        this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, this.arm_velx);
                      }
                   } else if (this.arm_posx + this.arm_velx <= this.arm_velx * 4) {
                      this.arm_posx = this.arm_velx * 4;
                      this.armDegreeLock = false;
                   } else {
-                     this.arm_posx += this.arm_velx;
+                     this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, this.arm_velx);
                   }
                }
 
-               if (this.wait_frame_cn == 13) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:979", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, 13))) {
                   var1 = MyRandom.nextInt(0, 100);
                   if (var1 < 80) {
                      var9 = 48;
@@ -986,7 +988,7 @@ class BossF3 extends BossObject {
                   this.isAiming = true;
                }
 
-               if (this.wait_frame_cn == this.aim_max + 13 - 1) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:991", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, this.aim_max + 13 - 1))) {
                   if (this.arm != null) {
                      this.arm.setAvaliable(true);
                   }
@@ -994,7 +996,7 @@ class BossF3 extends BossObject {
                   this.isAiming = false;
                }
 
-               if (this.wait_frame_cn == this.aim_max + 13) {
+               if (GameTime.event(this, "wait_frame_cn", "logic:999", GameTime.crosses(this, "wait_frame_cn", this.wait_frame_cn, this.aim_max + 13))) {
                   if (this.posX == 152832) {
                      if (player.getFootPositionX() - this.posX > 0) {
                         var2 = player.getFootPositionX() - this.posX;
@@ -1047,8 +1049,8 @@ class BossF3 extends BossObject {
                         this.isCaught = true;
                         this.arm_attack_step = 2;
                      } else {
-                        this.arm_posx += this.arm_velx;
-                        this.arm_posy += this.arm_vely;
+                        this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, this.arm_velx);
+                        this.arm_posy = GameTime.advance(this, "arm_posy", this.arm_posy, this.arm_vely);
                         if (this.posX + this.arm_posx + this.arm_velx - 2560 >= player.getFootPositionX()) {
                            this.isinArmRange = false;
                            this.arm_attack_step = 2;
@@ -1061,8 +1063,8 @@ class BossF3 extends BossObject {
                      this.isCaught = true;
                      this.arm_attack_step = 2;
                   } else {
-                     this.arm_posx += this.arm_velx;
-                     this.arm_posy += this.arm_vely;
+                     this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, this.arm_velx);
+                     this.arm_posy = GameTime.advance(this, "arm_posy", this.arm_posy, this.arm_vely);
                      if (this.posX + this.arm_posx + this.arm_velx + 2560 <= player.getFootPositionX()) {
                         this.isinArmRange = false;
                         this.arm_attack_step = 2;
@@ -1080,8 +1082,8 @@ class BossF3 extends BossObject {
                   if (this.isCaught) {
                      this.arm_velx = -this.arm_pre_velx * 1440 / 1320;
                      this.arm_vely = -this.arm_pre_vely * 1440 / 1320;
-                     this.arm_posx += this.arm_velx;
-                     this.arm_posy += this.arm_vely;
+                     this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, this.arm_velx);
+                     this.arm_posy = GameTime.advance(this, "arm_posy", this.arm_posy, this.arm_vely);
                      if (this.posX == 152832) {
                         if (this.arm_posx <= 4864) {
                            this.arm_posx = 4864;
@@ -1089,7 +1091,7 @@ class BossF3 extends BossObject {
                            this.isArmCaughtEnd = true;
                            this.isArmBack = false;
                            this.radius = 2304;
-                           this.wait_frame_offset_cn = 0;
+                           this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                            this.isArmMove = false;
                            this.arm.setShakeState(true);
                            this.boss_hang_posx = 152832;
@@ -1100,7 +1102,7 @@ class BossF3 extends BossObject {
                         this.isArmCaughtEnd = true;
                         this.isArmBack = false;
                         this.radius = 2304;
-                        this.wait_frame_offset_cn = 0;
+                        this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                         this.isArmMove = false;
                         this.arm.setShakeState(true);
                         this.boss_hang_posx = 167680;
@@ -1119,10 +1121,10 @@ class BossF3 extends BossObject {
                            }
                         }
 
-                        this.arm_posx += this.arm_velx;
+                        this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, this.arm_velx);
                         if (this.arm_vely > 0) {
                            if (this.arm_posy < 0) {
-                              this.arm_posy += this.arm_vely;
+                              this.arm_posy = GameTime.advance(this, "arm_posy", this.arm_posy, this.arm_vely);
                            } else {
                               this.arm_posy = 0;
                               this.armDegreeLock = true;
@@ -1134,7 +1136,7 @@ class BossF3 extends BossObject {
                            }
                         } else if (this.arm_vely < 0) {
                            if (this.arm_posy > 0) {
-                              this.arm_posy += this.arm_vely;
+                              this.arm_posy = GameTime.advance(this, "arm_posy", this.arm_posy, this.arm_vely);
                            } else {
                               this.arm_posy = 0;
                               this.armDegreeLock = true;
@@ -1149,14 +1151,14 @@ class BossF3 extends BossObject {
 
                      if (this.posX == 152832) {
                         if (this.arm_velx == 0 && this.arm_posx > 0) {
-                           this.arm_posx -= 480;
+                           this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, -(480));
                         }
 
                         if (this.arm_posx <= 0) {
                            this.arm_posx = 0;
                            this.arm_posy = 0;
                            this.isArmUncaughtEnd = true;
-                           this.wait_frame_offset_cn = 0;
+                           this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                            if (this.arm_posy == this.armStartPosY) {
                               this.armDegreeLock = true;
                               this.degree = 0;
@@ -1165,7 +1167,7 @@ class BossF3 extends BossObject {
 
                         if (player.getFootPositionX() <= 152832) {
                            this.arm_posy = 0;
-                           this.wait_frame_offset_cn = 0;
+                           this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                            if (this.arm_posy == this.armStartPosY) {
                               this.armDegreeLock = true;
                               this.degree = 0;
@@ -1173,14 +1175,14 @@ class BossF3 extends BossObject {
                         }
                      } else {
                         if (this.arm_velx == 0 && this.arm_posx < 0) {
-                           this.arm_posx += 480;
+                           this.arm_posx = GameTime.advance(this, "arm_posx", this.arm_posx, 480);
                         }
 
                         if (this.arm_posx >= 0) {
                            this.arm_posx = 0;
                            this.arm_posy = 0;
                            this.isArmUncaughtEnd = true;
-                           this.wait_frame_offset_cn = 0;
+                           this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                            if (this.arm_posy == this.armStartPosY) {
                               this.armDegreeLock = true;
                               this.degree = 0;
@@ -1189,7 +1191,7 @@ class BossF3 extends BossObject {
 
                         if (player.getFootPositionX() >= 167680) {
                            this.arm_posy = 0;
-                           this.wait_frame_offset_cn = 0;
+                           this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                            if (this.arm_posy == this.armStartPosY) {
                               this.armDegreeLock = true;
                               this.degree = 0;
@@ -1200,12 +1202,12 @@ class BossF3 extends BossObject {
                }
 
                if (this.isArmUncaughtEnd) {
-                  ++this.wait_frame_offset_cn;
-                  if (this.wait_frame_offset_cn == 13) {
+                  this.wait_frame_offset_cn = GameTime.advance(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 1);
+                  if (GameTime.event(this, "wait_frame_offset_cn", "logic:1206", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 13))) {
                      this.circleState = 2;
                   }
 
-                  if (this.wait_frame_offset_cn == 16) {
+                  if (GameTime.event(this, "wait_frame_offset_cn", "logic:1210", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 16))) {
                      this.circle_state = 0;
                      this.arm = null;
                      this.arm_attack_step = 0;
@@ -1214,7 +1216,7 @@ class BossF3 extends BossObject {
                }
 
                if (this.isArmCaughtEnd) {
-                  ++this.wait_frame_offset_cn;
+                  this.wait_frame_offset_cn = GameTime.advance(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 1);
                   if (this.boss_hang_posx == 152832) {
                      if (!this.isArmBack) {
                         for(var1 = 0; var1 < 5; ++var1) {
@@ -1232,28 +1234,28 @@ class BossF3 extends BossObject {
                               this.shakechainx = var2 + 512 + 1280;
                               this.arm_posy = this.radius * MyAPI.dSin(360 - (90 - (this.wait_frame_offset_cn - var1 * 10 - 5) * 18)) / 100;
                               this.shakechainy = MyAPI.dSin(360 - (90 - (this.wait_frame_offset_cn - var1 * 10 - 5) * 18)) * 768 / 100;
-                              if (this.wait_frame_offset_cn == var1 * 10 + 9 && this.wait_frame_offset_cn < 45) {
+                              if (GameTime.event(this, "wait_frame_offset_cn", "logic:1237", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, var1 * 10 + 9) && this.wait_frame_offset_cn < 45)) {
                                  this.playerLoseRings();
                               }
                            }
 
-                           if (this.wait_frame_offset_cn == 35) {
+                           if (GameTime.event(this, "wait_frame_offset_cn", "logic:1242", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 35))) {
                               this.isArmMove = true;
                            }
 
-                           if (this.wait_frame_offset_cn == 45) {
+                           if (GameTime.event(this, "wait_frame_offset_cn", "logic:1246", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 45))) {
                               this.arm.setAvaliable(false);
                               this.arm.setCaughtFlag(false);
                               this.arm.releasePlayer();
                            }
 
                            if (this.isArmMove) {
-                              this.posX += 144;
+                              this.posX = GameTime.advance(this, "posX", this.posX, 144);
                            }
                         }
                      }
 
-                     if (this.wait_frame_offset_cn == 50) {
+                     if (GameTime.event(this, "wait_frame_offset_cn", "logic:1258", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 50))) {
                         this.arm_posx = 0;
                         this.arm_posy = 0;
                         this.shakechainx = 0;
@@ -1263,7 +1265,7 @@ class BossF3 extends BossObject {
                      }
 
                      if (this.wait_frame_offset_cn > 50 && !this.isArmBack) {
-                        this.posX += 720;
+                        this.posX = GameTime.advance(this, "posX", this.posX, 720);
                         if (this.posX >= 172672) {
                            this.posX = 172672;
                            this.isArmBack = true;
@@ -1272,7 +1274,7 @@ class BossF3 extends BossObject {
                      }
 
                      if (this.isArmBack) {
-                        this.posX -= 480;
+                        this.posX = GameTime.advance(this, "posX", this.posX, -(480));
                         if (this.posX <= 167680) {
                            this.posX = 167680;
                            this.velocity = -480;
@@ -1281,10 +1283,10 @@ class BossF3 extends BossObject {
                            this.faceDrawer.setTrans(0);
                            this.pro_state = 0;
                            this.wait_frame_max = MyRandom.nextInt(0, 10) * 4 + 32;
-                           this.wait_frame_cn = 0;
+                           this.wait_frame_cn = GameTime.set(this, "wait_frame_cn", 0);
                            this.circleState = 2;
                            this.arm_attack_step = 0;
-                           this.wait_frame_offset_cn = 0;
+                           this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                            this.isinArmRange = false;
                            this.isMachineShake = false;
                            this.aim_max = 48;
@@ -1310,28 +1312,28 @@ class BossF3 extends BossObject {
                               this.shakechainx = var2 - 512 - 1280;
                               this.arm_posy = this.radius * MyAPI.dSin(360 - (90 - (this.wait_frame_offset_cn - var1 * 10 - 5) * 18)) / 100;
                               this.shakechainy = MyAPI.dSin(360 - (90 - (this.wait_frame_offset_cn - var1 * 10 - 5) * 18)) * 768 / 100;
-                              if (this.wait_frame_offset_cn == var1 * 10 + 9 && this.wait_frame_offset_cn < 45) {
+                              if (GameTime.event(this, "wait_frame_offset_cn", "logic:1315", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, var1 * 10 + 9) && this.wait_frame_offset_cn < 45)) {
                                  this.playerLoseRings();
                               }
                            }
 
-                           if (this.wait_frame_offset_cn == 35) {
+                           if (GameTime.event(this, "wait_frame_offset_cn", "logic:1320", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 35))) {
                               this.isArmMove = true;
                            }
 
-                           if (this.wait_frame_offset_cn == 45) {
+                           if (GameTime.event(this, "wait_frame_offset_cn", "logic:1324", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 45))) {
                               this.arm.setAvaliable(false);
                               this.arm.setCaughtFlag(false);
                               this.arm.releasePlayer();
                            }
 
                            if (this.isArmMove) {
-                              this.posX -= 144;
+                              this.posX = GameTime.advance(this, "posX", this.posX, -(144));
                            }
                         }
                      }
 
-                     if (this.wait_frame_offset_cn == 50) {
+                     if (GameTime.event(this, "wait_frame_offset_cn", "logic:1336", GameTime.crosses(this, "wait_frame_offset_cn", this.wait_frame_offset_cn, 50))) {
                         this.arm_posx = 0;
                         this.arm_posy = 0;
                         this.shakechainx = 0;
@@ -1340,7 +1342,7 @@ class BossF3 extends BossObject {
                      }
 
                      if (this.wait_frame_offset_cn > 50 && !this.isArmBack) {
-                        this.posX -= 720;
+                        this.posX = GameTime.advance(this, "posX", this.posX, -(720));
                         if (this.posX <= 147840) {
                            this.posX = 147840;
                            this.isArmBack = true;
@@ -1349,7 +1351,7 @@ class BossF3 extends BossObject {
                      }
 
                      if (this.isArmBack) {
-                        this.posX += 480;
+                        this.posX = GameTime.advance(this, "posX", this.posX, 480);
                         if (this.posX >= 152832) {
                            this.posX = 152832;
                            this.velocity = 480;
@@ -1358,10 +1360,10 @@ class BossF3 extends BossObject {
                            this.faceDrawer.setTrans(2);
                            this.pro_state = 0;
                            this.wait_frame_max = MyRandom.nextInt(0, 10) * 4 + 32;
-                           this.wait_frame_cn = 0;
+                           this.wait_frame_cn = GameTime.set(this, "wait_frame_cn", 0);
                            this.circleState = 2;
                            this.arm_attack_step = 0;
-                           this.wait_frame_offset_cn = 0;
+                           this.wait_frame_offset_cn = GameTime.set(this, "wait_frame_offset_cn", 0);
                            this.isinArmRange = false;
                            this.isMachineShake = false;
                            this.aim_max = 48;
@@ -1432,7 +1434,7 @@ class BossF3 extends BossObject {
             this.defence.logic(this.posX + this.recoil_offsetx, this.posY + this.shakeOffsetY + this.rayOffsetY);
             if (this.circle.getHurtState() || this.defence.getHurtState()) {
                this.face_state = 2;
-               this.face_cnt = 0;
+               this.face_cnt = GameTime.set(this, "face_cnt", 0);
                this.circle.resetHurtState();
                this.defence.resetHurtState();
             }
@@ -1448,8 +1450,8 @@ class BossF3 extends BossObject {
                      this.arm = null;
                   }
                } else {
-                  this.arm_posy += this.arm_drop_vely;
-                  this.arm_drop_vely += GRAVITY / 2;
+                  this.arm_posy = GameTime.advance(this, "arm_posy", this.arm_posy, this.arm_drop_vely);
+                  this.arm_drop_vely = GameTime.advance(this, "arm_drop_vely", this.arm_drop_vely, GRAVITY / 2);
                }
             }
 
@@ -1467,21 +1469,21 @@ class BossF3 extends BossObject {
                   this.drop_vely = 0;
                }
             } else {
-               this.posY += this.drop_vely;
-               this.drop_vely += GRAVITY / 2;
+               this.posY = GameTime.advancePosition(this, "posY", this.posY, "drop_vely", this.drop_vely);
+               this.drop_vely = GameTime.advance(this, "drop_vely", this.drop_vely, GRAVITY / 2);
             }
 
-            ++this.brokenFrame;
+            this.brokenFrame = GameTime.advance(this, "brokenFrame", this.brokenFrame, 1);
             var1 = MapManager.getCamera().x;
             var2 = MapManager.getCamera().y;
             if (!StageManager.isGoingToExtraStage()) {
-               if (this.brokenFrame % 3 == 0) {
+               if (GameTime.periodic(this, "brokenFrame", "logic:1480", this.brokenFrame, 3, 0)) {
                   var3 = MyRandom.nextInt(0, SCREEN_WIDTH);
                   var6 = MyRandom.nextInt(0, SCREEN_HEIGHT);
                   addGameObject(new Boom(37, var3 + var1 << 6, var6 + var2 << 6, 0, 0, 0, 0));
                }
 
-               if (this.brokenFrame % 3 == 0) {
+               if (GameTime.periodic(this, "brokenFrame", "logic:1486", this.brokenFrame, 3, 0)) {
                   var3 = MyRandom.nextInt(0, SCREEN_WIDTH);
                   var6 = MyRandom.nextInt(0, SCREEN_HEIGHT);
                   addGameObject(new BreakingParts(38, var3 + var1 << 6, var6 + var2 << 6, 0, 0, 0, 0));
@@ -1493,7 +1495,7 @@ class BossF3 extends BossObject {
                   this.bossbroken.logicBoom(this.posX, this.posY);
                }
 
-               if (this.brokenFrame == 43) {
+               if (GameTime.event(this, "brokenFrame", "logic:1498", GameTime.crosses(this, "brokenFrame", this.brokenFrame, 43))) {
                   var1 = this.posX;
                   var2 = this.posY;
                   addGameObject(new Boom(37, var1 + 1920, var2, 0, 0, 0, 0));
@@ -1522,14 +1524,14 @@ class BossF3 extends BossObject {
                soundInstance.playSe(35);
             }
 
-            if (this.brokenFrame == 48) {
+            if (GameTime.event(this, "brokenFrame", "logic:1527", GameTime.crosses(this, "brokenFrame", this.brokenFrame, 48))) {
                if (StageManager.isGoingToExtraStage()) {
                   this.state = 4;
                   this.escapefacedrawer.setActionId(4);
                   this.escapefacedrawer.setLoop(true);
                   this.fly_top = this.posY;
                   this.fly_end = 169472;
-                  this.wait_cnt = 0;
+                  this.wait_cnt = GameTime.set(this, "wait_cnt", 0);
                } else {
                   player.setMeetingBoss(true);
                   bossFighting = false;
@@ -1538,9 +1540,9 @@ class BossF3 extends BossObject {
             }
             break;
          case 4:
-            ++this.wait_cnt;
+            this.wait_cnt = GameTime.advance(this, "wait_cnt", this.wait_cnt, 1);
             if (this.wait_cnt >= this.wait_cnt_max && this.posY >= this.fly_top - this.fly_top_range) {
-               this.posY -= this.escape_v;
+               this.posY = GameTime.advance(this, "posY", this.posY, -(this.escape_v));
             }
 
             if (this.posY <= this.fly_top - this.fly_top_range && this.WaitCnt == 0) {
@@ -1569,9 +1571,9 @@ class BossF3 extends BossObject {
             }
 
             if (this.WaitCnt == 3 || this.WaitCnt == 4) {
-               this.posX += this.escape_v;
+               this.posX = GameTime.advance(this, "posX", this.posX, this.escape_v);
                if (this.posX - this.fly_end > this.fly_top_range) {
-                  this.posY -= this.fly_top_range;
+                  this.posY = GameTime.advance(this, "posY", this.posY, -(this.fly_top_range));
                }
             }
 

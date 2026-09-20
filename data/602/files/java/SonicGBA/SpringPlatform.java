@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
 
@@ -78,14 +80,14 @@ class SpringPlatform extends GimmickObject {
       int var1 = (this.centerY - this.posY) * 150 / 3840;
       int var3 = this.posX;
       int var2 = this.posY;
-      this.velY += var1;
+      this.velY = GameTime.advance(this, "velY", this.velY, var1);
       if (this.velY > 0) {
-         this.velY -= 10;
+         this.velY = GameTime.advance(this, "velY", this.velY, -(10));
       } else if (this.velY < 0) {
-         this.velY += 10;
+         this.velY = GameTime.advance(this, "velY", this.velY, 10);
       }
 
-      this.posY += this.velY;
+      this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
       if (this.posY > this.centerY + 3840) {
          this.posY = this.centerY + 3840;
          this.velY = 0;

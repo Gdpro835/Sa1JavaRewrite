@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.SoundSystem;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -99,7 +101,7 @@ class Arm extends GimmickObject {
          player.doWalkPoseInAir();
          player.degreeForDraw = player.faceDegree;
          isGotRings = false;
-         frame = 1;
+         frame = GameTime.set(Arm.class, "frame", 1);
       default:
       }
    }
@@ -143,45 +145,45 @@ class Arm extends GimmickObject {
 
    public void logic() {
       if (this.count > 0) {
-         --this.count;
+         this.count = Math.max(0, GameTime.advance(this, "count", this.count, -(1)));
       }
 
       switch(this.state) {
       case 1:
-         this.posY -= 300;
+         this.posY = GameTime.advance(this, "posY", this.posY, -(300));
          if (this.posY <= this.posYOriginal) {
             this.posY = this.posYOriginal;
             this.state = 2;
          }
 
-         ++frame;
-         if (frame == 5) {
+         frame = GameTime.advance(Arm.class, "frame", frame, 1);
+         if (GameTime.event(Arm.class, "frame", "logic:160", GameTime.crosses(Arm.class, "frame", frame, 5))) {
             soundInstance.playLoopSe(52);
          }
          break;
       case 2:
-         this.posX += 300;
-         ++frame;
+         this.posX = GameTime.advance(this, "posX", this.posX, 300);
+         frame = GameTime.advance(Arm.class, "frame", frame, 1);
          if (this.posX >= this.posXOriginal + this.mWidth) {
             this.posX = this.posXOriginal + this.mWidth;
             player.outOfControl = false;
             player.collisionState = 1;
             player.velY = 0;
             player.doWalkPoseInAir();
-            this.count = 4;
+            this.count = GameTime.set(this, "count", 4);
             this.state = 5;
             soundInstance.stopLoopSe();
          }
          break;
       case 3:
-         this.posX -= 300;
+         this.posX = GameTime.advance(this, "posX", this.posX, -(300));
          if (this.posX <= this.posXOriginal) {
             this.posX = this.posXOriginal;
             this.state = 4;
          }
          break;
       case 4:
-         this.posY += 300;
+         this.posY = GameTime.advance(this, "posY", this.posY, 300);
          if (this.posY >= this.posYOriginal + 3328) {
             this.posY = this.posYOriginal + 3328;
             this.state = 0;

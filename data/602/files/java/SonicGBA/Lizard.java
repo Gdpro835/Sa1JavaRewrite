@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -54,7 +56,7 @@ class Lizard extends EnemyObject {
          case 0:
             var3 = (this.limitLeftX + (this.mWidth >> 1)) / 150;
             if (this.velocity > 0) {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(2);
                this.drawer.setLoop(true);
@@ -72,7 +74,7 @@ class Lizard extends EnemyObject {
                   this.IsFired = true;
                }
             } else {
-               this.posX += this.velocity;
+               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
                this.drawer.setActionId(0);
                this.drawer.setTrans(0);
                this.drawer.setLoop(true);

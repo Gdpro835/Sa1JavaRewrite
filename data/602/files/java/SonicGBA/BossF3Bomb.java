@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -46,14 +48,14 @@ class BossF3Bomb extends BulletObject {
    }
 
    public void bulletLogic() {
-      this.posX += this.vel_x;
+      this.posX = GameTime.advancePosition(this, "posX", this.posX, "vel_x", this.vel_x);
       if (this.posY + this.vel_y >= this.getGroundY(this.posX, this.posY + this.vel_y)) {
          this.posY = this.getGroundY(this.posX, this.posY + this.vel_y);
          this.velorg_y = this.velorg_y * 7 / 8;
          this.vel_y = this.velorg_y;
       } else {
-         this.vel_y += GRAVITY;
-         this.posY += this.vel_y;
+         this.vel_y = GameTime.advance(this, "vel_y", this.vel_y, GRAVITY);
+         this.posY = GameTime.advancePosition(this, "posY", this.posY, "vel_y", this.vel_y);
       }
 
       this.refreshCollisionRect(this.posX, this.posY);

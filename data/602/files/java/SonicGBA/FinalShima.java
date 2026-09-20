@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -78,10 +80,10 @@ class FinalShima extends GimmickObject {
    public void logic() {
       if (this.dropState != 2) {
          if (this.used) {
-            this.posY = MyAPI.calNextPosition((double)this.posY, (double)(this.posOriginalY + 768), 1, 6);
+            this.posY = MyAPI.calNextPosition(this, "posY", (double)this.posY, (double)(this.posOriginalY + 768), 1, 6);
             if (this.posY > this.posOriginalY + 192 && this.dropState == 0) {
                this.dropState = 1;
-               this.startTime = System.currentTimeMillis();
+               this.startTime = GameTime.milliseconds();
             }
 
             if (this.dropState == 1) {
@@ -91,13 +93,13 @@ class FinalShima extends GimmickObject {
             int var2 = this.posY;
             int var3 = this.posOriginalY;
             int var1 = this.posOriginalY;
-            this.posY = MyAPI.calNextPositionReverse(var2, var3 + 768, var1, 1, 6);
+            this.posY = MyAPI.calNextPositionReverse(this, "posY", var2, var3 + 768, var1, 1, 6);
          }
       } else {
-         this.currentTime = System.currentTimeMillis();
+         this.currentTime = GameTime.milliseconds();
          if (this.currentTime - this.startTime >= 1000L) {
-            this.velY += GRAVITY;
-            this.posY += this.velY;
+            this.velY = GameTime.advance(this, "velY", this.velY, GRAVITY);
+            this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
          }
       }
 

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Coordinate;
 import Lib.MyAPI;
 import Lib.SoundSystem;
@@ -50,12 +52,12 @@ class BreakPlatform extends GimmickObject {
                var5 = var3 / this.blockNumX;
                var4 = var16[var5];
                var6 = GRAVITY;
-               var16[var5] = var4 + var6;
+               var16[var5] = GameTime.advance(var16, String.valueOf(var5), var4, var6);
             }
 
-            ++this.breakCount;
+            this.breakCount = GameTime.advance(this, "breakCount", this.breakCount, 1);
             if (this.breakCount > this.blockNumX * this.blockNumY) {
-               this.breakCount = this.blockNumX * this.blockNumY;
+               this.breakCount = GameTime.set(this, "breakCount", this.blockNumX * this.blockNumY);
             }
          }
 
@@ -65,7 +67,7 @@ class BreakPlatform extends GimmickObject {
                var4 = var3 / this.blockNumX;
                var5 = var16[var4];
                var6 = this.breakVelY[var3 % this.blockNumX][var3 / this.blockNumX];
-               var16[var4] = var5 + var6;
+               var16[var4] = GameTime.advance(var16, String.valueOf(var4), var5, var6);
             }
 
             MFImage var17 = platformImage;
@@ -114,13 +116,13 @@ class BreakPlatform extends GimmickObject {
       var3 = this.blockNumX;
       var2 = this.blockNumY;
       this.breakVelY = new int[var3][var2];
-      this.breakCount = 0;
+      this.breakCount = GameTime.set(this, "breakCount", 0);
       this.breakFlag = true;
    }
 
    private boolean isBreakingOver() {
       boolean var1;
-      if (this.breakCount == this.blockNumX * this.blockNumY) {
+      if (this.breakCount >= this.blockNumX * this.blockNumY) {
          var1 = true;
       } else {
          var1 = false;

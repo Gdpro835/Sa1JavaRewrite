@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -100,8 +102,8 @@ class Fish extends EnemyObject {
             }
             break;
          case 2:
-            this.posX += this.velX;
-            this.posY += this.velY;
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velX", this.velX);
+            this.posY = GameTime.advancePosition(this, "posY", this.posY, "velY", this.velY);
          }
 
          this.checkWithPlayer(var2, var1, this.posX, this.posY);

@@ -1,5 +1,6 @@
 package com.sega.mobile.framework.device;
 
+import com.sega.mobile.framework.opengl.GLGraphics;
 import com.sega.mobile.framework.android.Font;
 import com.sega.mobile.framework.android.Graphics;
 import com.sega.mobile.framework.utility.MFUtility;
@@ -75,6 +76,15 @@ public class MFGraphics {
             font_type = 8;
             currentFont = font_small;
         }
+    }
+
+    private GLGraphics gpuGraphics() {
+        if (!(g instanceof GLGraphics)) return null;
+        GLGraphics gpu = (GLGraphics) g;
+        gpu.setEffect(effectFlag ? redValue : 0, effectFlag ? greenValue : 0,
+                effectFlag ? blueValue : 0, effectFlag ? grayValue : 0);
+        if (effectFlag) gpu.setAlpha(alphaValue);
+        return gpu;
     }
 
     public void saveCanvas() {
@@ -403,6 +413,12 @@ public class MFGraphics {
     }
 
     public void drawRGB(int[] rgbData, int offset, int scanlength, int x, int y, int width, int height, boolean processAlpha) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.drawRGB(rgbData, offset, scanlength, x + transX, y + transY, width, height, processAlpha);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (this.effectFlag) {
             if (this.alphaValue != 0) {
                 if (!(this.redValue == 0 && this.greenValue == 0 && this.blueValue == 0)) {
@@ -493,6 +509,12 @@ public class MFGraphics {
     }
 
     private final void drawPixelImpl(int x, int y) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.fillRect(x, y, 1, 1);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (this.effectFlag) {
             this.pixelInt[0] = this.g.getColor() | -16777216;
             if (!(this.alphaValue == 0 || (this.redValue == 0 && this.greenValue == 0 && this.blueValue == 0))) {
@@ -514,6 +536,12 @@ public class MFGraphics {
     }
 
     public final void drawLine(int x1, int y1, int x2, int y2) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.drawLine(x1 + transX, y1 + transY, x2 + transX, y2 + transY);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x1 >>= MFDevice.preScaleShift;
             y1 >>= MFDevice.preScaleShift;
@@ -590,6 +618,12 @@ public class MFGraphics {
     }
 
     public final void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.fillTriangle(x1 + transX, y1 + transY, x2 + transX, y2 + transY, x3 + transX, y3 + transY);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x1 >>= MFDevice.preScaleShift;
             y1 >>= MFDevice.preScaleShift;
@@ -609,6 +643,12 @@ public class MFGraphics {
     }
 
     public final void drawRect(int x, int y, int w, int h) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.drawRect(x + transX, y + transY, w, h);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x >>= MFDevice.preScaleShift;
             y >>= MFDevice.preScaleShift;
@@ -633,6 +673,12 @@ public class MFGraphics {
     }
 
     public final void fillRect(int x, int y, int w, int h) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.fillRect(x + transX, y + transY, w, h);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x >>= MFDevice.preScaleShift;
             y >>= MFDevice.preScaleShift;
@@ -676,6 +722,12 @@ public class MFGraphics {
     }
 
     public final void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.drawArc(x + transX, y + transY, width, height, startAngle, arcAngle);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x >>= MFDevice.preScaleShift;
             y >>= MFDevice.preScaleShift;
@@ -691,6 +743,12 @@ public class MFGraphics {
     }
 
     public final void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.fillArc(x + transX, y + transY, width, height, startAngle, arcAngle);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x >>= MFDevice.preScaleShift;
             y >>= MFDevice.preScaleShift;
@@ -706,6 +764,12 @@ public class MFGraphics {
     }
 
     public final void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.drawRoundRect(x + transX, y + transY, width, height, arcWidth, arcHeight);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x >>= MFDevice.preScaleShift;
             y >>= MFDevice.preScaleShift;
@@ -721,6 +785,12 @@ public class MFGraphics {
     }
 
     public final void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
+        GLGraphics gpu = gpuGraphics();
+        if (gpu != null) {
+            gpu.fillRoundRect(x + transX, y + transY, width, height, arcWidth, arcHeight);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (MFDevice.preScaleZoomOutFlag) {
             x >>= MFDevice.preScaleShift;
             y >>= MFDevice.preScaleShift;
@@ -963,6 +1033,14 @@ public class MFGraphics {
     }
 
     private final void drawImageImpl(MFImage image, int x, int y) {
+        if (this.g instanceof GLGraphics) {
+            GLGraphics gpu = gpuGraphics();
+            gpu.setEffect(effectFlag ? redValue : 0, effectFlag ? greenValue : 0,
+                    effectFlag ? blueValue : 0, effectFlag ? grayValue : 0);
+            gpu.drawImage(image.image, this.transX + x, this.transY + y, 20);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (this.effectFlag) {
             this.drawEffectRGB = null;
             this.drawEffectRGB = new int[(image.getWidth() * image.getHeight())];
@@ -992,6 +1070,15 @@ public class MFGraphics {
     }
 
     private final void drawRegionImpl(MFImage image, int regionX, int regionY, int regionW, int regionH, int flipMode, int x, int y) {
+        if (this.g instanceof GLGraphics) {
+            GLGraphics gpu = gpuGraphics();
+            gpu.setEffect(effectFlag ? redValue : 0, effectFlag ? greenValue : 0,
+                    effectFlag ? blueValue : 0, effectFlag ? grayValue : 0);
+            gpu.drawRegion(image.image, regionX, regionY, regionW, regionH, flipMode,
+                    x + this.transX, y + this.transY, 20);
+            gpu.setEffect(0, 0, 0, 0);
+            return;
+        }
         if (!this.effectFlag) {
             this.g.drawRegion(image.image, regionX, regionY, regionW, regionH, flipMode, x + this.transX, y + this.transY, 20);
         } else if (this.alphaValue != 0) {

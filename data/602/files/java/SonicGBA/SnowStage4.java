@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyAPI;
@@ -38,10 +40,10 @@ class SnowStage4 extends BackGroundManager {
 
    public void draw(MFGraphics var1) {
       if (!GameObject.IsGamePause) {
-         posX += SPEED_X;
-         posX %= IMAGE_WIDTH;
-         posY += SPEED_Y;
-         posY %= IMAGE_HEIGHT;
+         posX = GameTime.advance(SnowStage4.class, "posX", posX, SPEED_X);
+         posX = GameTime.wrap(SnowStage4.class, "posX", posX, IMAGE_WIDTH);
+         posY = GameTime.advance(SnowStage4.class, "posY", posY, SPEED_Y);
+         posY = GameTime.wrap(SnowStage4.class, "posY", posY, IMAGE_HEIGHT);
       }
 
       this.drawWater(var1);

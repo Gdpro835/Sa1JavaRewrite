@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -107,19 +109,19 @@ class RollIsland extends GimmickObject {
 
    public void logic() {
       if (this.noCollisionCount > 0) {
-         --this.noCollisionCount;
+         this.noCollisionCount = (byte) Math.max(0, GameTime.advance(this, "noCollisionCount", this.noCollisionCount, -(1)));
       }
 
       if (player.outOfControl && player.outOfControlObject == this) {
          if (Key.repeat(Key.gRight)) {
-            this.velocity += 44;
+            this.velocity = GameTime.advance(this, "velocity", this.velocity, 44);
             if (this.velocity > 1280) {
                this.velocity = 1280;
             }
 
             player.faceDirection = true;
          } else if (Key.repeat(Key.gLeft)) {
-            this.velocity -= 44;
+            this.velocity = GameTime.advance(this, "velocity", this.velocity, -(44));
             if (this.velocity < -1280) {
                this.velocity = -1280;
             }
@@ -136,7 +138,7 @@ class RollIsland extends GimmickObject {
                player.isAfterSpinDash = false;
             }
          } else {
-            this.velocity -= 44;
+            this.velocity = GameTime.advance(this, "velocity", this.velocity, -(44));
          }
 
          this.rollLogic();
@@ -200,7 +202,7 @@ class RollIsland extends GimmickObject {
             player.lookUpCheck();
          }
       } else {
-         this.velocity -= 308;
+         this.velocity = GameTime.advance(this, "velocity", this.velocity, -(308));
          this.rollLogic();
       }
 
@@ -211,7 +213,7 @@ class RollIsland extends GimmickObject {
    }
 
    public boolean releaseWhileBeHurt() {
-      this.noCollisionCount = 0;
+      this.noCollisionCount = (byte) GameTime.set(this, "noCollisionCount", 0);
       return true;
    }
 
@@ -249,8 +251,8 @@ class RollIsland extends GimmickObject {
          }
       }
 
-      this.posX += var1;
-      this.posY += var2;
+      this.posX = GameTime.advance(this, "posX", this.posX, var1);
+      this.posY = GameTime.advance(this, "posY", this.posY, var2);
       if (this.velocity > 0) {
          if (DIRECTION[this.iLeft][0] > 0) {
             if (this.posX > this.posOriginalX + this.moveDistance) {
@@ -303,17 +305,17 @@ class RollIsland extends GimmickObject {
       }
 
       if (this.posX != this.posOriginalX || this.posY != this.posOriginalY) {
-         ++this.frame;
+         this.frame = GameTime.advance(this, "frame", this.frame, 1);
          if (Math.abs(this.velocity) != 0) {
             if (Math.abs(this.velocity) < 160) {
-               if (this.frame % 7 == 0) {
+               if (GameTime.periodic(this, "frame", "rollLogic:311", this.frame, 7, 0)) {
                   soundInstance.playSe(76);
                }
             } else if (Math.abs(this.velocity) < 1020) {
-               if (this.frame % 4 == 0) {
+               if (GameTime.periodic(this, "frame", "rollLogic:315", this.frame, 4, 0)) {
                   soundInstance.playSe(77);
                }
-            } else if (this.frame % 2 == 0) {
+            } else if (GameTime.periodic(this, "frame", "rollLogic:318", this.frame, 2, 0)) {
                soundInstance.playSe(78);
             }
          }

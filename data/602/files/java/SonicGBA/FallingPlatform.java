@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import com.sega.mobile.framework.device.MFGraphics;
 
 class FallingPlatform extends Platform {
@@ -20,7 +22,7 @@ class FallingPlatform extends Platform {
       if (Math.abs(player.getFootPositionX() - this.posOriginalX) >> 6 >= MapManager.CAMERA_WIDTH >> 1 && Math.abs(player.getFootPositionY() - this.posOriginalY) >> 6 >= MapManager.CAMERA_HEIGHT >> 1) {
          this.posY = this.posOriginalY;
          this.used = false;
-         this.fallingCount = 20;
+         this.fallingCount = GameTime.set(this, "fallingCount", 20);
          this.velocity = 0;
          this.refreshCollisionRect(this.posX, this.posY);
       }
@@ -51,11 +53,11 @@ class FallingPlatform extends Platform {
    public void logic() {
       this.refreshCollisionRect(this.posX, this.posY);
       if (this.fallingCount > 0 && this.used) {
-         --this.fallingCount;
+         this.fallingCount = GameTime.advance(this, "fallingCount", this.fallingCount, -(1));
       }
 
       if (this.fallingCount == 0) {
-         this.velocity += GRAVITY;
+         this.velocity = GameTime.advance(this, "velocity", this.velocity, GRAVITY);
       }
 
       if (player.isFootOnObject(this)) {
@@ -69,7 +71,7 @@ class FallingPlatform extends Platform {
       }
 
       this.checkWithPlayer(this.posX, this.posY, this.posX, this.posY + this.velocity);
-      this.posY += this.velocity;
+      this.posY = GameTime.advancePosition(this, "posY", this.posY, "velocity", this.velocity);
    }
 
    public void refreshCollisionRect(int var1, int var2) {

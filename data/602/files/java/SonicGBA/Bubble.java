@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -45,24 +47,24 @@ class Bubble extends GimmickObject {
    }
 
    public void logic() {
-      if (System.currentTimeMillis() / 1000L % 2L == 0L && !this.upBubbleFlag) {
+      if (GameTime.milliseconds() / 1000L % 2L == 0L && !this.upBubbleFlag) {
          addGameObject(new UpBubble(this.posX, this.posY), this.posX, this.posY);
          this.upBubbleFlag = true;
-      } else if (System.currentTimeMillis() / 1000L % 2L != 0L) {
+      } else if (GameTime.milliseconds() / 1000L % 2L != 0L) {
          this.upBubbleFlag = false;
       }
 
-      ++this.createPuyoCount;
+      this.createPuyoCount = GameTime.advance(this, "createPuyoCount", this.createPuyoCount, 1);
       if (this.createPuyoType >= createPuyo.length) {
          this.createPuyoType = 0;
       }
 
       if (this.createPuyoCount >= createPuyo[this.createPuyoType]) {
-         this.createPuyoCount = 0;
+         this.createPuyoCount = GameTime.set(this, "createPuyoCount", 0);
          ++this.createPuyoType;
          addGameObject(new BreatheBubble(this.posX, this.posY), this.posX, this.posY);
          this.breatheBubbleFlag = true;
-      } else if (System.currentTimeMillis() / 2500L % 2L != 0L) {
+      } else if (GameTime.milliseconds() / 2500L % 2L != 0L) {
          this.breatheBubbleFlag = false;
       }
 

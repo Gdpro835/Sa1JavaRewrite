@@ -1,5 +1,7 @@
 package Ending;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -219,7 +221,7 @@ public class NormalEnding extends State implements SonicDef {
 
     public void logic() {
         if (this.state != 14) {
-            this.count++;
+            this.count = GameTime.advance(this, "count", this.count, 1);
         }
         if (Key.press(536870912)) {
             pause();
@@ -238,7 +240,7 @@ public class NormalEnding extends State implements SonicDef {
                 this.cloudAppearFlag = true;
                 this.planeX = PLANE_START_X;
                 this.planeY = PLANE_START_Y;
-                this.count = 0;
+                this.count = GameTime.set(this, "count", 0);
                 SoundSystem.getInstance().playBgm(31, false);
                 return;
             case 1:
@@ -253,14 +255,14 @@ public class NormalEnding extends State implements SonicDef {
                     this.state = 2;
                 }
                 if (this.count >= 58) {
-                    this.planeX += PLANE_VEL_X;
+                    this.planeX = GameTime.advance(this, "planeX", this.planeX, PLANE_VEL_X);
                     return;
                 }
                 return;
             case 2:
-                this.planeX += PLANE_VEL_X;
+                this.planeX = GameTime.advance(this, "planeX", this.planeX, PLANE_VEL_X);
                 if (this.characterDrawer.checkEnd()) {
-                    this.planeY -= 10;
+                    this.planeY = GameTime.advance(this, "planeY", this.planeY, -(10));
                     this.characterX = this.planeX - 10;
                     this.characterY = this.planeY - 34;
                 }
@@ -277,8 +279,8 @@ public class NormalEnding extends State implements SonicDef {
                 }
                 return;
             case 3:
-                this.cloudGroupX += CLOUD_GROUP_VEL_X;
-                this.cloudGroupY += CLOUD_GROUP_VEL_Y;
+                this.cloudGroupX = GameTime.advance(this, "cloudGroupX", this.cloudGroupX, CLOUD_GROUP_VEL_X);
+                this.cloudGroupY = GameTime.advance(this, "cloudGroupY", this.cloudGroupY, CLOUD_GROUP_VEL_Y);
                 if (this.cloudGroupCount == 2) {
                     boolean nextState = false;
                     if (this.cloudGroupY >= (SCREEN_HEIGHT * 2) / 3) {
@@ -292,7 +294,7 @@ public class NormalEnding extends State implements SonicDef {
                         this.state = 4;
                         this.planeX = this.cloudGroupX - 10;
                         this.planeY = this.cloudGroupY + 20;
-                        this.count = 0;
+                        this.count = GameTime.set(this, "count", 0);
                         this.playerActionID = 2;
                         return;
                     }
@@ -307,19 +309,19 @@ public class NormalEnding extends State implements SonicDef {
                 }
                 return;
             case 4:
-                if (this.count == 80) {
+                if (GameTime.event(this, "count", "logic:312", GameTime.crosses(this, "count", this.count, 80))) {
                     this.playerActionID = 3;
                     this.state = 5;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.pilotSmile = true;
                     return;
                 }
                 return;
             case 5:
-                if (this.count == 29) {
+                if (GameTime.event(this, "count", "logic:321", GameTime.crosses(this, "count", this.count, 29))) {
                     this.state = 6;
                     birdInit();
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     return;
                 }
                 return;
@@ -327,14 +329,14 @@ public class NormalEnding extends State implements SonicDef {
                 if (birdLogic() && this.count >= 72) {
                     this.state = 7;
                     this.playerActionID = 5;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.pilotSmile = false;
                     return;
                 }
                 return;
             case 7:
                 if (this.count >= 64) {
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.state = 8;
                     return;
                 }
@@ -342,7 +344,7 @@ public class NormalEnding extends State implements SonicDef {
             case 8:
                 if (this.count >= 64) {
                     this.playerActionID = 6;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.state = 9;
                     return;
                 }
@@ -359,29 +361,29 @@ public class NormalEnding extends State implements SonicDef {
                     this.state = 10;
                     this.word1Y = WORD_START;
                     this.word2Y = WORD_START;
-                    this.count = 0;
+                    this.count = GameTime.set(this, "count", 0);
                     this.playerScale = 1.0f;
                     return;
                 }
                 return;
             case 10:
-                this.playerVelX += this.playerAccX;
-                this.playerVelY += this.playerAccY;
-                this.characterX += this.playerVelX;
-                this.characterY += this.playerVelY;
-                this.playerScale += SCALE_VELOCITY;
+                this.playerVelX = GameTime.advance(this, "playerVelX", this.playerVelX, this.playerAccX);
+                this.playerVelY = GameTime.advance(this, "playerVelY", this.playerVelY, this.playerAccY);
+                this.characterX = GameTime.advancePosition(this, "characterX", this.characterX, "playerVelX", this.playerVelX);
+                this.characterY = GameTime.advancePosition(this, "characterY", this.characterY, "playerVelY", this.playerVelY);
+                this.playerScale += (float) ((SCALE_VELOCITY) * GameTime.assetUnits());
                 if (this.characterX < this.preCharacterX && this.playerVelX < 0) {
                     this.state = 11;
-                    this.characterX -= this.playerVelX;
-                    this.characterY -= this.playerVelY;
+                    this.characterX = GameTime.advance(this, "characterX", this.characterX, -(this.playerVelX));
+                    this.characterY = GameTime.advance(this, "characterY", this.characterY, -(this.playerVelY));
                     fadeInitAndStart(0, 0);
                 }
-                this.word1Y += WORD_VELOCITY;
+                this.word1Y = GameTime.advance(this, "word1Y", this.word1Y, WORD_VELOCITY);
                 if (this.word1Y <= WORD_DESTINY_1) {
                     this.word1Y = WORD_DESTINY_1;
                 }
                 if (this.count > 70) {
-                    this.word2Y += WORD_VELOCITY;
+                    this.word2Y = GameTime.advance(this, "word2Y", this.word2Y, WORD_VELOCITY);
                     if (this.word2Y <= WORD_DESTINY_2) {
                         this.word2Y = WORD_DESTINY_2;
                         return;
@@ -390,7 +392,7 @@ public class NormalEnding extends State implements SonicDef {
                 }
                 return;
             case 11:
-                this.word1Y += WORD_VELOCITY;
+                this.word1Y = GameTime.advance(this, "word1Y", this.word1Y, WORD_VELOCITY);
                 if (this.word1Y <= WORD_DESTINY_1) {
                     this.word1Y = WORD_DESTINY_1;
                 }
@@ -398,11 +400,11 @@ public class NormalEnding extends State implements SonicDef {
                     if (this.word2Y <= WORD_DESTINY_2) {
                         this.word2Y = WORD_DESTINY_2;
                     } else {
-                        this.word2Y += WORD_VELOCITY;
-                        this.endcount = 0;
+                        this.word2Y = GameTime.advance(this, "word2Y", this.word2Y, WORD_VELOCITY);
+                        this.endcount = GameTime.set(this, "endcount", 0);
                     }
                     if (this.word2Y == WORD_DESTINY_2) {
-                        this.endcount++;
+                        this.endcount = GameTime.advance(this, "endcount", this.endcount, 1);
                         if (((float) this.endcount) == END_DISPLAY_COUNT) {
                             fadeInitAndStart(0, 255);
                             return;
@@ -425,25 +427,25 @@ public class NormalEnding extends State implements SonicDef {
                     SoundSystem.getInstance().stopBgm(false);
                     if (SpecialStageState.emeraldMissed()) {
                         fadeInitAndStart(0, 255);
-                        this.endcount = 30;
+                        this.endcount = GameTime.set(this, "endcount", 30);
                     } else {
                         fadeInitAndStart(0, 255);
-                        this.endcount = 10;
+                        this.endcount = GameTime.set(this, "endcount", 10);
                     }
                 }
                 if (this.endcount >= 10 && this.endcount < 26) {
-                    this.endcount++;
+                    this.endcount = GameTime.advance(this, "endcount", this.endcount, 1);
                     if (this.endcount >= 26 && fadeChangeOver()) {
                         Standard2.splashinit(true);
                         State.setState(0);
                     }
                 }
                 if (this.endcount >= 30) {
-                    this.endcount++;
+                    this.endcount = GameTime.advance(this, "endcount", this.endcount, 1);
                     if (this.endcount >= 46 && fadeChangeOver()) {
                         this.state = 13;
                         fadeInitAndStart(255, 0);
-                        this.endcount = 0;
+                        this.endcount = GameTime.set(this, "endcount", 0);
                         return;
                     }
                     return;
@@ -451,7 +453,7 @@ public class NormalEnding extends State implements SonicDef {
                 return;
             case 13:
                 if (fadeChangeOver()) {
-                    this.endcount++;
+                    this.endcount = GameTime.advance(this, "endcount", this.endcount, 1);
                     if (((float) this.endcount) == EMERALD_DISPLAY_COUNT) {
                         fadeInitAndStart(0, 255);
                         Key.touchOpeningClose();
@@ -638,7 +640,7 @@ public class NormalEnding extends State implements SonicDef {
     }
 
     private int getPlaneOffset() {
-        this.planeOffsetDegree += 10;
+        this.planeOffsetDegree = GameTime.advance(this, "planeOffsetDegree", this.planeOffsetDegree, 10);
         return ((MyAPI.dSin(this.planeOffsetDegree) * 12) / 100) + 12;
     }
 
@@ -657,7 +659,7 @@ public class NormalEnding extends State implements SonicDef {
     }
 
     private boolean birdLogic() {
-        this.birdX -= 2;
+        this.birdX = GameTime.advance(this, "birdX", this.birdX, -(2));
         if (this.birdX >= (SCREEN_WIDTH >> 1) + 40) {
             return false;
         }
@@ -678,8 +680,8 @@ public class NormalEnding extends State implements SonicDef {
     }
 
     private void degreeLogic() {
-        this.degree += 10;
-        this.degree %= MDPhone.SCREEN_WIDTH;
+        this.degree = GameTime.advance(this, "degree", this.degree, 10);
+        this.degree = GameTime.wrap(this, "degree", this.degree, MDPhone.SCREEN_WIDTH);
     }
 
     private int getOffsetY(int degreeOffset) {
@@ -695,7 +697,7 @@ public class NormalEnding extends State implements SonicDef {
     }
 
     public static void drawFadeBase(MFGraphics g, int vel2) {
-        fadeAlpha = MyAPI.calNextPosition((double) fadeAlpha, (double) fadeToValue, 1, vel2, 3.0d);
+        fadeAlpha = MyAPI.calNextPosition(NormalEnding.class, "fadeAlpha", (double) fadeAlpha, (double) fadeToValue, 1, vel2, 3.0d);
         if (fadeAlpha != 0) {
             if (preFadeAlpha != fadeAlpha) {
                 for (int w = 0; w < 40; w++) {
@@ -726,7 +728,7 @@ public class NormalEnding extends State implements SonicDef {
         SoundSystem.getInstance().stopBgm(false);
         SoundSystem.getInstance().playBgm(33);
         Key.touchOpeningInit();
-        this.endcount = 0;
+        this.endcount = GameTime.set(this, "endcount", 0);
         this.isSkipPressed = false;
     }
 
@@ -800,7 +802,7 @@ public class NormalEnding extends State implements SonicDef {
             } else if (this.interrupt_state == 13) {
                 fadeInitAndStart(0, 0);
                 this.state = 13;
-                this.endcount = this.needEmeraldCount;
+                this.endcount = GameTime.set(this, "endcount", this.needEmeraldCount);
             }
             Key.clear();
         }

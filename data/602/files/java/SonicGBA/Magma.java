@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import com.sega.mobile.framework.device.MFGraphics;
@@ -31,7 +33,7 @@ class Magma extends EnemyObject {
       }
 
       magmaDrawer = magmaAnimation.getDrawer(0, false, 0);
-      wait_cnt = 0;
+      wait_cnt = GameTime.set(Magma.class, "wait_cnt", 0);
       this.emenyid = var1;
       magmaDrawer.setPause(true);
    }
@@ -58,12 +60,12 @@ class Magma extends EnemyObject {
 
          if (magmaDrawer.checkEnd()) {
             state = 1;
-            wait_cnt = 0;
+            wait_cnt = GameTime.set(Magma.class, "wait_cnt", 0);
          }
          break;
       case 1:
          if (wait_cnt < wait_cnt_max) {
-            ++wait_cnt;
+            wait_cnt = Math.min(wait_cnt_max, GameTime.advance(Magma.class, "wait_cnt", wait_cnt, 1));
          }
       }
 
@@ -93,7 +95,7 @@ class Magma extends EnemyObject {
          int var2 = this.posY;
          switch(state) {
          case 0:
-            this.posY += velocity;
+            this.posY = GameTime.advance(this, "posY", this.posY, velocity);
             if (IsFire) {
                BulletObject.addBullet(this.emenyid, this.posX, this.posY, -this.fire_start_speed, -this.fire_start_speed * 2);
                BulletObject.addBullet(this.emenyid, this.posX, this.posY, this.fire_start_speed, -this.fire_start_speed * 2);
@@ -103,7 +105,7 @@ class Magma extends EnemyObject {
             break;
          case 1:
             this.posY = this.limitBottomY;
-            if (wait_cnt == wait_cnt_max) {
+            if (GameTime.event(Magma.class, "wait_cnt", "logic:108", GameTime.crosses(Magma.class, "wait_cnt", wait_cnt, wait_cnt_max))) {
                state = 0;
                magmaDrawer.restart();
                IsFire = false;

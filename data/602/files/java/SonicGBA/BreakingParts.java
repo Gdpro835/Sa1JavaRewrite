@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.MyRandom;
@@ -34,7 +36,7 @@ class BreakingParts extends EnemyObject {
          this.pos[var1][4] = MyRandom.nextInt(5);
       }
 
-      frame = 0;
+      frame = GameTime.set(BreakingParts.class, "frame", 0);
    }
 
    public static void releaseAllResource() {
@@ -64,15 +66,15 @@ class BreakingParts extends EnemyObject {
 
    public void logic() {
       if (!IsGamePause) {
-         ++frame;
+         frame = GameTime.advance(BreakingParts.class, "frame", frame, 1);
 
          for(int var1 = 0; var1 < this.pos.length; ++var1) {
             int[] var2 = this.pos[var1];
-            var2[0] += this.pos[var1][2];
+            var2[0] = GameTime.advance(var2, String.valueOf(0), var2[0], this.pos[var1][2]);
             var2 = this.pos[var1];
-            var2[3] += GRAVITY >> 1;
+            var2[3] = GameTime.advance(var2, String.valueOf(3), var2[3], GRAVITY >> 1);
             var2 = this.pos[var1];
-            var2[1] += this.pos[var1][3];
+            var2[1] = GameTime.advance(var2, String.valueOf(1), var2[1], this.pos[var1][3]);
          }
 
          if (frame >= 50) {

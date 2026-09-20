@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import Lib.AnimationDrawer;
 import Lib.SoundSystem;
@@ -36,9 +38,9 @@ class SeabedVolcanoAsynBase extends GimmickObject {
    }
 
    public static void staticLogic() {
-      ++count;
-      count = (byte)(count % 50);
-      if (count == 25) {
+      count = (byte) GameTime.advance(SeabedVolcanoAsynBase.class, "count", count, 1);
+      count = (byte) GameTime.wrap(SeabedVolcanoAsynBase.class, "count", count, 50);
+      if (GameTime.event(SeabedVolcanoAsynBase.class, "count", "staticLogic:43", GameTime.crosses(SeabedVolcanoAsynBase.class, "count", count, 25))) {
          SeabedVolcanoAsynPlatform.shot();
       }
 
@@ -55,13 +57,13 @@ class SeabedVolcanoAsynBase extends GimmickObject {
    }
 
    public void draw(MFGraphics var1) {
-      if (count == 22) {
+      if (GameTime.event(SeabedVolcanoAsynBase.class, "count", "draw:60", GameTime.crosses(SeabedVolcanoAsynBase.class, "count", count, 22))) {
          this.drawer.setActionId(1);
          this.drawer.restart();
          SoundSystem var3 = soundInstance;
          SoundSystem var2 = soundInstance;
          var3.playSe(53);
-         count = 23;
+         count = (byte) GameTime.set(SeabedVolcanoAsynBase.class, "count", 23);
       }
 
       this.drawInMap(var1, this.drawer, this.posX, this.posY + 192);

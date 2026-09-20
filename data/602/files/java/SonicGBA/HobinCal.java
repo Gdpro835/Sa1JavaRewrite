@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.MyAPI;
 
 public class HobinCal implements SonicDef {
@@ -30,23 +32,12 @@ public class HobinCal implements SonicDef {
    }
 
    public void logic() {
-      if (this.timeCount > 0) {
-         --this.timeCount;
-      }
-
-      if (this.timeCount > 0) {
-         if (this.timeCount == 9) {
-            this.distance = this.power;
-         } else {
-            this.distance = -this.distance >> 1;
-         }
-
-         if (this.timeCount == 1) {
-            this.distance = 0;
-            this.power = 0;
-         }
-      }
-
+      if (this.timeCount <= 0) return;
+      this.timeCount = Math.max(0, GameTime.advance(this, "timeCount", this.timeCount, -1));
+      double elapsed = 10.0 - GameTime.precise(this, "timeCount", this.timeCount);
+      this.distance = elapsed >= 9.0 ? 0 : (int) (this.power * Math.pow(0.5, Math.max(0, elapsed - 1.0))
+              * Math.cos(Math.PI * Math.max(0, elapsed - 1.0)));
+      if (this.timeCount == 0) { this.power = 0; this.distance = 0; }
    }
 
    public void startHobin(int var1, int var2, int var3) {
@@ -54,6 +45,6 @@ public class HobinCal implements SonicDef {
       }
 
       this.degree = var2 % 360;
-      this.timeCount = 10;
+      this.timeCount = GameTime.set(this, "timeCount", 10);
    }
 }

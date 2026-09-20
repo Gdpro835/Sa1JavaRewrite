@@ -1,0 +1,15 @@
+# Local compilation / Android build products
+*.class
+*.apk
+*.aab
+*.dex
+/build/
+/out/
+/test-results/
+.gradle/
+__pycache__/
+
+# Machine-specific SDK paths and signing material
+local.properties
+*.jks
+*.keystore

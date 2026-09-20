@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import GameEngine.Key;
 import Lib.Animation;
 import Lib.AnimationDrawer;
@@ -475,7 +477,7 @@ public class PlayerTails extends PlayerObject {
             var1 = 1;
          }
 
-         this.velY = var2 + var1 * 30;
+         this.velY = GameTime.advance(this, "velY", var2, var1 * 30);
          var2 = this.velY;
          if (this.isAntiGravity) {
             var1 = -1;
@@ -483,7 +485,7 @@ public class PlayerTails extends PlayerObject {
             var1 = 1;
          }
 
-         this.velY = var2 - var1 * this.getGravity();
+         this.velY = GameTime.advance(this, "velY", var2, -(var1 * this.getGravity()));
       }
 
       if (this.myAnimationID != 12 && this.myAnimationID != 48 && this.myAnimationID != 49) {
@@ -496,8 +498,8 @@ public class PlayerTails extends PlayerObject {
                soundInstance.playLoopSe(15);
             }
 
-            this.flyCount = 128;
-            this.flyUpCoolCount = 1;
+            this.flyCount = GameTime.set(this, "flyCount", 128);
+            this.flyUpCoolCount = GameTime.set(this, "flyUpCoolCount", 1);
             var2 = this.velY;
             if (this.isAntiGravity) {
                var1 = -1;
@@ -514,7 +516,7 @@ public class PlayerTails extends PlayerObject {
                var1 = 1;
             }
 
-            this.velY = var2 - var1 * this.getGravity();
+            this.velY = GameTime.advance(this, "velY", var2, -var1 * this.getGravity());
             var2 = this.velY;
             if (this.isAntiGravity) {
                var1 = -1;
@@ -522,13 +524,13 @@ public class PlayerTails extends PlayerObject {
                var1 = 1;
             }
 
-            this.velY = var2 + var1 * 30;
+            this.velY = var2 + (var1 * 30);
          }
       } else {
-         --this.flyCount;
+         this.flyCount = Math.max(0, GameTime.advance(this, "flyCount", this.flyCount, -(1)));
          if (this.flyUpCoolCount != 1) {
             if ((this.isAntiGravity || this.velY < -176) && (!this.isAntiGravity || this.velY > 176)) {
-               this.flyUpCoolCount = 1;
+               this.flyUpCoolCount = GameTime.set(this, "flyUpCoolCount", 1);
             } else {
                if (this.myAnimationID != 48 && this.myAnimationID != 49) {
                   var2 = this.velY;
@@ -538,7 +540,7 @@ public class PlayerTails extends PlayerObject {
                      var1 = 1;
                   }
 
-                  this.velY = var2 + var1 * -90;
+                  this.velY = GameTime.advance(this, "velY", var2, var1 * -90);
                } else {
                   var2 = this.velY;
                   if (this.isAntiGravity) {
@@ -547,17 +549,17 @@ public class PlayerTails extends PlayerObject {
                      var1 = 1;
                   }
 
-                  this.velY = var2 + var1 * -450;
+                  this.velY = GameTime.advance(this, "velY", var2, var1 * -450);
                }
 
-               ++this.flyUpCoolCount;
-               if (this.flyUpCoolCount == 8) {
-                  this.flyUpCoolCount = 1;
+               this.flyUpCoolCount = GameTime.advance(this, "flyUpCoolCount", this.flyUpCoolCount, 1);
+               if (GameTime.event(this, "flyUpCoolCount", "extraLogicJump:556", GameTime.crosses(this, "flyUpCoolCount", this.flyUpCoolCount, 8))) {
+                  this.flyUpCoolCount = GameTime.set(this, "flyUpCoolCount", 1);
                }
             }
          } else {
             if (Key.press(16777216) && (!this.isAntiGravity && this.velY >= -176 || this.isAntiGravity && this.velY <= 176) && this.flyCount > 0) {
-               this.flyUpCoolCount = 2;
+               this.flyUpCoolCount = GameTime.set(this, "flyUpCoolCount", 2);
             } else if (Key.press(Key.gSelect | 8388608)) {
                this.animationID = 4;
                this.doJumpForwardly = false;
@@ -573,7 +575,7 @@ public class PlayerTails extends PlayerObject {
                var1 = 1;
             }
 
-            this.velY = var2 + var1 * 30;
+            this.velY = GameTime.advance(this, "velY", var2, var1 * 30);
          }
 
          var2 = this.velY;
@@ -583,7 +585,7 @@ public class PlayerTails extends PlayerObject {
             var1 = 1;
          }
 
-         this.velY = var2 - var1 * this.getGravity();
+         this.velY = GameTime.advance(this, "velY", var2, -(var1 * this.getGravity()));
          if (this.isInWater && this.myAnimationID == 12) {
             this.myAnimationID = 48;
          } else if (!this.isInWater) {
@@ -607,7 +609,7 @@ public class PlayerTails extends PlayerObject {
    protected void extraLogicWalk() {
       if (this.flyCount > 0) {
          soundInstance.stopLoopSe();
-         this.flyCount = 0;
+         this.flyCount = GameTime.set(this, "flyCount", 0);
       }
 
       if (Key.press(Key.gSelect | 8388608) && this.myAnimationID != 11 && this.myAnimationID != 19 && this.collisionState != 1 && this.animationID != 4) {
@@ -680,11 +682,11 @@ public class PlayerTails extends PlayerObject {
    }
 
    public void resetFlyCount() {
-      this.flyCount = 0;
+      this.flyCount = GameTime.set(this, "flyCount", 0);
    }
 
    public void stopFly() {
       soundInstance.stopLoopSe();
-      this.flyCount = 0;
+      this.flyCount = GameTime.set(this, "flyCount", 0);
    }
 }

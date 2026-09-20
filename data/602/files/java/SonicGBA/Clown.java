@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.Animation;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -97,7 +99,7 @@ class Clown extends EnemyObject {
          int var2 = this.posX;
          int var1 = this.posY;
          if (this.velocity > 0) {
-            this.posX += this.velocity;
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
             this.drawer.setActionId(0);
             this.drawer.setTrans(2);
             if (this.posX >= this.limitRightX) {
@@ -105,7 +107,7 @@ class Clown extends EnemyObject {
                this.velocity = -this.velocity;
             }
          } else {
-            this.posX += this.velocity;
+            this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
             this.drawer.setActionId(0);
             this.drawer.setTrans(0);
             if (this.posX <= this.limitLeftX) {
