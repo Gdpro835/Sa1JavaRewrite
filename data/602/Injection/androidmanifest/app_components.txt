@@ -9,6 +9,8 @@
             android:label="@string/app_name"
             android:name="com.sega.MFLib.Main"
             android:launchMode="singleTask"
+
+android:hardwareAccelerated="true"
             android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|locale|navigation|orientation|screenLayout">
             <intent-filter>
