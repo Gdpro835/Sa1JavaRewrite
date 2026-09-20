@@ -1,0 +1,7 @@
+----------
+1. ERROR in /storage/emulated/0/.sketchware/data/636/files/java/SonicGBA/StageManager.java (at line 886)
+	if (var4) {
+	    ^^^^
+The local variable var4 may not have been initialized
+----------
+1 problem (1 error)

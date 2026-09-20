@@ -1,0 +1,136 @@
+{
+  "animations": [
+    {
+      "frames": [
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 0,
+              "offset_x": 0,
+              "pos_x": -91,
+              "pos_y": -1
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        },
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 1,
+              "offset_x": 0,
+              "pos_x": -91,
+              "pos_y": -6
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        },
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 2,
+              "offset_x": 0,
+              "pos_x": -91,
+              "pos_y": -8
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        },
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 3,
+              "offset_x": 0,
+              "pos_x": -91,
+              "pos_y": -2
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        }
+      ],
+      "actions": [
+        [
+          {
+            "index": 0,
+            "frame_id": 0,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          },
+          {
+            "index": 1,
+            "frame_id": 1,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          },
+          {
+            "index": 2,
+            "frame_id": 2,
+            "duration": 4,
+            "pos_x": 0,
+            "pos_y": 0
+          },
+          {
+            "index": 3,
+            "frame_id": 3,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          }
+        ]
+      ],
+      "metadata_int": 71
+    }
+  ],
+  "images": [
+    {
+      "clips": [
+        {
+          "index": 0,
+          "x": 0,
+          "y": 0,
+          "w": 182,
+          "h": 3
+        },
+        {
+          "index": 1,
+          "x": 0,
+          "y": 4,
+          "w": 182,
+          "h": 14
+        },
+        {
+          "index": 2,
+          "x": 0,
+          "y": 18,
+          "w": 182,
+          "h": 17
+        },
+        {
+          "index": 3,
+          "x": 0,
+          "y": 35,
+          "w": 182,
+          "h": 5
+        }
+      ],
+      "full_path": "/warning_0.png"
+    }
+  ]
+}

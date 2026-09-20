@@ -1,0 +1,4217 @@
+{
+    "root_node_id": 13,
+    "root_point_id": 0,
+    "nodes": [
+        {
+            "label": "arm_b1",
+            "animation_id": 0,
+            "action_id": 12,
+            "animation_x": 11,
+            "animation_y": 5,
+            "connect_points": [
+                {
+                    "x": 12,
+                    "y": 5,
+                    "link_node_id": 1,
+                    "link_point_id": 1
+                }
+            ]
+        },
+        {
+            "label": "shouler_b",
+            "animation_id": 0,
+            "action_id": 10,
+            "animation_x": 14,
+            "animation_y": 13,
+            "connect_points": [
+                {
+                    "x": 15,
+                    "y": 14,
+                    "link_node_id": 9,
+                    "link_point_id": 3
+                },
+                {
+                    "x": 15,
+                    "y": 14,
+                    "link_node_id": 0,
+                    "link_point_id": 0
+                },
+                {
+                    "x": 15,
+                    "y": 14,
+                    "link_node_id": 3,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "arm_b3",
+            "animation_id": 0,
+            "action_id": 13,
+            "animation_x": 9,
+            "animation_y": 5,
+            "connect_points": [
+                {
+                    "x": 10,
+                    "y": 5,
+                    "link_node_id": 3,
+                    "link_point_id": 1
+                },
+                {
+                    "x": 10,
+                    "y": 29,
+                    "link_node_id": 4,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "arm_b2",
+            "animation_id": 0,
+            "action_id": 11,
+            "animation_x": 12,
+            "animation_y": 43,
+            "connect_points": [
+                {
+                    "x": 13,
+                    "y": 6,
+                    "link_node_id": 1,
+                    "link_point_id": 2
+                },
+                {
+                    "x": 12,
+                    "y": 44,
+                    "link_node_id": 2,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "hand_b",
+            "animation_id": 0,
+            "action_id": 14,
+            "animation_x": 13,
+            "animation_y": 7,
+            "connect_points": [
+                {
+                    "x": 14,
+                    "y": 8,
+                    "link_node_id": 2,
+                    "link_point_id": 1
+                }
+            ]
+        },
+        {
+            "label": "head",
+            "animation_id": 0,
+            "action_id": 2,
+            "animation_x": 25,
+            "animation_y": 25,
+            "connect_points": [
+                {
+                    "x": 26,
+                    "y": 26,
+                    "link_node_id": 9,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "con_bar_back",
+            "animation_id": 0,
+            "action_id": 4,
+            "animation_x": 18,
+            "animation_y": 9,
+            "connect_points": [
+                {
+                    "x": 19,
+                    "y": 10,
+                    "link_node_id": 9,
+                    "link_point_id": 5
+                },
+                {
+                    "x": 8,
+                    "y": 21,
+                    "link_node_id": 7,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "leg_back",
+            "animation_id": 0,
+            "action_id": 6,
+            "animation_x": 11,
+            "animation_y": 11,
+            "connect_points": [
+                {
+                    "x": 11,
+                    "y": 12,
+                    "link_node_id": 6,
+                    "link_point_id": 1
+                },
+                {
+                    "x": 16,
+                    "y": 40,
+                    "link_node_id": 8,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "foot_back",
+            "animation_id": 0,
+            "action_id": 8,
+            "animation_x": 22,
+            "animation_y": 10,
+            "connect_points": [
+                {
+                    "x": 23,
+                    "y": 10,
+                    "link_node_id": 7,
+                    "link_point_id": 1
+                }
+            ]
+        },
+        {
+            "label": "body",
+            "animation_id": 0,
+            "action_id": 1,
+            "animation_x": 27,
+            "animation_y": 62,
+            "connect_points": [
+                {
+                    "x": 38,
+                    "y": 24,
+                    "link_node_id": 5,
+                    "link_point_id": 0
+                },
+                {
+                    "x": 33,
+                    "y": 63,
+                    "link_node_id": 10,
+                    "link_point_id": 0
+                },
+                {
+                    "x": 42,
+                    "y": 33,
+                    "link_node_id": 15,
+                    "link_point_id": 0
+                },
+                {
+                    "x": 25,
+                    "y": 30,
+                    "link_node_id": 1,
+                    "link_point_id": 0
+                },
+                {
+                    "x": 28,
+                    "y": 62,
+                    "link_node_id": 13,
+                    "link_point_id": 0
+                },
+                {
+                    "x": 24,
+                    "y": 62,
+                    "link_node_id": 6,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "con_bar_front",
+            "animation_id": 0,
+            "action_id": 5,
+            "animation_x": 19,
+            "animation_y": 8,
+            "connect_points": [
+                {
+                    "x": 20,
+                    "y": 9,
+                    "link_node_id": 9,
+                    "link_point_id": 1
+                },
+                {
+                    "x": 8,
+                    "y": 19,
+                    "link_node_id": 11,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "leg_front",
+            "animation_id": 0,
+            "action_id": 7,
+            "animation_x": 14,
+            "animation_y": 12,
+            "connect_points": [
+                {
+                    "x": 14,
+                    "y": 13,
+                    "link_node_id": 10,
+                    "link_point_id": 1
+                },
+                {
+                    "x": 18,
+                    "y": 41,
+                    "link_node_id": 12,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "foot_front",
+            "animation_id": 0,
+            "action_id": 9,
+            "animation_x": 18,
+            "animation_y": 9,
+            "connect_points": [
+                {
+                    "x": 19,
+                    "y": 10,
+                    "link_node_id": 11,
+                    "link_point_id": 1
+                }
+            ]
+        },
+        {
+            "label": "blue arc",
+            "animation_id": 0,
+            "action_id": 0,
+            "animation_x": 7,
+            "animation_y": 14,
+            "connect_points": [
+                {
+                    "x": 8,
+                    "y": 15,
+                    "link_node_id": 9,
+                    "link_point_id": 4
+                }
+            ]
+        },
+        {
+            "label": "arm_f1",
+            "animation_id": 0,
+            "action_id": 12,
+            "animation_x": 10,
+            "animation_y": 4,
+            "connect_points": [
+                {
+                    "x": 11,
+                    "y": 5,
+                    "link_node_id": 15,
+                    "link_point_id": 1
+                }
+            ]
+        },
+        {
+            "label": "shouler_f",
+            "animation_id": 0,
+            "action_id": 10,
+            "animation_x": 13,
+            "animation_y": 13,
+            "connect_points": [
+                {
+                    "x": 14,
+                    "y": 14,
+                    "link_node_id": 9,
+                    "link_point_id": 2
+                },
+                {
+                    "x": 14,
+                    "y": 14,
+                    "link_node_id": 14,
+                    "link_point_id": 0
+                },
+                {
+                    "x": 14,
+                    "y": 14,
+                    "link_node_id": 17,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "arm_f3",
+            "animation_id": 0,
+            "action_id": 13,
+            "animation_x": 10,
+            "animation_y": 3,
+            "connect_points": [
+                {
+                    "x": 10,
+                    "y": 4,
+                    "link_node_id": 17,
+                    "link_point_id": 1
+                },
+                {
+                    "x": 11,
+                    "y": 28,
+                    "link_node_id": 18,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "arm_f2",
+            "animation_id": 0,
+            "action_id": 11,
+            "animation_x": 11,
+            "animation_y": 41,
+            "connect_points": [
+                {
+                    "x": 12,
+                    "y": 4,
+                    "link_node_id": 15,
+                    "link_point_id": 2
+                },
+                {
+                    "x": 12,
+                    "y": 41,
+                    "link_node_id": 16,
+                    "link_point_id": 0
+                }
+            ]
+        },
+        {
+            "label": "hand_f",
+            "animation_id": 0,
+            "action_id": 14,
+            "animation_x": 14,
+            "animation_y": 5,
+            "connect_points": [
+                {
+                    "x": 15,
+                    "y": 6,
+                    "link_node_id": 16,
+                    "link_point_id": 1
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "label": "待机",
+            "time_limit": 1,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 314
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 333
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 348
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 2
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 319
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "开始挡脸",
+            "time_limit": 59,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 36
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 45
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 45
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 19
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 40
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 144
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 358
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 314
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 333
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 333
+                        },
+                        {
+                            "frame_position": 58,
+                            "degree": 24
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 333
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 348
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 349
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 359
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 8
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 2
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 2
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 2
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 359
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 319
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 58,
+                            "degree": 28
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 29
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 29
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 29
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 23
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 41
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 128
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 9,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 15,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 52,
+                            "degree": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "左手攻击",
+            "time_limit": 195,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 45
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 38
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 38
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 38
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 38
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 144
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 144
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 144
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 144
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 144
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 358
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 343
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 24
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 60
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 71
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 71
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 11
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 348
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 8
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 16
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 16
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 347
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 359
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 349
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 349
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 349
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 349
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 28
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 43
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 60
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 60
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 68
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 29
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 52
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 124
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 124
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 34
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 128
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 128
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 128
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 128
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 21
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 29,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 86,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 115,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 135,
+                            "degree": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "右手攻击",
+            "time_limit": 170,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 38
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 121
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 121
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 46
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 144
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 144
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 144
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 22
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 358
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 343
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 11
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 11
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 11
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 347
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 13
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 13
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 348
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 349
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 349
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 349
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 329
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 68
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 68
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 68
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 33
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 34
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 34
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 34
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 34
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 21
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 21
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 21
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 21
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 68,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 92,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 112,
+                            "degree": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "掘地准备",
+            "time_limit": 76,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 46
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 340
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 22
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 96
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 96
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 283
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 283
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 355
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 348
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 357
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 329
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 1
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 33
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 34
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 341
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 21
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 86
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 49,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 75,
+                            "degree": 295
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "掘地",
+            "time_limit": 8,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 340
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 96
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 89
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 89
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 96
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 96
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 96
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 283
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 269
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 269
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 269
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 269
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 275
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 283
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 274
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 355
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 357
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 1
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 341
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 71
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 78
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 71
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 78
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 86
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 1,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 2,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 3,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 4,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 5,
+                            "degree": 316
+                        },
+                        {
+                            "frame_position": 6,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 7,
+                            "degree": 316
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "射线准备",
+            "time_limit": 84,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 340
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 358
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 96
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 96
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 76
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 283
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 296
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 305
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 352
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 337
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": -20
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": -17
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 355
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 14
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 40
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 46
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 345
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 357
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 360
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 360
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 1
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 9
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 32
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 38
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 341
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 343
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 359
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 86
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 71
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 2
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 295
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 310
+                        },
+                        {
+                            "frame_position": 26,
+                            "degree": 320
+                        },
+                        {
+                            "frame_position": 83,
+                            "degree": 358
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "回归挡脸",
+            "time_limit": 54,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 45
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 144
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 352
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 358
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": -17
+                        },
+                        {
+                            "frame_position": 8,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 46
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 24
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 345
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 348
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 360
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 8
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 359
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 38
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 28
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 359
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 29
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 2
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 128
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "出场",
+            "time_limit": 1,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 336
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 352
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": -17
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 355
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 46
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 345
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 18
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 1
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 38
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 341
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 345
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 2
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "label": "死亡",
+            "time_limit": 123,
+            "tracks": [
+                {
+                    "node_id": 0,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 1,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 290
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 240
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 276
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 341
+                        }
+                    ]
+                },
+                {
+                    "node_id": 2,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 52
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 52
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 52
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 41
+                        }
+                    ]
+                },
+                {
+                    "node_id": 3,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 4,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 352
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 313
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 313
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 313
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 347
+                        }
+                    ]
+                },
+                {
+                    "node_id": 5,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": -17
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": -17
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": -17
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": -17
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": -17
+                        }
+                    ]
+                },
+                {
+                    "node_id": 6,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 355
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 18
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 48
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 48
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 11
+                        }
+                    ]
+                },
+                {
+                    "node_id": 7,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 46
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 14
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 14
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 14
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 14
+                        }
+                    ]
+                },
+                {
+                    "node_id": 8,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 345
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 345
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 345
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 345
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 345
+                        }
+                    ]
+                },
+                {
+                    "node_id": 9,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 360
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 10
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 79
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 120
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 84
+                        }
+                    ]
+                },
+                {
+                    "node_id": 10,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 1
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 19
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 49
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 49
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 5
+                        }
+                    ]
+                },
+                {
+                    "node_id": 11,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 38
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 17
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 17
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 17
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 17
+                        }
+                    ]
+                },
+                {
+                    "node_id": 12,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 341
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 341
+                        }
+                    ]
+                },
+                {
+                    "node_id": 13,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 14,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 15,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 359
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 289
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 227
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 269
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 350
+                        }
+                    ]
+                },
+                {
+                    "node_id": 16,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 2
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 65
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 65
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 65
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 20
+                        }
+                    ]
+                },
+                {
+                    "node_id": 17,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 0
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 0
+                        }
+                    ]
+                },
+                {
+                    "node_id": 18,
+                    "keyframes": [
+                        {
+                            "frame_position": 0,
+                            "degree": 358
+                        },
+                        {
+                            "frame_position": 17,
+                            "degree": 294
+                        },
+                        {
+                            "frame_position": 53,
+                            "degree": 294
+                        },
+                        {
+                            "frame_position": 69,
+                            "degree": 294
+                        },
+                        {
+                            "frame_position": 117,
+                            "degree": 0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

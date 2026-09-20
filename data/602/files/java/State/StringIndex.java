@@ -1,0 +1,48 @@
+package State;
+
+public interface StringIndex {
+    public static final int BLACK_BACKGROUND_ID = 102;
+    public static final int BLUE_BACKGROUND_ID = 103;
+    public static final int FONT_COLON = 47;
+    public static final int FONT_COLON_BIG = 125;
+    public static final int FONT_COLON_RED = 135;
+    public static final int FONT_HEAD = 91;
+    public static final int FONT_PAUSE = 94;
+    public static final int MENU_ABOUT = 7;
+    public static final int MENU_COMFIRM = 10;
+    public static final int MENU_CONTINUE = 12;
+    public static final int MENU_CONTINUE_GAME = 151;
+    public static final int MENU_HELP = 6;
+    public static final int MENU_MORE_GAME = 3;
+    public static final int MENU_NEW_GAME = 145;
+    public static final int MENU_OPTION = 5;
+    public static final int MENU_PRESS_START = 0;
+    public static final int MENU_QUIT = 8;
+    public static final int MENU_QUIT_ASK = 9;
+    public static final int MENU_RACE_GAME = 2;
+    public static final int MENU_RANKING = 4;
+    public static final int MENU_SELECT_STAGE = 11;
+    public static final int MENU_START_GAME = 1;
+    public static final int STR_DIFFICULTY = 50;
+    public static final int STR_EASY = 51;
+    public static final int STR_HARD = 53;
+    public static final int STR_NORMAL = 52;
+    public static final int STR_RESET_RECORD = 146;
+    public static final int STR_RESET_RECORD_COMFIRM = 147;
+    public static final int STR_RIGHT_ARROW = 113;
+    public static final int STR_SE = 143;
+    public static final int STR_SOUND = 54;
+    public static final int STR_SOUND_CLOSE = 55;
+    public static final int STR_SOUND_HIGH = 56;
+    public static final int STR_SOUND_LOW = 58;
+    public static final int STR_SOUND_MEDIUM = 57;
+    public static final int STR_SOUND_OPEN = 144;
+    public static final int STR_STAGE_NAME_1 = 86;
+    public static final int STR_STAGE_NAME_2 = 87;
+    public static final int STR_STAGE_NAME_3 = 88;
+    public static final int STR_STAGE_NAME_4 = 89;
+    public static final int STR_TIME_LIMIT = 59;
+    public static final int STR_TIME_LIMIT_OFF = 61;
+    public static final int STR_TIME_LIMIT_ON = 60;
+    public static final int WHITE_BACKGROUND_ID = 118;
+}

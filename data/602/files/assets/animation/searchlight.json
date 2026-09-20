@@ -1,0 +1,80 @@
+{
+  "animations": [
+    {
+      "frames": [
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 0,
+              "offset_x": 0,
+              "pos_x": -56,
+              "pos_y": -288
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        },
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 1,
+              "offset_x": 0,
+              "pos_x": -33,
+              "pos_y": -336
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        }
+      ],
+      "actions": [
+        [
+          {
+            "index": 0,
+            "frame_id": 0,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "frame_id": 1,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          }
+        ]
+      ],
+      "metadata_int": 38
+    }
+  ],
+  "images": [
+    {
+      "clips": [
+        {
+          "index": 0,
+          "x": 0,
+          "y": 48,
+          "w": 112,
+          "h": 288
+        },
+        {
+          "index": 1,
+          "x": 112,
+          "y": 0,
+          "w": 66,
+          "h": 336
+        }
+      ],
+      "full_path": "/searchlight_0.png"
+    }
+  ]
+}

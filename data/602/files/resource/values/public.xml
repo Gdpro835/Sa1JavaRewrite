@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <public type="string" name="app_name" id="0x7f030000" />
+    <public type="mipmap" name="icon" id="0x7f060000" />
+    <public type="mipmap" name="ic_launcher" id="0x7f060001" />
+    <public type="mipmap" name="ic_launcher_monochrome" id="0x7f060002" />
+</resources>

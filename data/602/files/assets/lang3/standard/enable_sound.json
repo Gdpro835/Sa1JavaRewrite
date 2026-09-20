@@ -1,0 +1,129 @@
+{
+  "animations": [
+    {
+      "frames": [
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 0,
+              "offset_x": 0,
+              "pos_x": -186,
+              "pos_y": -80
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        },
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 0,
+              "offset_x": 0,
+              "pos_x": -186,
+              "pos_y": -80
+            },
+            {
+              "index": 1,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 1,
+              "offset_x": 0,
+              "pos_x": -72,
+              "pos_y": 28
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        },
+        {
+          "clips": [
+            {
+              "index": 0,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 0,
+              "offset_x": 0,
+              "pos_x": -186,
+              "pos_y": -80
+            },
+            {
+              "index": 1,
+              "function_id": 0,
+              "clip_flags": 0,
+              "sheet_index": 2,
+              "offset_x": 0,
+              "pos_x": 8,
+              "pos_y": 28
+            }
+          ],
+          "rectarrays": [],
+          "crossarrays": []
+        }
+      ],
+      "actions": [
+        [
+          {
+            "index": 0,
+            "frame_id": 0,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "frame_id": 1,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "frame_id": 2,
+            "duration": 0,
+            "pos_x": 0,
+            "pos_y": 0
+          }
+        ]
+      ],
+      "metadata_int": 72
+    }
+  ],
+  "images": [
+    {
+      "clips": [
+        {
+          "index": 0,
+          "x": 0,
+          "y": 0,
+          "w": 374,
+          "h": 160
+        },
+        {
+          "index": 1,
+          "x": 0,
+          "y": 160,
+          "w": 64,
+          "h": 24
+        },
+        {
+          "index": 2,
+          "x": 64,
+          "y": 160,
+          "w": 64,
+          "h": 24
+        }
+      ],
+      "full_path": "/enable_sound_0.png"
+    }
+  ]
+}
