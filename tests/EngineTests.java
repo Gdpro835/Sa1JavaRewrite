@@ -325,6 +325,8 @@ public final class EngineTests {
         AnimationTimeline timeline = new AnimationTimeline();
         timeline.advance(0.1, true, durations);
         check(timeline.frame() == 1, "animation advances a variable amount");
+        near(timeline.secondsInFrame(), 0.1 - UNIT, 1e-12, "animation retains time inside its current pose");
+        near(timeline.secondsInFrame(), 0.1 - UNIT, 1e-12, "reading motion progress cannot consume time");
         timeline.advance(0.3, true, durations);
         check(timeline.frame() == 0, "animation retains overflow across multiple frames and loop");
         timeline.reset();
@@ -334,6 +336,7 @@ public final class EngineTests {
         check(timeline.ended() && !timeline.endTriggered(), "end trigger is one-shot");
         timeline.seek(1);
         check(!timeline.ended() && timeline.frame() == 1, "seeking clears the end latch");
+        near(timeline.secondsInFrame(), 0.0, 0.0, "seek resets motion progress");
         timeline.advance(UNIT, false, durations);
         check(timeline.frame() == 1, "seek restarts the selected frame duration");
         timeline.advance(UNIT, false, durations);

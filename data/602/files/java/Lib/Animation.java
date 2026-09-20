@@ -484,6 +484,15 @@ if (in == null) {
         this.m_Actions[ani].Draw(g, frame, x, y, attr);
     }
 
+    public void DrawAniInterpolated(MFGraphics g, short ani, short frame, short next, double blend, int x, int y, short attr) {
+        Action action = this.m_Actions[ani];
+        if (frame < 0 || frame >= action.m_nFrames || next < 0 || next >= action.m_nFrames) return;
+        action.m_CurFrame = frame;
+        Frame current = this.m_Frames[action.m_FrameInfo[frame][0] & 255];
+        Frame following = this.m_Frames[action.m_FrameInfo[next][0] & 255];
+        current.Draw(g, x, y, attr, following, blend);
+    }
+
     public AnimationDrawer getDrawer(int actionId, boolean loop, int trans) {
         this.refCount++;
         return new AnimationDrawer(this, actionId, loop, trans);
@@ -987,42 +996,69 @@ if (in == null) {
     }
 
     public void Draw(MFGraphics g, int x, int y, short attr) {
+        Draw(g, x, y, attr, null, 0.0);
+    }
+
+    private void Draw(MFGraphics g, int x, int y, short attr, Frame next, double blend) {
+        if (next == this) next = null;
         if (this.m_nClips != 0) {
             for (int i = 0; i < this.m_nClips; i++) {
+                int drawX = x, drawY = y;
+                // Opt-in UI translation only: no morphing between different sprite cells,
+                // no matching ambiguous repeated tiles and no tween across wrap/teleport cuts.
+                if (next != null && attr == 0 && blend > 0.0) {
+                    int match = motionMatch(i, next);
+                    if (match >= 0) {
+                        drawX += (int) Math.round((next.m_ClipInfo[match][0] - m_ClipInfo[i][0]) * blend);
+                        drawY += (int) Math.round((next.m_ClipInfo[match][1] - m_ClipInfo[i][1]) * blend);
+                    }
+                }
                 switch (this.functionID[i]) {
                     case 0:
                         if (this.this$0.isDoubleScale) {
                             g.saveCanvas();
-                            g.translateCanvas(x, y);
+                            g.translateCanvas(drawX, drawY);
                             g.scaleCanvas(0.5f, 0.5f);
                             DrawImage(g, i, 0, 0, attr);
                             g.restoreCanvas();
                             break;
                         } else {
-                            DrawImage(g, i, x, y, attr);
+                            DrawImage(g, i, drawX, drawY, attr);
                             break;
                         }
                     case 1:
-                        fillRect(g, i, x, y, attr);
+                        fillRect(g, i, drawX, drawY, attr);
                         break;
                     case 2:
-                        drawRect(g, i, x, y, attr);
+                        drawRect(g, i, drawX, drawY, attr);
                         break;
                     case 6:
                         try {
-                            short s = this.m_ClipInfo[i][0];
-                            short s2 = this.m_ClipInfo[i][1];
+                            int childX = this.m_ClipInfo[i][0], childY = this.m_ClipInfo[i][1];
+                            Animation childAnimation = this.this$0.qiAnimationArray[this.m_ClipInfo[i][2]];
+                            Frame child = childAnimation.m_Frames[this.m_ClipInfo[i][3]];
+                            Frame nextChild = null;
+                            // Qi intros compose their moving pictures from nested frames.
+                            // Pair stable child slots, then match actual image cells recursively.
+                            if (next != null && attr == 0 && blend > 0.0 && next.m_nClips == m_nClips
+                                    && next.functionID[i] == 6 && next.m_ClipInfo[i][2] == m_ClipInfo[i][2]) {
+                                int dx = next.m_ClipInfo[i][0] - childX, dy = next.m_ClipInfo[i][1] - childY;
+                                if (Math.abs(dx) <= MFDevice.getScreenWidth() && Math.abs(dy) <= MFDevice.getScreenHeight()) {
+                                    childX += (int) Math.round(dx * blend);
+                                    childY += (int) Math.round(dy * blend);
+                                    nextChild = childAnimation.m_Frames[next.m_ClipInfo[i][3]];
+                                }
+                            }
                             if (this.this$0.isDoubleScale) {
                                 g.saveCanvas();
-                                g.translateCanvas(x + s, y + s2);
+                                g.translateCanvas(drawX + childX, drawY + childY);
                                 g.scaleCanvas(0.5f, 0.5f);
-                                this.this$0.qiAnimationArray[this.m_ClipInfo[i][2]].m_Frames[this.m_ClipInfo[i][3]].Draw(g, 0, 0, attr);
+                                child.Draw(g, 0, 0, attr, nextChild, blend);
                                 g.restoreCanvas();
-                                break;
                             } else {
-                                this.this$0.qiAnimationArray[this.m_ClipInfo[i][2]].m_Frames[this.m_ClipInfo[i][3]].Draw(g, x + s, y + s2, attr);
-                                break;
+                                child.Draw(g, drawX + childX, drawY + childY, attr, nextChild, blend);
                             }
+                            break;
                         } catch (Exception e) {
                             System.out.println(String.valueOf((int) this.m_ClipInfo[i][3]) + "is out of bounds");
                             break;
@@ -1030,6 +1066,41 @@ if (in == null) {
                 }
             }
         }
+    }
+
+    private boolean sameMotionClip(int index, Frame other, int otherIndex) {
+        if (functionID[index] != other.functionID[otherIndex]) return false;
+        // Nested references are paired separately by stable child slots in Draw().
+        if (functionID[index] != 0 && functionID[index] != 1 && functionID[index] != 2) return false;
+        if (functionID[index] != 0 && color != other.color) return false;
+        for (int n = 2; n < m_ClipInfo[index].length; n++)
+            if (m_ClipInfo[index][n] != other.m_ClipInfo[otherIndex][n]) return false;
+        return true;
+    }
+
+    private int motionMatch(int index, Frame next) {
+        if (functionID[index] != 0 && functionID[index] != 1 && functionID[index] != 2) return -1;
+        for (int i = 0; i < m_nClips; i++)
+            if (i != index && sameMotionClip(index, this, i)) return -1;
+        int match = -1;
+        for (int i = 0; i < next.m_nClips; i++) {
+            if (sameMotionClip(index, next, i)) {
+                if (match >= 0) return -1;
+                match = i;
+            }
+        }
+        if (match < 0) return -1;
+        int width, height;
+        if (functionID[index] == 0) {
+            short[] rect = this$0.imageInfo[m_ClipInfo[index][4]].m_Clips[m_ClipInfo[index][2]];
+            boolean rotated = (m_ClipInfo[index][3] & 16) != 0;
+            width = rect[rotated ? 3 : 2]; height = rect[rotated ? 2 : 3];
+        } else {
+            width = m_ClipInfo[index][2]; height = m_ClipInfo[index][3];
+        }
+        if (Math.abs(next.m_ClipInfo[match][0] - m_ClipInfo[index][0]) > width
+                || Math.abs(next.m_ClipInfo[match][1] - m_ClipInfo[index][1]) > height) return -1;
+        return match;
     }
 
     public void DrawImage(MFGraphics mFGraphics, int i, int i2, int i3, short s) {

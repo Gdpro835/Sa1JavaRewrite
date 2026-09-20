@@ -28,6 +28,7 @@ public class AnimationDrawer {
     private boolean endTrigger;
     private boolean loop;
     private boolean started;
+    private boolean interpolateMotion;
     private short m_CurFrame;
     private boolean m_bPause;
     private int mustKeepTime = -1;
@@ -44,6 +45,11 @@ public class AnimationDrawer {
 
     public static boolean isAllPause() {
         return allPause;
+    }
+
+    /** UI-only keyframe position tweening; sprite poses and playback duration stay authored. */
+    public void setInterpolateMotion(boolean enabled) {
+        this.interpolateMotion = enabled;
     }
 
     public void mustKeepFrameTime(int keepTime) {
@@ -170,8 +176,20 @@ public class AnimationDrawer {
         started = true;
         ani.SetCurAni(actionId);
         ani.SetLoop(loop);
-        if (zoomEnable) ani.DrawAni(g, actionId, m_CurFrame, MyAPI.zoomOut(x), MyAPI.zoomOut(y), attr);
-        else ani.DrawAni(g, actionId, m_CurFrame, x, y, attr);
+        int drawX = zoomEnable ? MyAPI.zoomOut(x) : x;
+        int drawY = zoomEnable ? MyAPI.zoomOut(y) : y;
+        int count = ani.getFrameNum(actionId);
+        if (interpolateMotion && transId == 0 && count > 0) {
+            int next = m_CurFrame + 1;
+            if (next >= count) next = loop ? 0 : m_CurFrame;
+            double unit = mustKeepTime > 0 ? mustKeepTime / 1000.0 : GameTime.ASSET_TIME_UNIT_SECONDS;
+            // Long authored holds stay still; only the final unit approaches the next pose.
+            double blend = Math.max(0.0, Math.min(1.0,
+                    1.0 - (durations.seconds(m_CurFrame) - timeline.secondsInFrame()) / unit));
+            ani.DrawAniInterpolated(g, actionId, m_CurFrame, (short) next, blend, drawX, drawY, attr);
+        } else {
+            ani.DrawAni(g, actionId, m_CurFrame, drawX, drawY, attr);
+        }
     }
 
     public void setPause(boolean pause) {
@@ -188,6 +206,9 @@ public class AnimationDrawer {
 
     public void restart() {
         timeline.reset();
+        // Reused menu/intro drawers must not play their entrance while still hidden.
+        // draw() or an explicit moveOn() activates the restarted action again.
+        started = false;
         lastAdvanceFrame = Long.MIN_VALUE;
         endTrigger = false;
         this.end = false;

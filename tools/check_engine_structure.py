@@ -55,6 +55,17 @@ require('void onUpdate(double deltaSeconds)' in text('com/sega/mobile/framework/
 require('Lib.Animation.updateAll()' in text('MFLib/MainState.java'), 'direct animation playback must advance from update')
 require('AnimationDrawer.updateAll()' in text('MFLib/MainState.java'), 'animation time belongs to the update phase')
 require('startTime = System.currentTimeMillis()' not in text('Lib/AnimationDrawer.java'), 'animations must pause with simulation time')
+title = text('State/TitleState.java')
+title_cleanup = title.split('private void openingClose()', 1)[1].split('private void openingDraw(', 1)[0]
+title_cleanup += title.split('public void close()', 1)[1].split('public void draw(', 1)[0]
+require('Thread.sleep' not in title_cleanup and 'System.gc()' not in title_cleanup,
+        'no forced stalls at intro/title transitions')
+character_logic = title.split('private void characterSelectLogic()', 1)[1].split('private void creditDraw(', 1)[0]
+character_draw = title.split('private void drawCharacterSelect(', 1)[1].split('private void drawIntergradeRecord(', 1)[0]
+require('this.character_move && this.charSelAniDrawer.checkEnd()' in character_logic,
+        'character selection waits on its finite transition, not the looping case animation')
+require('character_move =' not in character_draw and '.setLoop(' not in character_draw,
+        'character selection transitions belong to update, not draw')
 require(int(json.loads((ROOT / 'data/602/project_config').read_text())['min_sdk']) >= 14, 'renderer needs Android API 14+')
 require(json.loads((ROOT / 'data/602/build_config').read_text())['java_ver'] == '1.7', 'retain Sketchware Java 7 format')
 require(not (ROOT / 'build.gradle').exists(), 'do not silently replace the Sketchware project with Gradle')

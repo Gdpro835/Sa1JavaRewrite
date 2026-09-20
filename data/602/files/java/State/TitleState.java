@@ -650,7 +650,16 @@ public class TitleState extends State {
 
         if (GameTime.event(this, "character_sel_frame_cnt", "characterSelectLogic:651", GameTime.crosses(this, "character_sel_frame_cnt", this.character_sel_frame_cnt, 16))) {
             this.charSelCaseDrawer.setActionId(15);
+            this.charSelCaseDrawer.setLoop(true);
             this.charSelRoleDrawer.setActionId(28);
+        }
+
+        // The rotating selection animation is finite; the case idle animation is not.
+        // Never rely on draw() advancing a one-frame action before setLoop(true).
+        if (this.character_move && this.charSelAniDrawer.checkEnd()) {
+            this.charSelCaseDrawer.setLoop(false);
+            this.charSelCaseDrawer.setActionId(this.character_id * 3 + 17);
+            this.character_move = false;
         }
 
         if (this.character_sel_frame_cnt > 16) {
@@ -1105,7 +1114,6 @@ public class TitleState extends State {
         if (this.character_sel_frame_cnt > 4 && this.character_sel_frame_cnt <= 16) {
             this.charSelCaseDrawer.draw(var1, SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1);
         }
-        if (this.character_sel_frame_cnt >= 16) this.charSelCaseDrawer.setLoop(true);
 
         AnimationDrawer var5;
         if (this.character_sel_frame_cnt > 9) {
@@ -1123,11 +1131,6 @@ public class TitleState extends State {
 
             this.charSelTitleDrawer.draw(var1, (SCREEN_WIDTH >> 1) - 256, SCREEN_HEIGHT >> 1);
             this.charSelCaseDrawer.draw(var1, SCREEN_WIDTH >> 1, SCREEN_HEIGHT >> 1);
-            if (this.character_move && this.charSelCaseDrawer.checkEnd()) {
-                this.charSelCaseDrawer.setLoop(false);
-                this.charSelCaseDrawer.setActionId(this.character_id * 3 + 17);
-                this.character_move = false;
-            }
         }
 
         if (muiAniDrawer == null) {
@@ -1931,6 +1934,13 @@ public class TitleState extends State {
             this.charSelFilAniDrawer = this.charSelFilAni[0].getDrawer(0, false, 0);
         }
 
+        this.charSelAniDrawer.setInterpolateMotion(true);
+        this.charSelCaseDrawer.setInterpolateMotion(true);
+        this.charSelRoleDrawer.setInterpolateMotion(true);
+        this.charSelTitleDrawer.setInterpolateMotion(true);
+        this.charSelAniDrawer.setLoop(false);
+        this.charSelCaseDrawer.setLoop(false);
+        this.charSelRoleDrawer.setLoop(false);
         this.charSelAniDrawer.setActionId(0);
         this.charSelCaseDrawer.setActionId(3);
         this.charSelRoleDrawer.setActionId(4);
@@ -2797,13 +2807,6 @@ public class TitleState extends State {
         this.openingDrawer = null;
         Animation.closeAnimationDrawer(this.skipDrawer);
         this.skipDrawer = null;
-        System.gc();
-
-        try {
-            Thread.sleep(100L);
-        } catch (Exception var2) {
-            var2.printStackTrace();
-        }
 
     }
 
@@ -2875,6 +2878,7 @@ public class TitleState extends State {
             // Use the drawers' authored durations; the intro does not control render FPS.
             for(var1 = 0; var1 < this.openingDrawer.length; ++var1) {
                 this.openingDrawer[var1] = this.openingAnimation[var1].getDrawer(0, false, 0);
+                this.openingDrawer[var1].setInterpolateMotion(true);
             }
         } else {
             for(var1 = 0; var1 < this.openingDrawer.length; ++var1) {
@@ -4448,13 +4452,6 @@ public class TitleState extends State {
         this.openingClose();
         Animation.closeAnimationDrawer(this.interruptDrawer);
         this.interruptDrawer = null;
-        System.gc();
-
-        try {
-            Thread.sleep(100L);
-        } catch (Exception var2) {
-            var2.printStackTrace();
-        }
 
     }
 

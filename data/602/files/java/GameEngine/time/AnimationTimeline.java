@@ -46,6 +46,8 @@ public final class AnimationTimeline {
         return Double.isNaN(seconds) || Double.isInfinite(seconds) ? 0.001 : Math.max(0.001, seconds);
     }
 
+    /** Fractional time retained inside the current authored pose; reading never advances it. */
+    public double secondsInFrame() { return Math.max(0.0, remainder); }
     public int frame() { return frame; }
     public boolean ended() { return ended; }
     public boolean endTriggered() { return endTriggered; }

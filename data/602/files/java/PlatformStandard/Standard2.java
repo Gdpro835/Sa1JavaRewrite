@@ -246,13 +246,13 @@ public class Standard2 implements Def {
         g.fillRect(0, 0, screenWidth, screenHeight);
         switch (state) {
             case 1:
-                drawSplashEffect1(g, splashImage1, screenWidth >> 1, (screenHeight >> 1) - (splashImage1.getHeight() >> 1), count);
+                drawSplashEffect1(g, splashImage1, screenWidth >> 1, (screenHeight >> 1) - (splashImage1.getHeight() >> 1), splashTime());
                 return;
             case 2:
                 MyAPI.drawImage(g, splashImage1, screenWidth >> 1, (screenHeight >> 1) - (splashImage1.getHeight() >> 1), 17);
                 return;
             case 3:
-                drawSplashEffect2(g, splashImage1, screenWidth >> 1, (screenHeight >> 1) - (splashImage1.getHeight() >> 1), count, screenHeight);
+                drawSplashEffect2(g, splashImage1, screenWidth >> 1, (screenHeight >> 1) - (splashImage1.getHeight() >> 1), splashTime(), screenHeight);
                 return;
             default:
                 return;
@@ -263,18 +263,34 @@ public class Standard2 implements Def {
         return state == 4 && count >= 20;
     }
 
-    private static void drawSplashEffect1(MFGraphics g, MFImage image, int x, int y, int count2) {
-        for (int i = 0; i < (image.getHeight() + y) - ((image.getHeight() * count2) / 16); i++) {
-            MyAPI.drawImage(g, image, 0, (image.getHeight() - ((image.getHeight() * count2) / 16)) - 1, image.getWidth(), 1, 0, x, i, 17);
-        }
-        MyAPI.drawImage(g, image, 0, image.getHeight() - ((image.getHeight() * count2) / 16), image.getWidth(), (image.getHeight() * count2) / 16, 0, x, (image.getHeight() + y) - ((image.getHeight() * count2) / 16), 17);
+    private static double splashTime() {
+        // The integer counter controls phase boundaries, not the visible motion rate.
+        return GameTime.precise(Standard2.class, "count", count);
     }
 
-    private static void drawSplashEffect2(MFGraphics g, MFImage image, int x, int y, int count2, int screenHeight) {
-        for (int i = (image.getHeight() + y) - ((image.getHeight() * count2) / 16); i < screenHeight; i++) {
-            MyAPI.drawImage(g, image, 0, (image.getHeight() - ((image.getHeight() * count2) / 16)) - 1, image.getWidth(), 1, 0, x, i, 17);
-        }
-        MyAPI.drawImage(g, image, 0, 0, image.getWidth(), image.getHeight() - ((image.getHeight() * count2) / 16), 0, x, y, 17);
+    private static void drawStretchedRow(MFGraphics g, MFImage image, int row, int x, int y, int rows) {
+        if (rows <= 0 || row < 0 || row >= image.getHeight()) return;
+        // One quad instead of one draw/transform per screen scanline.
+        g.saveCanvas();
+        g.translateCanvas(0, y);
+        g.scaleCanvas(1f, rows);
+        MyAPI.drawImage(g, image, 0, row, image.getWidth(), 1, 0, x, 0, 17);
+        g.restoreCanvas();
+    }
+
+    private static void drawSplashEffect1(MFGraphics g, MFImage image, int x, int y, double count2) {
+        int height = image.getHeight();
+        int shown = (int) Math.round(height * Math.max(0.0, Math.min(1.0, count2 / 16.0)));
+        int seam = y + height - shown;
+        drawStretchedRow(g, image, height - shown - 1, x, 0, seam);
+        if (shown > 0) MyAPI.drawImage(g, image, 0, height - shown, image.getWidth(), shown, 0, x, seam, 17);
+    }
+
+    private static void drawSplashEffect2(MFGraphics g, MFImage image, int x, int y, double count2, int screenHeight) {
+        int remaining = (int) Math.round(image.getHeight() * Math.max(0.0, Math.min(1.0, 1.0 - count2 / 16.0)));
+        int seam = y + remaining;
+        drawStretchedRow(g, image, remaining - 1, x, seam, screenHeight - seam);
+        if (remaining > 0) MyAPI.drawImage(g, image, 0, 0, image.getWidth(), remaining, 0, x, y, 17);
     }
 
     private static void splashInit2() {
@@ -316,7 +332,7 @@ public class Standard2 implements Def {
         g.fillRect(0, 0, screenWidth, screenHeight);
         switch (state) {
             case 1:
-                drawSplash2Effect(g, splashImage2, screenWidth >> 1, (screenHeight >> 1) - (splashImage2.getHeight() >> 1), count, screenWidth);
+                drawSplash2Effect(g, splashImage2, screenWidth >> 1, (screenHeight >> 1) - (splashImage2.getHeight() >> 1), splashTime(), screenWidth);
                 return;
             case 2:
             case 4:
@@ -334,17 +350,15 @@ public class Standard2 implements Def {
         return state == 4;
     }
 
-    private static void drawSplash2Effect(MFGraphics g, MFImage image, int x, int y, int count2, int screenWidth) {
+    private static void drawSplash2Effect(MFGraphics g, MFImage image, int x, int y, double count2, int screenWidth) {
         int space = image.getHeight() / 25;
-        int clipHeight = (image.getHeight() / 25) / 2;
+        int clipHeight = space / 2;
         for (int i = 0; i < 25; i++) {
             int countBase = (30 - ((i * 8) / 25)) - 1;
-            int countDiff = countBase - count2;
-            if (countDiff < 0) {
-                countDiff = 0;
-            }
-            MyAPI.drawImage(g, image, 0, i * space, image.getWidth(), clipHeight + 1, 0, x + ((((-screenWidth) - ((24 - i) * 4)) * countDiff) / countBase), y + (i * space), 17);
-            MyAPI.drawImage(g, image, 0, (i * space) + clipHeight, image.getWidth(), clipHeight + 1, 0, x + (((((24 - i) * 4) + screenWidth) * countDiff) / countBase), (i * space) + y + clipHeight, 17);
+            double countDiff = Math.max(0.0, countBase - count2);
+            int offset = (int) Math.round((screenWidth + (24 - i) * 4) * countDiff / countBase);
+            MyAPI.drawImage(g, image, 0, i * space, image.getWidth(), clipHeight + 1, 0, x - offset, y + i * space, 17);
+            MyAPI.drawImage(g, image, 0, i * space + clipHeight, image.getWidth(), clipHeight + 1, 0, x + offset, y + i * space + clipHeight, 17);
         }
     }
 
@@ -400,12 +414,22 @@ public class Standard2 implements Def {
     public static void fadeInit(int from, int to) {
         fadeFromValue = from;
         fadeToValue = to;
-        fadeAlpha = fadeFromValue;
+        fadeAlpha = GameTime.set(Standard2.class, "fadeAlpha", fadeFromValue);
         preFadeAlpha = -1;
     }
 
     public static void drawFade(MFGraphics g) {
         fadeAlpha = MyAPI.calNextPosition(Standard2.class, "fadeAlpha", (double) fadeAlpha, (double) fadeToValue, 1, 3, 3.0d);
+        if (g.getg() instanceof com.sega.mobile.framework.opengl.GLGraphics) {
+            if (fadeAlpha == 0) return;
+            int color = g.getColor(), alpha = g.getAlpha();
+            g.setColor(fadeRGB[0] & MapManager.END_COLOR);
+            g.setAlpha(fadeAlpha);
+            g.fillRect(0, 0, MyAPI.zoomOut(SCREEN_WIDTH), MyAPI.zoomOut(SCREEN_HEIGHT));
+            g.setColor(color);
+            g.setAlpha(alpha);
+            return;
+        }
         if (fadeAlpha != 0) {
             if (preFadeAlpha != fadeAlpha) {
                 for (int w = 0; w < 40; w++) {
