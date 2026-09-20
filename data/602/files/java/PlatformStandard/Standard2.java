@@ -419,7 +419,7 @@ public class Standard2 implements Def {
     }
 
     public static void drawFade(MFGraphics g) {
-        fadeAlpha = MyAPI.calNextPosition(Standard2.class, "fadeAlpha", (double) fadeAlpha, (double) fadeToValue, 1, 3, 3.0d);
+        fadeAlpha = GameTime.approachOnce(Standard2.class, "fadeAlpha", fadeAlpha, fadeToValue, 1, 3, 3.0d);
         if (g.getg() instanceof com.sega.mobile.framework.opengl.GLGraphics) {
             if (fadeAlpha == 0) return;
             int color = g.getColor(), alpha = g.getAlpha();

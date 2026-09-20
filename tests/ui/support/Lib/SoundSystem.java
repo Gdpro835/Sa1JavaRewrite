@@ -9,6 +9,7 @@ public final class SoundSystem {
     public void playBgm(int id) { playBgm(id, true); }
     public void playBgm(int id, boolean loop) { bgmStarts++; playing = true; }
     public void stopBgm(boolean dispose) { playing = false; }
+    public void resumeBgm() { playing = true; }
     public boolean bgmPlaying() { return playing; }
     public void playSe(int id) { }
     public void playSe(int id, boolean loop) { }

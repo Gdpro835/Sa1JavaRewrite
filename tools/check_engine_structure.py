@@ -66,6 +66,16 @@ require('this.character_move && this.charSelAniDrawer.checkEnd()' in character_l
         'character selection waits on its finite transition, not the looping case animation')
 require('character_move =' not in character_draw and '.setLoop(' not in character_draw,
         'character selection transitions belong to update, not draw')
+option_draw = title.split('private void optionDraw(', 1)[1].split('private void optionInit()', 1)[0]
+require('GameTime.advance' not in option_draw and 'this.optionOffsetX - 100' in option_draw,
+        'settings header is update-owned and covers the leading tile after modulo wrap')
+require('GameTime.advance(this, "optionDrawOffsetY"' not in title and 'GameTime.advance(this, "stageDrawOffsetY"' not in title,
+        'integrated menu displacement must not be time-scaled a second time')
+state = text('State/State.java')
+for name in ['touchPadOpacityDraw', 'touchPadPositionDraw', 'touchPadSizeDraw']:
+    draw_method = state.split('public void ' + name + '(', 1)[1].split('\n    public ', 1)[0]
+    require('releaseTouchkeyBoard()' not in draw_method and 'Key.touchkeyboardClose()' not in draw_method,
+            'control preview draw must not reload resources or reset input: ' + name)
 require(int(json.loads((ROOT / 'data/602/project_config').read_text())['min_sdk']) >= 14, 'renderer needs Android API 14+')
 require(json.loads((ROOT / 'data/602/build_config').read_text())['java_ver'] == '1.7', 'retain Sketchware Java 7 format')
 require(not (ROOT / 'build.gradle').exists(), 'do not silently replace the Sketchware project with Gradle')

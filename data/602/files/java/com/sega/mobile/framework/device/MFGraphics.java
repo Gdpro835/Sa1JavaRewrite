@@ -151,6 +151,18 @@ public class MFGraphics {
         this.g.translate((float) dx, (float) dy);
     }
 
+    /** Sub-pixel UI motion; the integer overload retains its legacy shift/rounding behavior. */
+    public void translateCanvas(float dx, float dy) {
+        if (MFDevice.preScaleZoomOutFlag) {
+            float scale = 1 << MFDevice.preScaleShift;
+            dx /= scale; dy /= scale;
+        } else if (MFDevice.preScaleZoomInFlag) {
+            float scale = 1 << MFDevice.preScaleShift;
+            dx *= scale; dy *= scale;
+        }
+        this.g.translate(dx, dy);
+    }
+
     public static final MFGraphics createMFGraphics(Object graphics, int width, int height) {
         if (MFDevice.preScaleZoomOutFlag) {
             width >>= MFDevice.preScaleShift;

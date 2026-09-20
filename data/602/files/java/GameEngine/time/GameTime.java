@@ -146,6 +146,13 @@ public final class GameTime {
         double next = approachValue(exact, target, numerator, denominator, minimum);
         return advance(owner, name, current, (next - exact) / assetUnits());
     }
+    /** Shared UI presentation state (e.g. a fade behind a modal) advances only once per update. */
+    public static int approachOnce(Object owner, String name, int current, double target, int numerator, int denominator, double minimum) {
+        Channel value = channel(owner, name);
+        if (value.initialized && value.lastFrame == frameId && value.expected == current) return current;
+        return approach(owner, name, current, target, numerator, denominator, minimum);
+    }
+
     public static int reverseApproach(Object owner, String name, int current, int origin, int target, int numerator, int denominator, int minimum) {
         if (denominator <= numerator || denominator <= 0 || assetUnits() <= 0.0) return current;
         double exact = precise(owner, name, current);

@@ -26,5 +26,7 @@ compile() {
 }
 compile -cp "$ANDROID_JAR" -d "$TMP/production" "@$TMP/production.txt"
 compile -cp "$TMP/production:$ANDROID_JAR:$JSON_JAR" -d "$TMP/tests" "@$TMP/tests.txt"
-"$JAVA" -ea -Dsa1.assets="$ROOT/data/602/files/assets" \
-    -cp "$TMP/tests:$TMP/production:$JSON_JAR:$ANDROID_JAR" MenuRegressionTests "$@"
+for suite in ${UI_TEST_CLASS:-MenuRegressionTests OtherMenuRegressionTests}; do
+    "$JAVA" -ea -Dsa1.assets="$ROOT/data/602/files/assets" \
+        -cp "$TMP/tests:$TMP/production:$JSON_JAR:$ANDROID_JAR" "$suite" "$@"
+done

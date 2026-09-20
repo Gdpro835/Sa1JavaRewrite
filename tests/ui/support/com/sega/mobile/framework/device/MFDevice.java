@@ -5,12 +5,14 @@ import java.util.*;
 
 /** Test-only host services. The menu, input components and animation code remain production code. */
 public final class MFDevice {
+    public static int resourceReads;
     public static boolean preScaleZoomInFlag, preScaleZoomOutFlag, useClearFont;
     public static int preScaleShift;
     public static MFGraphics fontGraphics;
     public static MFImage fontImage;
     public static final Vector<MFComponent> componentVector = new Vector<MFComponent>();
     public static InputStream getResourceAsStream(String name) {
+        resourceReads++;
         File file = new File(System.getProperty("sa1.assets"), name.startsWith("/") ? name.substring(1) : name);
         try { return new FileInputStream(file); } catch (FileNotFoundException e) { return null; }
     }

@@ -24,6 +24,9 @@ import com.sega.mobile.framework.device.MFDevice;
 
 public abstract class State implements SonicDef, StringIndex {
     public static double delta = 0;
+    private static int touchKeyboardAssetSize = -1;
+    private int previewSize = -1;
+    private int previewLeft = Integer.MIN_VALUE, previewRight = Integer.MIN_VALUE;
     public static final int ARROW_WAIT_FRAME = 4;
     public static final int BACKGROUND_WIDTH = 80;
     private static final int[] BAR_ANIMATION;
@@ -398,7 +401,7 @@ public abstract class State implements SonicDef, StringIndex {
     }
 
     public static void drawFadeBase(MFGraphics var0, int var1) {
-        fadeAlpha = MyAPI.calNextPosition(State.class, "fadeAlpha", (double)fadeAlpha, (double)fadeToValue, 1, var1, 3.0);
+        fadeAlpha = GameTime.approachOnce(State.class, "fadeAlpha", fadeAlpha, fadeToValue, 1, var1, 3.0);
         drawFadeCore(var0);
     }
 
@@ -449,13 +452,13 @@ public abstract class State implements SonicDef, StringIndex {
 
     public static void drawFadeInSpeed(final MFGraphics mfGraphics, final int n) {
         if (State.fadeFromValue > State.fadeToValue) {
-            State.fadeAlpha = GameTime.advance(State.class, "fadeAlpha", State.fadeAlpha, -(n));
+            State.fadeAlpha = GameTime.advanceOnce(State.class, "fadeAlpha", State.fadeAlpha, -(n));
             if (State.fadeAlpha <= State.fadeToValue) {
                 State.fadeAlpha = State.fadeToValue;
             }
         }
         else if (State.fadeFromValue < State.fadeToValue) {
-            State.fadeAlpha = GameTime.advance(State.class, "fadeAlpha", State.fadeAlpha, n);
+            State.fadeAlpha = GameTime.advanceOnce(State.class, "fadeAlpha", State.fadeAlpha, n);
             if (State.fadeAlpha >= State.fadeToValue) {
                 State.fadeAlpha = State.fadeToValue;
             }
@@ -627,14 +630,14 @@ public abstract class State implements SonicDef, StringIndex {
         }
         State.fadeFromValue = fadeFromValue;
         State.fadeToValue = fadeToValue;
-        State.fadeAlpha = State.fadeFromValue;
+        State.fadeAlpha = GameTime.set(State.class, "fadeAlpha", State.fadeFromValue);
         State.preFadeAlpha = -1;
     }
     
     public static void fadeInitAndStart(final int fadeFromValue, final int fadeToValue) {
         State.fadeFromValue = fadeFromValue;
         State.fadeToValue = fadeToValue;
-        State.fadeAlpha = State.fadeFromValue;
+        State.fadeAlpha = GameTime.set(State.class, "fadeAlpha", State.fadeFromValue);
         State.preFadeAlpha = -1;
         State.fading = true;
     }
@@ -642,7 +645,7 @@ public abstract class State implements SonicDef, StringIndex {
     public static void fadeInit_Modify(final int fadeFromValue, final int fadeToValue) {
         State.fadeFromValue = fadeFromValue;
         State.fadeToValue = fadeToValue;
-        State.fadeAlpha = State.fadeFromValue;
+        State.fadeAlpha = GameTime.set(State.class, "fadeAlpha", State.fadeFromValue);
         State.preFadeAlpha = -1;
     }
 
@@ -687,10 +690,14 @@ public abstract class State implements SonicDef, StringIndex {
     }
 
     public static void initTouchkeyBoard() {
+        if (touchkeyboardAnimation != null && touchKeyboardAssetSize != GlobalResource.touchKeyBoardSize) {
+            releaseTouchkeyBoard();
+        }
         if (touchkeyboardAnimation == null) {
             StringBuilder var1 = new StringBuilder("/tuch/control_panel");
             var1.append(GlobalResource.touchKeyBoardSize);
             touchkeyboardAnimation = new Animation(var1.toString());
+            touchKeyboardAssetSize = GlobalResource.touchKeyBoardSize;
         }
 
         if (touchkeyboardDrawer == null) touchkeyboardDrawer = touchkeyboardAnimation.getDrawer(0, true, 0);
@@ -717,6 +724,7 @@ public abstract class State implements SonicDef, StringIndex {
     }
 
     public static void releaseTouchkeyBoard() {
+        touchKeyboardAssetSize = -1;
         Animation.closeAnimation(touchkeyboardAnimation);
         touchkeyboardAnimation = null;
         Animation.closeAnimationDrawer(touchkeyboardDrawer);
@@ -1154,11 +1162,6 @@ public abstract class State implements SonicDef, StringIndex {
             muiAniDrawer = (new Animation(var6.toString())).getDrawer(0, false, 0);
         } else {
             muiAniDrawer.setActionId(62);
-            PageFrameCnt = GameTime.advance(State.class, "PageFrameCnt", PageFrameCnt, 1);
-            PageFrameCnt = GameTime.wrap(State.class, "PageFrameCnt", PageFrameCnt, 11);
-            int backgroundSteps = GameTime.periods(State.class, "PageFrameCnt", "helpBackground", PageFrameCnt, 2, 0);
-            PageBackGroundOffsetX = (PageBackGroundOffsetX + backgroundSteps) % 64;
-            PageBackGroundOffsetY = ((PageBackGroundOffsetY - backgroundSteps) % 56 + 56) % 56;
 
             int var2;
             int var3;
@@ -1247,7 +1250,16 @@ public abstract class State implements SonicDef, StringIndex {
         this.returnPageCursor = 0;
     }
 
+    protected void updatePageBackground(int tileWidth) {
+        PageFrameCnt = GameTime.advanceOnce(State.class, "PageFrameCnt", PageFrameCnt, 1);
+        PageFrameCnt = GameTime.wrap(State.class, "PageFrameCnt", PageFrameCnt, 11);
+        int steps = GameTime.periods(State.class, "PageFrameCnt", "pageBackground", PageFrameCnt, 2, 0);
+        PageBackGroundOffsetX = (PageBackGroundOffsetX + steps) % tileWidth;
+        PageBackGroundOffsetY = ((PageBackGroundOffsetY - steps) % 56 + 56) % 56;
+    }
+
     public void helpLogic() {
+        updatePageBackground(64);
         if (Key.press(16) || Key.touchhelpleftarrow.Isin() && Key.touchpage.IsClick()) {
             this.arrowindex = 0;
         } else if (Key.press(32) || Key.touchhelprightarrow.Isin() && Key.touchpage.IsClick()) {
@@ -2099,10 +2111,24 @@ public abstract class State implements SonicDef, StringIndex {
         return var1;
     }
 
+    private void updateTouchPadPreview() {
+        resetTouchPosition();
+        initTouchkeyBoard();
+        if (previewSize != GlobalResource.touchKeyBoardSize || previewLeft != GlobalResource.touchKeyBoardLeftPosition
+                || previewRight != GlobalResource.touchKeyBoardRightPosition || Key.touchdirectgamekey == null) {
+            Key.touchkeyboardClose();
+            Key.touchkeyboardInit();
+            previewSize = GlobalResource.touchKeyBoardSize;
+            previewLeft = GlobalResource.touchKeyBoardLeftPosition;
+            previewRight = GlobalResource.touchKeyBoardRightPosition;
+        }
+    }
+
     public void touchPadInit() {
         Key.touchPadOptionClose();
         Key.touchPadOptionInit();
-        initTouchkeyBoard();
+        previewSize = -1;
+        updateTouchPadPreview();
         this.timeCnt = GameTime.set(this, "timeCnt", 0);
         this.isTouchPadClick = false;
         fadeInit(0, 192);
@@ -2115,8 +2141,6 @@ public abstract class State implements SonicDef, StringIndex {
             var4.append("/mui");
             muiAniDrawer = (new Animation(var4.toString())).getDrawer(0, false, 0);
         } else {
-            releaseTouchkeyBoard();
-            initTouchkeyBoard();
             muiAniDrawer.setActionId(54);
             muiAniDrawer.draw(var1, SCREEN_WIDTH >> 1, (SCREEN_HEIGHT >> 1) - 20);
             muiAniDrawer.setActionId(98);
@@ -2221,6 +2245,8 @@ public abstract class State implements SonicDef, StringIndex {
             GlobalResource.touchKeyBoardOpacity = 3;
         }
 
+        updateTouchPadPreview();
+
         byte var1;
         if ((Key.buttonPress(524288 | 8388608) || Key.touchpadoptionreturn.IsButtonPress()) && fadeChangeOver()) {
             SoundSystem.getInstance().playSe(2);
@@ -2239,10 +2265,6 @@ public abstract class State implements SonicDef, StringIndex {
             var4.append("/mui");
             muiAniDrawer = (new Animation(var4.toString())).getDrawer(0, false, 0);
         } else {
-            Key.touchkeyboardClose();
-            Key.touchkeyboardInit();
-            releaseTouchkeyBoard();
-            initTouchkeyBoard();
             muiAniDrawer.setActionId(59);
             muiAniDrawer.draw(var1, 62, 48);
             muiAniDrawer.draw(var1, SCREEN_WIDTH - 62, 48);
@@ -2412,6 +2434,8 @@ public abstract class State implements SonicDef, StringIndex {
             GlobalResource.touchKeyBoardRightPosition = (SCREEN_WIDTH >> 1) - 120 + (40 - (GlobalResource.touchKeyBoardSize * 8));
         }
 
+        updateTouchPadPreview();
+
         byte var1;
         if ((Key.buttonPress(524288 | 8388608) || Key.touchpadoptionreturn.IsButtonPress()) && fadeChangeOver()) {
             SoundSystem.getInstance().playSe(2);
@@ -2430,11 +2454,6 @@ public abstract class State implements SonicDef, StringIndex {
             var4.append("/mui");
             muiAniDrawer = (new Animation(var4.toString())).getDrawer(0, false, 0);
         } else {
-            Key.touchkeyboardClose();
-            Key.touchkeyboardInit();
-            resetTouchPosition();
-            releaseTouchkeyBoard();
-            initTouchkeyBoard();
             muiAniDrawer.setActionId(54);
             muiAniDrawer.draw(var1, SCREEN_WIDTH >> 1, (SCREEN_HEIGHT >> 1) - 20);
             muiAniDrawer.setActionId(97);
@@ -2538,6 +2557,8 @@ public abstract class State implements SonicDef, StringIndex {
         } else if (GlobalResource.touchKeyBoardSize < 0) {
             GlobalResource.touchKeyBoardSize = 5;
         }
+
+        updateTouchPadPreview();
 
         byte var1;
         if ((Key.buttonPress(524288 | 8388608) || Key.touchpadoptionreturn.IsButtonPress()) && fadeChangeOver()) {

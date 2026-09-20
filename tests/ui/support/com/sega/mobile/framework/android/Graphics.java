@@ -7,9 +7,11 @@ public class Graphics {
     public static final int LEFT = 4, TOP = 16, RIGHT = 8, BOTTOM = 32, HCENTER = 1, VCENTER = 2;
     public final ArrayList<String> commands = new ArrayList<String>();
     public int rgbCalls, rectCalls;
+    public boolean fractionalTranslation, fractionalTranslationY;
+    private int saveDepth;
     private int alpha = 255, color;
     private Font font = Font.getFont(11);
-    public void clearCommands() { commands.clear(); rgbCalls = rectCalls = 0; }
+    public void clearCommands() { commands.clear(); rgbCalls = rectCalls = 0; fractionalTranslation = fractionalTranslationY = false; }
     public void setFilterBitmap(boolean value) { }
     public void setAntiAlias(boolean value) { }
     public void setAlpha(int value) { alpha = value; }
@@ -19,9 +21,15 @@ public class Graphics {
     public int getColor() { return color; }
     public void setFont(Font value) { font = value; }
     public Font getFont() { return font; }
-    public void save() { }
-    public void restore() { }
-    public void translate(float x, float y) { }
+    public void save() { saveDepth++; }
+    public void restore() {
+        if (--saveDepth < 0) throw new AssertionError("Unbalanced graphics restore");
+    }
+    public int getSaveDepth() { return saveDepth; }
+    public void translate(float x, float y) {
+        fractionalTranslation |= x != Math.rint(x) || y != Math.rint(y);
+        fractionalTranslationY |= y != Math.rint(y);
+    }
     public void scale(float x, float y) { }
     public void scale(float x, float y, float px, float py) { }
     public void rotate(float angle) { }

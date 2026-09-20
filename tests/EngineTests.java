@@ -1,6 +1,7 @@
 import GameEngine.time.AnimationTimeline;
 import GameEngine.time.FrameClock;
 import GameEngine.time.GameTime;
+import GameEngine.time.MenuScroll;
 import GameEngine.time.RateAccumulator;
 import com.sega.mobile.framework.opengl.SpriteTransform;
 import com.sega.engine.action.*;
@@ -401,6 +402,67 @@ public final class EngineTests {
         check(GameTime.approach(owner, "reused", value, 0, 1, 8, 1) == 0, "pooled smoothing reset");
     }
 
+    private static void menuScroll() {
+        for (final double fps : new double[]{10, 30, 60, 120, 144, -1}) {
+            GameTime.reset();
+            final MenuScroll scroll = new MenuScroll();
+            scroll.reset(0);
+            final double[] previous = {0};
+            final boolean[] monotonic = {true};
+            simulate(0.18, fps, new Step() { public void update() {
+                scroll.update(GameTime.deltaSeconds(), false, 0, -1, -400, 0, false);
+                monotonic[0] &= scroll.position() <= previous[0];
+                previous[0] = scroll.position();
+            }});
+            simulate(0.8, fps, new Step() { public void update() {
+                scroll.update(GameTime.deltaSeconds(), false, 0, 0, -400, 0, false);
+                monotonic[0] &= scroll.position() <= previous[0];
+                previous[0] = scroll.position();
+            }});
+            check(monotonic[0], "no backwards jump at a menu row boundary, fps " + fps);
+            near(scroll.position(), -24, 1e-9, "short arrow press finishes one full row, fps " + fps);
+            check(!scroll.moving(), "arrow movement ends, fps " + fps);
+            simulate(10, fps, new Step() { public void update() {
+                scroll.update(GameTime.deltaSeconds(), false, 0, -1, -400, 0, false);
+            }});
+            near(scroll.position(), -400, 1e-9, "held arrow stops at list boundary, fps " + fps);
+            scroll.reset(0);
+            scroll.update(0.01, true, 100, 0, -400, 0, true);
+            final double[] elapsed = {0};
+            simulate(0.3, fps, new Step() { public void update() {
+                elapsed[0] += GameTime.deltaSeconds();
+                scroll.update(GameTime.deltaSeconds(), true, 100 - 80 * elapsed[0], 0, -400, 0, true);
+            }});
+            near(scroll.position(), -24, 1e-8, "drag follows absolute pointer displacement, fps " + fps);
+            check(scroll.consumedGesture() && !scroll.canSelect(), "drag cannot click a menu item, fps " + fps);
+            simulate(0.5, fps, new Step() { public void update() {
+                scroll.update(GameTime.deltaSeconds(), false, 0, 0, -400, 0, true);
+            }});
+            double speed = 80 * (1 - Math.exp(-0.3 / 0.04));
+            near(scroll.position(), -24 - speed * speed / (2 * (3 / (UNIT * UNIT))), 1e-8,
+                    "fling speed uses elapsed seconds, not an integer frame counter, fps " + fps);
+            scroll.update(0.01, true, 100, 0, -400, 0, true);
+            check(scroll.canSelect(), "a new stationary touch can select again, fps " + fps);
+            scroll.update(0.01, true, 150, 0, -400, 0, true);
+            simulate(1.0, fps, new Step() { public void update() {
+                scroll.update(GameTime.deltaSeconds(), false, 0, 0, -400, 0, true);
+            }});
+            near(scroll.position(), 0, 0, "elastic overscroll settles at the exact edge, fps " + fps);
+            double frozen = scroll.position();
+            scroll.update(0, false, 0, -1, -400, 0, false);
+            near(scroll.position(), frozen, 0, "paused menu cannot scroll, fps " + fps);
+        }
+        GameTime.reset();
+        Object fade = new Object();
+        GameTime.beginFrame(1.0 / 60);
+        int value = GameTime.approachOnce(fade, "alpha", 200, 0, 1, 3, 3);
+        check(GameTime.approachOnce(fade, "alpha", value, 0, 1, 3, 3) == value,
+                "a modal and its background cannot advance one shared fade twice");
+        value = GameTime.set(fade, "alpha", 200);
+        check(GameTime.approachOnce(fade, "alpha", value, 0, 1, 3, 3) < value,
+                "explicit fade restart re-arms a same-frame update");
+    }
+
     private static void transforms() {
         int[][] expected = {{0,1,2,3},{3,2,1,0},{1,0,3,2},{2,3,0,1},{0,3,2,1},{3,0,1,2},{1,2,3,0},{2,1,0,3}};
         float[] uv = new float[8];
@@ -419,7 +481,7 @@ public final class EngineTests {
     }
 
     public static void main(String[] arguments) {
-        clock(); clockDoesNotSkipDisplayFrames(); rates(); events(); wrappedEvents(); movement(); animation(); smoothing(); transforms();
+        clock(); clockDoesNotSkipDisplayFrames(); rates(); events(); wrappedEvents(); movement(); animation(); smoothing(); menuScroll(); transforms();
         System.out.println("PASS: " + assertions + " assertions; clocks, rates, events, production movement/sweeps, animation, integer smoothing, all 8 sprite transforms.");
     }
 }
