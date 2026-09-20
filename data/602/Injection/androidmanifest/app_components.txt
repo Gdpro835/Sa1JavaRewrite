@@ -10,7 +10,7 @@
             android:name="com.sega.MFLib.Main"
             android:launchMode="singleTask"
             android:hardwareAccelerated="true"
-android:screenOrientation="landscape"
+            android:screenOrientation="landscape"
             android:configChanges="keyboard|keyboardHidden|locale|navigation|orientation|screenLayout">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
