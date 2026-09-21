@@ -45,6 +45,14 @@ require('System.exit(' not in main, 'lifecycle must not terminate the VM')
 require('new Thread' not in world and 'Thread.sleep' not in world, 'no companion/network-copy game mutation threads')
 require('glDrawArrays' in batch and 'GL_ONE_MINUS_SRC_ALPHA' in batch, 'scene geometry and premultiplied alpha')
 require('getGenerationId()' in batch and 'textures.clear()' in batch, 'mutable bitmap uploads and EGL recreation')
+gl = text('com/sega/mobile/framework/opengl/GLGraphics.java')
+require('matrix.getValues(matrixValues)' in gl and 'TextTextureCache.rasterScale(' in gl,
+        'system text raster resolution must include the final display transform')
+require('batch.getMaxTextureSize()' in gl and 'mask.offsetY' in gl and 'font.getFontAscent()' in gl,
+        'text masks respect GPU limits while preserving logical baseline/anchors')
+require('textPaint.setAntiAlias(enabled)' not in gl,
+        'sprite AA setting must not disable independent system-text antialiasing')
+
 require('worldCal.actionLogic(var1 - var7, var2 - var4)' in player, 'absolute collision correction must remain unscaled')
 require('worldCal.moveVelocity(this.velX, this.velY, this.totalVelocity)' in player, 'player velocity must be integrated')
 require('this.velX = this.footPointX - footPointX;' not in player and 'railDisplacement(' in player, 'rail motion and exit velocity must use time units')

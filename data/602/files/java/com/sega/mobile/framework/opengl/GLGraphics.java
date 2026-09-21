@@ -2,16 +2,12 @@ package com.sega.mobile.framework.opengl;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import com.sega.mobile.framework.android.Font;
 import com.sega.mobile.framework.android.Graphics;
 import com.sega.mobile.framework.android.Image;
 import java.util.ArrayDeque;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /** Graphics compatibility facade issuing textured triangles, never a CPU frame buffer. */
 public final class GLGraphics extends Graphics {
@@ -26,8 +22,9 @@ public final class GLGraphics extends Graphics {
     private final Rect clip = new Rect();
     private final float[] xy = new float[8];
     private final float[] uv = new float[8];
-    private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final LinkedHashMap<String, Bitmap> textCache = new LinkedHashMap<String, Bitmap>(32, 0.75f, true);
+    // System text keeps its own AA, independent of the scene's pixel-art switch.
+    private final TextTextureCache textCache = new TextTextureCache();
+    private final float[] matrixValues = new float[9];
     private int color = 0xff000000;
     private int alpha = 255;
     private int surfaceWidth, surfaceHeight;
@@ -52,7 +49,6 @@ public final class GLGraphics extends Graphics {
     }
 
     @Override public void setFilterBitmap(boolean enabled) { linear = enabled; }
-    @Override public void setAntiAlias(boolean enabled) { textPaint.setAntiAlias(enabled); }
     @Override public void setAlpha(int value) { alpha = Math.max(0, Math.min(255, value)); }
     @Override public int getAlpha() { return alpha; }
     @Override public void setColor(int value) { color = 0xff000000 | value; }
@@ -193,26 +189,16 @@ public final class GLGraphics extends Graphics {
     }
     @Override public void drawString(String text, int x, int y, int anchor) {
         if (text == null || text.length() == 0) return;
-        String key = font.getHeight() + ":" + text;
-        Bitmap bitmap = textCache.get(key);
-        textPaint.setTextSize(font.getHeight());
-        if (bitmap == null) {
-            Paint.FontMetricsInt metrics = textPaint.getFontMetricsInt();
-            bitmap = Bitmap.createBitmap(Math.max(1, (int) Math.ceil(textPaint.measureText(text)) + 2),
-                    Math.max(1, metrics.descent - metrics.ascent + 2), Bitmap.Config.ARGB_8888);
-            textPaint.setColor(0xffffffff);
-            new android.graphics.Canvas(bitmap).drawText(text, 1, 1 - metrics.ascent, textPaint);
-            textCache.put(key, bitmap);
-            if (textCache.size() > 128) {
-                Iterator<Map.Entry<String, Bitmap>> it = textCache.entrySet().iterator();
-                Map.Entry<String, Bitmap> oldest = it.next();
-                oldest.getValue().recycle(); it.remove();
-            }
-        }
-        x = anchoredX(x, font.stringWidth(text), anchor); y = anchoredY(y, font.getHeight(), anchor);
-        rectangle(x - 1, y - 1, bitmap.getWidth(), bitmap.getHeight());
+        matrix.getValues(matrixValues);
+        int rasterScale = TextTextureCache.rasterScale(matrixValues[Matrix.MSCALE_X], matrixValues[Matrix.MSKEW_X],
+                matrixValues[Matrix.MSKEW_Y], matrixValues[Matrix.MSCALE_Y]);
+        TextTextureCache.Entry mask = textCache.get(font, text, rasterScale, batch.getMaxTextureSize());
+        x = anchoredX(x, font.stringWidth(text), anchor);
+        y = anchoredY(y, font.getHeight(), anchor);
+        // Keep the original logical baseline/anchors; only the raster resolution changes.
+        rectangle(x + mask.offsetX, y - font.getFontAscent() + mask.offsetY, mask.width, mask.height);
         SpriteTransform.textureCoordinates(0, 0, 0, 1, 1, uv);
-        batch.quad(bitmap, true, xy, uv, paintColor());
+        batch.quad(mask.bitmap, true, xy, uv, paintColor());
     }
     @Override public void drawRGB(int[] data, int offset, int stride, int x, int y, int w, int h, boolean processAlpha) {
         if (w <= 0 || h <= 0) return;
@@ -225,7 +211,6 @@ public final class GLGraphics extends Graphics {
         bitmap.recycle();
     }
     public void release() {
-        for (Bitmap bitmap : textCache.values()) bitmap.recycle();
         textCache.clear();
         stack.clear();
     }

@@ -265,6 +265,7 @@ public final class SpriteBatch {
         whiteTexture = program = 0;
     }
 
+    public int getMaxTextureSize() { return maxTextureSize; }
     public int getDrawCalls() { return drawCalls; }
     public int getTextureCount() { return textures.size(); }
     public long getTextureBytes() { return textureBytes; }
