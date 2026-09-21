@@ -601,6 +601,8 @@ public abstract class State implements SonicDef, StringIndex {
         state = null;
         stateId = -1;
         Lib.AnimationDrawer.setAllPause(false);
+        Lib.AnimationDrawer.setWorldPaused(false);
+        Lib.AnimationDrawer.setWorldContext(false);
     }
 
     public static void exitGame() {
@@ -877,6 +879,13 @@ public abstract class State implements SonicDef, StringIndex {
         SpecialStageState.loadData();
         StageManager.loadHighScoreRecord();
         State.resetTouchPosition();
+    }
+
+    /** Whether the scene's gameplay animation clock is stopped; menu/UI time stays live. */
+    public boolean isWorldAnimationPaused() { return false; }
+
+    public static boolean worldAnimationsPaused() {
+        return state != null && state.isWorldAnimationPaused();
     }
 
     public static void stateLogic() {

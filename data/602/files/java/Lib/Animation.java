@@ -578,6 +578,7 @@ if (in == null) {
         public double seconds(int frame) { return Math.max(1, m_FrameInfo[frame][1] & 255) * GameTime.ASSET_TIME_UNIT_SECONDS; }
     };
     private boolean started;
+    private boolean worldAnimation = AnimationDrawer.isWorldContext();
     private short m_CurFrame = 0;
     private boolean m_bLoop = true;
 
@@ -687,7 +688,8 @@ if (in == null) {
 
     private void advance() {
         if (m_nFrames <= 0 || m_Ani.imageInfo == null || m_Ani.m_Actions[m_Ani.m_CurAni] != this) return;
-        if (!m_bPause && !AnimationDrawer.isAllPause() && lastAdvanceFrame != GameTime.frameId()) {
+        if (!m_bPause && !AnimationDrawer.isAllPause() && !(worldAnimation && AnimationDrawer.isWorldPaused())
+                && lastAdvanceFrame != GameTime.frameId()) {
             lastAdvanceFrame = GameTime.frameId();
             timeline.advance(GameTime.deltaSeconds(), m_bLoop, durations);
             m_CurFrame = (short) timeline.frame();
@@ -696,6 +698,7 @@ if (in == null) {
 
     public void Draw(MFGraphics g, int x, int y, short attr) {
         if (m_nFrames <= 0) return;
+        worldAnimation |= AnimationDrawer.isWorldContext();
         if (!started) {
             started = true;
             timeline.seek(m_CurFrame);

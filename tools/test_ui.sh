@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Production menu/animation integration tests with headless host/audio/graphics doubles.
+# Production menu/gameplay/animation integration tests with headless host/audio/graphics doubles.
 # This does not execute Android, EGL, GLES shaders or audio drivers.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -26,7 +26,7 @@ compile() {
 }
 compile -cp "$ANDROID_JAR" -d "$TMP/production" "@$TMP/production.txt"
 compile -cp "$TMP/production:$ANDROID_JAR:$JSON_JAR" -d "$TMP/tests" "@$TMP/tests.txt"
-for suite in ${UI_TEST_CLASS:-MenuRegressionTests OtherMenuRegressionTests}; do
+for suite in ${UI_TEST_CLASS:-MenuRegressionTests OtherMenuRegressionTests SonicGBA.GameplayRegressionTests}; do
     "$JAVA" -ea -Dsa1.assets="$ROOT/data/602/files/assets" \
         -cp "$TMP/tests:$TMP/production:$JSON_JAR:$ANDROID_JAR" "$suite" "$@"
 done

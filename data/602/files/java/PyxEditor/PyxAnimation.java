@@ -20,12 +20,14 @@ public class PyxAnimation {
     public static void updateAll() {
         if (pauseFlag || AnimationDrawer.isAllPause()) return;
         for (PyxAnimation animation : active.keySet()) {
-            if (animation.currentAction >= 0 && animation.actionArray != null)
+            if (animation.currentAction >= 0 && animation.actionArray != null
+                    && !(animation.worldAnimation && AnimationDrawer.isWorldPaused()))
                 animation.actionArray[animation.currentAction].moveOn();
         }
     }
     public static final int ZOOM = 6;
     private static boolean pauseFlag = false;
+    private boolean worldAnimation = AnimationDrawer.isWorldContext();
     private Action[] actionArray;
     /* access modifiers changed from: private */
     public Animation[] animationArray;
@@ -108,6 +110,7 @@ public class PyxAnimation {
     }
 
     public void drawAction(MFGraphics mFGraphics, int i, int i2, int i3) {
+        worldAnimation |= AnimationDrawer.isWorldContext();
         if (this.currentAction != i) {
             this.actionArray[i].reset();
             this.currentAction = i;
@@ -120,6 +123,7 @@ public class PyxAnimation {
     }
 
     public void drawAction(MFGraphics mFGraphics, int i, int i2) {
+        worldAnimation |= AnimationDrawer.isWorldContext();
         if (this.currentAction >= 0) {
             calBeforeDraw();
             for (Node draw : this.nodeArray) {
@@ -524,6 +528,7 @@ public class PyxAnimation {
         }
 
         public void moveOn() {
+            if (pauseFlag || AnimationDrawer.isAllPause() || (this.this$0.worldAnimation && AnimationDrawer.isWorldPaused())) return;
             if (lastAdvanceFrame == GameTime.frameId()) return;
             lastAdvanceFrame = GameTime.frameId();
             this.frame = GameTime.advance(this, "frame", this.frame, this.this$0.speed);

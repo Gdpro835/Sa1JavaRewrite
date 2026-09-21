@@ -74,10 +74,12 @@ public class MainState implements MFGameState, Def {
     }
 
     public void onUpdate(double deltaSeconds) {
+        // Apply lifecycle pause before advancing any registered animation.
+        pauseCheck();
+        AnimationDrawer.setWorldPaused(State.worldAnimationsPaused());
         Lib.Animation.updateAll();
         AnimationDrawer.updateAll();
         PyxEditor.PyxAnimation.updateAll();
-        pauseCheck();
         State.stateLogic();
         pauseCheck();
     }

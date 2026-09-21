@@ -2884,16 +2884,19 @@ public class GameState extends State {
             case 36:
             case 37:
             default:
-                if (GameObject.IsGamePause) {
-                    AnimationDrawer.setAllPause(true);
-                }
-
                 if (this.interrupt_state != 5 && this.interrupt_state != 14 && this.interrupt_state != 4) {
-                    this.drawGame(var1);
-                }
-
-                if (GameObject.IsGamePause) {
-                    AnimationDrawer.setAllPause(false);
+                    boolean oldWorld = AnimationDrawer.setWorldContext(true);
+                    boolean oldPause = AnimationDrawer.isAllPause();
+                    boolean oldGamePause = GameObject.IsGamePause;
+                    GameObject.IsGamePause = isWorldAnimationPaused();
+                    AnimationDrawer.setAllPause(oldPause || GameObject.IsGamePause);
+                    try {
+                        this.drawGame(var1);
+                    } finally {
+                        GameObject.IsGamePause = oldGamePause;
+                        AnimationDrawer.setAllPause(oldPause);
+                        AnimationDrawer.setWorldContext(oldWorld);
+                    }
                 }
 
                 if (this.state != 15 && this.state != 16 && this.state != 17 && this.state != 27) {
@@ -3068,6 +3071,11 @@ public class GameState extends State {
             }
         }
 
+    }
+
+    @Override
+    public boolean isWorldAnimationPaused() {
+        return GameObject.IsGamePause || this.state == 18;
     }
 
     public void drawGame(MFGraphics var1) {

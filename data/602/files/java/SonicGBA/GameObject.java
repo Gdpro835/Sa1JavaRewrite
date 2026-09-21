@@ -1360,6 +1360,15 @@ public abstract class GameObject extends ACObject implements SonicDef {
    }
 
    public static void logicObjects() {
+      boolean previous = AnimationDrawer.setWorldContext(true);
+      try {
+         logicWorldObjects();
+      } finally {
+         AnimationDrawer.setWorldContext(previous);
+      }
+   }
+
+   private static void logicWorldObjects() {
       if (!IsGamePause) {
          if (MFMain.multiplayer) setPlayer2();
          worldSeconds += GameTime.deltaSeconds();

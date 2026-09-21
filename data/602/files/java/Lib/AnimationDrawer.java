@@ -9,7 +9,7 @@ public class AnimationDrawer {
     private static final java.util.WeakHashMap<AnimationDrawer, Boolean> active =
             new java.util.WeakHashMap<AnimationDrawer, Boolean>();
     public static void updateAll() {
-        for (AnimationDrawer drawer : active.keySet()) if (drawer.started) drawer.advance();
+        for (AnimationDrawer drawer : active.keySet()) if (drawer.started) drawer.advance(false);
     }
     private final AnimationTimeline timeline = new AnimationTimeline();
     private long lastAdvanceFrame = Long.MIN_VALUE;
@@ -21,6 +21,19 @@ public class AnimationDrawer {
         }
     };
     private static boolean allPause = false;
+    private static boolean worldContext;
+    private static boolean worldPaused;
+    private boolean worldAnimation = worldContext;
+
+    /** Draw/update scope marks scene animations without freezing the pause-menu UI. */
+    public static boolean setWorldContext(boolean world) {
+        boolean previous = worldContext;
+        worldContext = world;
+        return previous;
+    }
+    public static boolean isWorldContext() { return worldContext; }
+    public static void setWorldPaused(boolean paused) { worldPaused = paused; }
+    public static boolean isWorldPaused() { return worldPaused; }
     private short actionId;
     private Animation ani;
     private short attr;
@@ -157,14 +170,17 @@ public class AnimationDrawer {
 
     public void moveOn() {
         started = true;
-        advance();
+        worldAnimation |= worldContext;
+        // Legacy shared animations (rings, torches, etc.) disable automatic playback,
+        // then explicitly step once. A skipped automatic update must not consume that step.
+        advance(true);
     }
 
-    private void advance() {
-        if (ani == null || lastAdvanceFrame == GameTime.frameId()) return;
+    private void advance(boolean explicit) {
+        if (ani == null || allPause || (worldAnimation && worldPaused) || (!explicit && m_bPause)) return;
+        if (lastAdvanceFrame == GameTime.frameId()) return;
         lastAdvanceFrame = GameTime.frameId();
         endTrigger = false;
-        if (m_bPause || allPause) return;
         timeline.advance(GameTime.deltaSeconds() * Math.abs(speedMulti / (double) speedDivide), loop, durations);
         m_CurFrame = (short) timeline.frame();
         end = timeline.ended();
@@ -173,6 +189,7 @@ public class AnimationDrawer {
 
     public void draw(MFGraphics g, int x, int y, boolean zoomEnable) {
         if (ani == null) return;
+        worldAnimation |= worldContext;
         started = true;
         ani.SetCurAni(actionId);
         ani.SetLoop(loop);
@@ -192,6 +209,7 @@ public class AnimationDrawer {
         }
     }
 
+    /** Suspend automatic playback; explicit moveOn() retains its legacy stepping contract. */
     public void setPause(boolean pause) {
         this.m_bPause = pause;
     }

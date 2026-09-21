@@ -1139,19 +1139,19 @@ public class StageManager implements SonicDef {
 
    public static void stageLogic() {
       if (stagePassFlag && stagePassCount > 0) {
-         stagePassCount = GameTime.advance(StageManager.class, "stagePassCount", stagePassCount, -(1));
+         stagePassCount = Math.max(0, GameTime.advance(StageManager.class, "stagePassCount", stagePassCount, -(1)));
       }
 
       if (stageRestartFlag && stageRestartCount > 0) {
-         stageRestartCount = GameTime.advance(StageManager.class, "stageRestartCount", stageRestartCount, -(1));
+         stageRestartCount = Math.max(0, GameTime.advance(StageManager.class, "stageRestartCount", stageRestartCount, -(1)));
       }
 
       if (stageGameoverFlag && stageGameoverCount > 0) {
-         stageGameoverCount = GameTime.advance(StageManager.class, "stageGameoverCount", stageGameoverCount, -(1));
+         stageGameoverCount = Math.max(0, GameTime.advance(StageManager.class, "stageGameoverCount", stageGameoverCount, -(1)));
       }
 
       if (stageTimeoverFlag && stageTimeoverCount > 0) {
-         stageTimeoverCount = GameTime.advance(StageManager.class, "stageTimeoverCount", stageTimeoverCount, -(1));
+         stageTimeoverCount = Math.max(0, GameTime.advance(StageManager.class, "stageTimeoverCount", stageTimeoverCount, -(1)));
       }
 
    }

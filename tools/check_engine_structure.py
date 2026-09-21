@@ -55,6 +55,14 @@ require('void onUpdate(double deltaSeconds)' in text('com/sega/mobile/framework/
 require('Lib.Animation.updateAll()' in text('MFLib/MainState.java'), 'direct animation playback must advance from update')
 require('AnimationDrawer.updateAll()' in text('MFLib/MainState.java'), 'animation time belongs to the update phase')
 require('startTime = System.currentTimeMillis()' not in text('Lib/AnimationDrawer.java'), 'animations must pause with simulation time')
+main_state = text('MFLib/MainState.java').split('public void onUpdate(double deltaSeconds)', 1)[1].split('public void onResume()', 1)[0]
+require(main_state.index('pauseCheck()') < main_state.index('AnimationDrawer.setWorldPaused(') < main_state.index('Lib.Animation.updateAll()'),
+        'apply lifecycle/world pause before all animation registry updates')
+require('completeStageAnimation();' in player.split('public void logic()', 1)[1], 'finish animations commit stage completion in update')
+player_draw = player.split('public void draw(MFGraphics var1, boolean var2)', 1)[1].split('public void draw2(', 1)[0]
+require('StageManager.setStagePass()' not in player_draw, 'drawing cannot commit a goal/capsule completion')
+require('offsetx == SCREEN_WIDTH - movespeedx' not in player, 'clear jingle cannot depend on a skipped exact coordinate')
+
 title = text('State/TitleState.java')
 title_cleanup = title.split('private void openingClose()', 1)[1].split('private void openingDraw(', 1)[0]
 title_cleanup += title.split('public void close()', 1)[1].split('public void draw(', 1)[0]

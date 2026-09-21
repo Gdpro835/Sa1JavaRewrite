@@ -33,6 +33,8 @@ import com.sega.mobile.framework.device.MFDevice;
 public abstract class PlayerObject extends MoveObject implements Focusable, ACWorldCalUser {
    public boolean Player2Hurt = false;
    public PlayerObject myPlayer = null;
+   private int renderedAnimationID = Integer.MIN_VALUE;
+   private static boolean stageClearJingleStarted;
    public static PlayerObject[] myPlayerStatic = new PlayerObject[2];
    private static final int A = 3072;
    public boolean AI = false;
@@ -1638,8 +1640,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    }
 
    public static void initMovingBar() {
-      offsetx = SCREEN_WIDTH;
-      offsety = (SCREEN_HEIGHT >> 1) + 48;
+      offsetx = GameTime.set(PlayerObject.class, "offsetx", SCREEN_WIDTH);
+      offsety = GameTime.set(PlayerObject.class, "offsety", (SCREEN_HEIGHT >> 1) + 48);
+      stageClearJingleStarted = false;
       if (StageManager.getStageID() < 12) {
          if (StageManager.getStageID() % 2 == 0) {
             passStageActionID = 34;
@@ -2596,47 +2599,26 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    }
 
    public static boolean movingBar() {
-      if (offsetx <= 0) {
-         offsetx = 0;
-      } else {
-         offsetx = GameTime.advance(PlayerObject.class, "offsetx", offsetx, -(movespeedx));
-         if (offsetx == SCREEN_WIDTH - movespeedx) {
-            if (stageModeState == 1) {
-               if (isRaceModeNewRecord()) {
-                  SoundSystem.getInstance().playBgm(41, false);
-               } else {
-                  SoundSystem.getInstance().playBgm(42, false);
-               }
-            } else if (StageManager.getStageID() == 12) {
-               SoundSystem.getInstance().playBgm(28, false);
-            } else if (StageManager.getStageID() == 13) {
-               SoundSystem.getInstance().playBgm(29, false);
-            } else {
-               if (StageManager.getStageID() % 2 == 0) {
-                  SoundSystem.getInstance().playBgm(26, false);
-               }
-
-               if (StageManager.getStageID() % 2 == 1) {
-                  SoundSystem.getInstance().playBgm(27, false);
-               }
-            }
-         }
-      }
-
-      boolean var0;
-      if (offsetx == 0) {
-         if (offsety <= (SCREEN_HEIGHT >> 1) - 36) {
-            offsety = (SCREEN_HEIGHT >> 1) - 36;
-            var0 = true;
+      int targetY = (SCREEN_HEIGHT >> 1) - 36;
+      if (GameTime.deltaSeconds() <= 0.0) return offsetx == 0 && offsety == targetY;
+      if (!stageClearJingleStarted) {
+         stageClearJingleStarted = true;
+         if (stageModeState == 1) {
+            SoundSystem.getInstance().playBgm(isRaceModeNewRecord() ? 41 : 42, false);
+         } else if (StageManager.getStageID() == 12) {
+            SoundSystem.getInstance().playBgm(28, false);
+         } else if (StageManager.getStageID() == 13) {
+            SoundSystem.getInstance().playBgm(29, false);
          } else {
-            offsety = GameTime.advance(PlayerObject.class, "offsety", offsety, -(movespeedy));
-            var0 = false;
+            SoundSystem.getInstance().playBgm(StageManager.getStageID() % 2 == 0 ? 26 : 27, false);
          }
-      } else {
-         var0 = false;
       }
-
-      return var0;
+      // The old first-frame equality could be skipped entirely by a variable delta.
+      offsetx = Math.max(0, GameTime.advanceOnce(PlayerObject.class, "offsetx", offsetx, -movespeedx));
+      if (offsetx == 0) {
+         offsety = Math.max(targetY, GameTime.advanceOnce(PlayerObject.class, "offsety", offsety, -movespeedy));
+      }
+      return offsetx == 0 && offsety == targetY;
    }
 
    private static void playerLifeUpBGM() {
@@ -4889,7 +4871,9 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                }
             }
 
+            int rendered = this.animationID;
             this.drawCharacter(var1);
+            this.renderedAnimationID = rendered;
             if (characterID == 3) {
                if (this.animationID == 4 && !IsGamePause) {
                   if (this.ducting) {
@@ -4952,10 +4936,6 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
                   break;
                case 31:
                   this.animationID = 1;
-                  break;
-               case 35:
-               case 37:
-                  StageManager.setStagePass();
                   break;
                case 42:
                   this.animationID = 43;
@@ -5813,7 +5793,18 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       return var1;
    }
 
+   private void completeStageAnimation() {
+      if (IsGamePause || this.drawer == null || this.animationID != this.renderedAnimationID || !this.drawer.checkEnd()) return;
+      if ((isTerminal && terminalType == 0 && this.animationID == 35)
+            || (this.isCelebrate && this.animationID == 37)) {
+         // Consume completion before movement logic changes goal animation 35 to loop 36.
+         // Rendering must not be responsible for committing stage completion.
+         StageManager.setStagePass();
+      }
+   }
+
    public void logic() {
+        completeStageAnimation();
         for (int i = 0; i < 5; ++i) {
             if (PlayerObject.itemVec[i][0] >= 0) {
                 if (PlayerObject.itemVec[i][1] > 0) {
