@@ -7,16 +7,13 @@ import Lib.AnimationDrawer;
 import Lib.MyAPI;
 import Lib.SoundSystem;
 import com.sega.mobile.framework.device.MFGraphics;
-import com.sega.mobile.framework.utility.MFMath;
 
 class BossF1 extends BossObject {
-   private static final int Accy1 = 96;
-   private static final int BALL_ACC_ACC = 22;
-   private static final int BALL_ACC_ACC2 = 17;
-   private static final int BALL_ACC_MAX;
-   private static final int BALL_BOTTOM_Y = 48064;
+   // 256 world units at the authored 15 units/frame. This is a duration, not a tick.
+   private static final double SWING_PHASE_SECONDS = 256.0 / 15.0 * GameTime.ASSET_TIME_UNIT_SECONDS;
+   private static final double DEPLOY_SECONDS = 17.0 * GameTime.ASSET_TIME_UNIT_SECONDS;
    private static final int BALL_RANGE = 2048;
-   private static final int BALL_RASIUS = 4992;
+   private static final int BALL_RADIUS = 4992;
    private static final int BALL_START_Y = 42240;
    private static final int BOSS_1_STOP_POSY = 39936;
    private static final int BOSS_2_STOP_POSY = 43264;
@@ -83,15 +80,12 @@ class BossF1 extends BossObject {
    private static final int cnt_max = 8;
    private static Animation faceAni;
    private static Animation machineAni;
-   private int Accy = 0;
-   private int RADIUS = 4992;
    private BossF1Ball ball;
    private AnimationDrawer[] ballDrawer;
    private int[][] ballPos;
-   private int[] ballVel;
-   private int ballvely;
+   private double deploySeconds;
+   private double swingSeconds;
    private BossBroken bossbroken;
-   private int degree;
    private boolean directTrans = false;
    private boolean displayFlag;
    private int drop_cnt;
@@ -100,23 +94,14 @@ class BossF1 extends BossObject {
    private AnimationDrawer faceDrawer;
    private int face_cnt;
    private int face_state;
-   private int frameCn;
    private boolean isDisplayBall = false;
    private int laugh_cn;
-   private int lineVelocity;
    private AnimationDrawer machineDrawer;
    private int machine_state;
-   private int oppoBallPosX;
-   private int oppoBallPosY;
    private int pro_step;
    private int show_step;
    private int state;
    private int velocity;
-   private int vely;
-
-   static {
-      BALL_ACC_MAX = GRAVITY;
-   }
 
    protected BossF1(int var1, int var2, int var3, int var4, int var5, int var6, int var7) {
       super(var1, var2, var3, var4, var5, var6, var7);
@@ -153,7 +138,6 @@ class BossF1 extends BossObject {
          this.ballPos[var4][1] = 42240;
       }
 
-      this.ballVel = new int[6];
       this.isDisplayBall = false;
       this.directTrans = false;
       this.ball = new BossF1Ball(var1, var2, var3, 0, 0, 0, 0);
@@ -204,11 +188,6 @@ class BossF1 extends BossObject {
 
    }
 
-   private void degreeCal() {
-      this.lineVelocity = GameTime.advance(this, "lineVelocity", this.lineVelocity, (GRAVITY - 60) * MyAPI.dSin((this.degree >> 6) - 90) / 100);
-      this.degree = GameTime.advance(this, "degree", this.degree, -(((this.lineVelocity << 6) / this.RADIUS << 6) * 180 / 201));
-   }
-
    public static void releaseAllResource() {
       Animation.closeAnimation(machineAni);
       Animation.closeAnimation(faceAni);
@@ -218,34 +197,110 @@ class BossF1 extends BossObject {
       ballAni = null;
    }
 
-   public void balllogic(boolean var1) {
-      this.oppoBallPosY = GameTime.advance(this, "oppoBallPosY", this.oppoBallPosY, this.ballvely);
-      if (this.oppoBallPosY > 4992) {
-         this.oppoBallPosY = 4992;
+   private static double smooth(double t) {
+      return t * t * (3.0 - 2.0 * t);
+   }
+
+   private static int between(int from, int to, double t) {
+      return (int) Math.round(from + (to - from) * t);
+   }
+
+   /** One authoritative fixed-point pose for chain rendering and the damaging ball. */
+   private void positionBall(double offsetX, double offsetY) {
+      for (int i = 0; i < 4; i++) {
+         double fraction = (i * 14 + 13) / 78.0;
+         this.ballPos[i][0] = (int) Math.round(this.posX + offsetX * fraction);
+         this.ballPos[i][1] = (int) Math.round(this.posY + offsetY * fraction);
       }
-
-      this.oppoBallPosX = MFMath.sqrt(24920064 - this.oppoBallPosY * this.oppoBallPosY) >> 6;
-
-      for(int var2 = 0; var2 < 4; ++var2) {
-         if (var1) {
-            this.ballPos[var2][0] = this.posX + this.oppoBallPosX * (var2 * 14 + 13) / 78;
-         } else {
-            this.ballPos[var2][0] = this.posX - this.oppoBallPosX * (var2 * 14 + 13) / 78;
-         }
-
-         this.ballPos[var2][1] = this.posY + this.oppoBallPosY * (var2 * 14 + 13) / 78;
-      }
-
-      if (var1) {
-         this.ballPos[4][0] = this.posX + this.oppoBallPosX;
-      } else {
-         this.ballPos[4][0] = this.posX - this.oppoBallPosX;
-      }
-
-      this.ballPos[4][1] = this.posY + this.oppoBallPosY;
+      this.ballPos[4][0] = (int) Math.round(this.posX + offsetX);
+      this.ballPos[4][1] = (int) Math.round(this.posY + offsetY);
       this.ballPos[5][0] = this.posX;
       this.ballPos[5][1] = this.posY + 256;
       this.ball.logic(this.ballPos[4][0], this.ballPos[4][1]);
+   }
+
+   private double deployBall(double seconds) {
+      double remaining = Math.max(0.0, this.deploySeconds + seconds - DEPLOY_SECONDS);
+      this.deploySeconds = Math.min(DEPLOY_SECONDS, this.deploySeconds + seconds);
+      double progress = smooth(this.deploySeconds / DEPLOY_SECONDS);
+      for (int i = 0; i < this.ballPos.length; i++) {
+         int target = i == 5 ? this.posY + 256
+               : this.posY + (i == 4 ? BALL_RADIUS : (i * 14 + 13) * 64);
+         this.ballPos[i][0] = this.posX;
+         this.ballPos[i][1] = between(BALL_START_Y, target, progress);
+      }
+      return remaining;
+   }
+
+   private void openingSwing(double seconds) {
+      this.swingSeconds += seconds;
+      if (this.swingSeconds + 1e-10 >= SWING_PHASE_SECONDS * 2.0) {
+         // Carry the remainder into combat, never discard a long display interval.
+         this.swingSeconds = Math.max(0.0, this.swingSeconds - SWING_PHASE_SECONDS * 2.0) % (SWING_PHASE_SECONDS * 4.0);
+         this.state = STATE_PRO;
+         this.pro_step = PRO_STEP_BOTTOM_2_LEFT;
+         this.machine_state = MACHINE_WAIT;
+         this.directTrans = false;
+         battlePose();
+         return;
+      }
+      boolean returning = this.swingSeconds + 1e-10 >= SWING_PHASE_SECONDS;
+      this.show_step = returning ? SHOW_BOSS_GOTO_PRO : SHOW_BOSS_END;
+      double t = Math.max(0.0, Math.min(1.0, this.swingSeconds / SWING_PHASE_SECONDS - (returning ? 1.0 : 0.0)));
+      double travel = smooth(t);
+      this.posX = between(returning ? BOSS_MOVE_1_POSX : INIT_STOP_POSX,
+            returning ? BOSS_LEFT_POSX : BOSS_MOVE_1_POSX, travel);
+      this.posY = between(returning ? BOSS_MOVE_1_POSY : INIT_STOP_POSY,
+            returning ? BOSS_MOVE_2_POSY : BOSS_MOVE_1_POSY, travel);
+      // Ease out of the deployment; join the periodic swing with matching angular velocity.
+      double angle = Math.PI * 0.5 * (returning ? Math.cos(t * Math.PI * 0.5) : smooth(t));
+      positionBall(BALL_RADIUS * Math.sin(angle), BALL_RADIUS * Math.cos(angle));
+   }
+
+   private void battlePose() {
+      double phaseTime = this.swingSeconds / SWING_PHASE_SECONDS;
+      double boundary = Math.rint(phaseTime);
+      if (Math.abs(phaseTime - boundary) < 1e-10) phaseTime = boundary;
+      int phase = (int) phaseTime % 4;
+      double t = smooth(phaseTime - Math.floor(phaseTime));
+      if (phase != this.pro_step) {
+         this.pro_step = phase;
+         this.machine_state = (phase & 1) == 0 ? MACHINE_WAIT : MACHINE_MOVE;
+         if ((phase & 1) != 0) this.face_state = FACE_NORMAL;
+      }
+      this.directTrans = phase == 1 || phase == 2;
+      this.velocity = this.directTrans ? 180 : -180;
+      switch (phase) {
+         case 0:
+            this.posX = BOSS_LEFT_POSX;
+            this.posY = between(BOSS_MOVE_2_POSY, BOSS_MOVE_1_POSY, t);
+            break;
+         case 1:
+            this.posX = between(BOSS_LEFT_POSX, BOSS_RIGHT_POSX, t);
+            this.posY = between(BOSS_MOVE_1_POSY, BOSS_MOVE_2_POSY, t);
+            break;
+         case 2:
+            this.posX = BOSS_RIGHT_POSX;
+            this.posY = between(BOSS_MOVE_2_POSY, BOSS_MOVE_1_POSY, t);
+            break;
+         default:
+            this.posX = between(BOSS_RIGHT_POSX, BOSS_LEFT_POSX, t);
+            this.posY = between(BOSS_MOVE_1_POSY, BOSS_MOVE_2_POSY, t);
+      }
+      // Sample a continuous angle, rather than integrating Y then snapping it to 0/radius.
+      double angle = -Math.PI * 0.5 * Math.sin(phaseTime * Math.PI * 0.5);
+      positionBall(BALL_RADIUS * Math.sin(angle), BALL_RADIUS * Math.cos(angle));
+   }
+
+   private void drawPart(MFGraphics g, AnimationDrawer drawer, int x, int y) {
+      g.saveCanvas();
+      try {
+         // drawInMap truncates to game pixels; retain its 1/64-pixel remainder on the GPU.
+         g.translateCanvas((x & 63) / 64f, (y & 63) / 64f);
+         this.drawInMap(g, drawer, x, y);
+      } finally {
+         g.restoreCanvas();
+      }
    }
 
    public void close() {
@@ -336,15 +391,15 @@ class BossF1 extends BossObject {
          if (this.state >= 1) {
             if (this.isDisplayBall) {
                for(int var2 = 0; var2 < 6; ++var2) {
-                  this.drawInMap(var1, this.ballDrawer[var2], this.ballPos[var2][0], this.ballPos[var2][1]);
+                  this.drawPart(var1, this.ballDrawer[var2], this.ballPos[var2][0], this.ballPos[var2][1]);
                }
             }
 
-            this.drawInMap(var1, this.machineDrawer);
+            this.drawPart(var1, this.machineDrawer, this.posX, this.posY);
             if (!this.directTrans) {
-               this.drawInMap(var1, this.faceDrawer, this.posX + 192, this.posY - 1920);
+               this.drawPart(var1, this.faceDrawer, this.posX + 192, this.posY - 1920);
             } else {
-               this.drawInMap(var1, this.faceDrawer, this.posX - 192, this.posY - 1920);
+               this.drawPart(var1, this.faceDrawer, this.posX - 192, this.posY - 1920);
             }
 
             if (this.ball != null) {
@@ -366,6 +421,7 @@ class BossF1 extends BossObject {
    }
 
    public void logic() {
+      if (IsGamePause || GameTime.deltaSeconds() <= 0.0) return;
       if (!this.dead) {
          int var3 = this.posX;
          int var4 = this.posY;
@@ -401,8 +457,6 @@ class BossF1 extends BossObject {
             }
             break;
          case 1:
-            int var1;
-            short var2;
             switch(this.show_step) {
             case 0:
                if (this.enter_screen_frame_cn < 18) {
@@ -436,18 +490,7 @@ class BossF1 extends BossObject {
                this.changeAniState(this.machineDrawer, 0);
                this.isDisplayBall = true;
 
-               for(var1 = 4; var1 >= 0; --var1) {
-                  var5 = this.ballVel;
-                  if (var1 < 4) {
-                     var2 = 512;
-                  } else {
-                     var2 = 0;
-                  }
-
-                  var5[var1] = (5824 - (4 - var1) * 896 - var2) / 17;
-               }
-
-               this.ballVel[5] = this.ballVel[0] >> 1;
+               this.deploySeconds = 0.0;
                break label202;
             case 3:
                if (this.laugh_cn < 10) {
@@ -456,218 +499,31 @@ class BossF1 extends BossObject {
                   this.changeAniState(this.faceDrawer, 0);
                }
 
-               for(var1 = 0; var1 < 6; ++var1) {
-                  var5 = this.ballPos[var1];
-                  var5[1] = GameTime.advance(var5, String.valueOf(1), var5[1], this.ballVel[var1]);
-               }
+               double remainder = deployBall(GameTime.deltaSeconds());
+               if (this.deploySeconds < DEPLOY_SECONDS) break label202;
 
-               if (this.ballPos[4][1] < 48064) {
-                  break label202;
-               }
-
-               for(var1 = 4; var1 >= 0; --var1) {
-                  var5 = this.ballPos[var1];
-                  if (var1 < 4) {
-                     var2 = 512;
-                  } else {
-                     var2 = 0;
-                  }
-
-                  var5[1] = '므' - (4 - var1) * 896 - var2;
-               }
-
-               this.ballPos[5][0] = this.posX;
-               this.ballPos[5][1] = this.posY + 256;
                this.show_step = 4;
                this.machine_state = 1;
                MapManager.setCameraUpLimit(544);
                MapManager.setCameraDownLimit(784);
                this.velocity = -45;
-               this.vely = -7;
                this.changeAniState(this.machineDrawer, 1);
-               this.oppoBallPosX = 0;
-               this.oppoBallPosY = 4992;
-               this.frameCn = GameTime.set(this, "frameCn", 0);
-               this.ballvely = 0;
+               this.swingSeconds = 0.0;
+               openingSwing(remainder);
                break label202;
             case 4:
-               this.bossStateChange();
-               if (this.show_step != 5) {
-                  if (this.frameCn < 17) {
-                     this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
-                  } else {
-                     this.frameCn = GameTime.set(this, "frameCn", 17);
-                  }
-
-                  if (this.frameCn < 8) {
-                     this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, -(96));
-                  } else if (this.frameCn < 16) {
-                     this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, 96);
-                  } else {
-                     this.ballvely = 0;
-                     this.oppoBallPosY = 0;
-                  }
-               }
-
-               if (this.posX > 54528) {
-                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
-                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-               } else {
-                  this.show_step = 5;
-                  this.frameCn = GameTime.set(this, "frameCn", 0);
-                  this.posY = 42880;
-                  this.posX = 54528;
-                  this.vely = 7;
-               }
-
-               this.balllogic(true);
-               break label202;
             case 5:
+               openingSwing(GameTime.deltaSeconds());
                this.bossStateChange();
-               if (this.state != 2) {
-                  if (this.frameCn < 17) {
-                     this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
-                     this.Accy = (BALL_ACC_MAX - this.frameCn * 22) / 2;
-                     if (this.Accy < 0) {
-                        this.Accy = 0;
-                     }
-
-                     this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, this.Accy);
-                  } else {
-                     this.frameCn = GameTime.set(this, "frameCn", 17);
-                     this.oppoBallPosY = 4992;
-                  }
-               }
-
-               if (this.posX > 53760) {
-                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
-                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-               } else {
-                  this.state = 2;
-                  this.posY = 43136;
-                  this.posX = 53760;
-                  this.pro_step = 0;
-                  this.frameCn = GameTime.set(this, "frameCn", 0);
-                  this.vely = -15;
-                  this.ballvely = 0;
-                  this.machine_state = 0;
-               }
-
-               this.balllogic(true);
+               break label202;
             default:
                break label202;
             }
          case 2:
+            this.swingSeconds = (this.swingSeconds + GameTime.deltaSeconds()) % (SWING_PHASE_SECONDS * 4.0);
+            battlePose();
             this.bossStateChange();
-            switch(this.pro_step) {
-            case 0:
-               if (this.frameCn < 17) {
-                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
-                  this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, -(this.Accy));
-               } else {
-                  this.frameCn = GameTime.set(this, "frameCn", 17);
-                  this.oppoBallPosY = 0;
-                  this.oppoBallPosX = 4992;
-               }
-
-               if (this.posY > 42880) {
-                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
-               } else {
-                  this.posY = 42880;
-                  this.pro_step = 1;
-                  this.velocity = 180;
-                  this.vely = 15;
-                  this.frameCn = GameTime.set(this, "frameCn", 0);
-                  this.machine_state = 1;
-                  this.face_state = 0;
-                  this.directTrans = true;
-                  this.ballvely = 0;
-               }
-
-               this.balllogic(false);
-               break label202;
-            case 1:
-               if (this.frameCn < 17) {
-                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
-                  this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, this.Accy);
-               } else {
-                  this.frameCn = GameTime.set(this, "frameCn", 17);
-                  this.oppoBallPosY = 4992;
-                  this.oppoBallPosX = 0;
-               }
-
-               if (this.posX < 56832) {
-                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
-               } else {
-                  this.posX = 56832;
-                  this.posY = 43136;
-                  this.pro_step = 2;
-                  this.vely = -15;
-                  this.machine_state = 0;
-                  this.frameCn = GameTime.set(this, "frameCn", 0);
-                  this.ballvely = 0;
-               }
-
-               this.balllogic(false);
-               break label202;
-            case 2:
-               if (this.frameCn < 17) {
-                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
-                  this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, -(this.Accy));
-               } else {
-                  this.frameCn = GameTime.set(this, "frameCn", 17);
-                  this.oppoBallPosY = 0;
-                  this.oppoBallPosX = 4992;
-               }
-
-               if (this.posY > 42880) {
-                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
-               } else {
-                  this.posY = 42880;
-                  this.pro_step = 3;
-                  this.frameCn = GameTime.set(this, "frameCn", 0);
-                  this.directTrans = false;
-                  this.velocity = -180;
-                  this.vely = 15;
-                  this.machine_state = 1;
-                  this.face_state = 0;
-                  this.ballvely = 0;
-               }
-
-               this.balllogic(true);
-               break label202;
-            case 3:
-               if (this.frameCn < 17) {
-                  this.frameCn = Math.min(17, GameTime.advance(this, "frameCn", this.frameCn, 1));
-                  this.Accy = (BALL_ACC_MAX - this.frameCn * 17) / 2;
-                  this.ballvely = GameTime.advance(this, "ballvely", this.ballvely, this.Accy);
-               } else {
-                  this.frameCn = GameTime.set(this, "frameCn", 17);
-                  this.oppoBallPosY = 4992;
-                  this.oppoBallPosX = 0;
-               }
-
-               if (this.posX > 53760) {
-                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-                  this.posY = GameTime.advancePosition(this, "posY", this.posY, "vely", this.vely);
-               } else {
-                  this.posX = 53760;
-                  this.posY = 43136;
-                  this.pro_step = 0;
-                  this.vely = -15;
-                  this.machine_state = 0;
-                  this.frameCn = GameTime.set(this, "frameCn", 0);
-                  this.ballvely = 0;
-               }
-
-               this.balllogic(true);
-            default:
-               break label202;
-            }
+            break;
          case 3:
             if (this.posY >= 46336) {
                this.posY = 46336;

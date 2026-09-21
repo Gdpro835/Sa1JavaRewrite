@@ -59,6 +59,13 @@ require('this.velX = this.footPointX - footPointX;' not in player and 'railDispl
 require('timeCount += 60' not in player and 'GameTime.milliseconds(' in player, 'score time must be real elapsed time')
 require('GameTime.event(this, "fire_cnt", "initialShot"' in text('SonicGBA/Crab.java'), 'initial attack must not repeat on fractional frames')
 require('GameTime.steps(this, "attack_cn"' in text('SonicGBA/Boss4.java'), 'crossed switch timeline events must not be skipped')
+boss_f1 = text('SonicGBA/BossF1.java')
+require('swingSeconds' in boss_f1 and 'Math.sin(phaseTime * Math.PI * 0.5)' in boss_f1
+        and 'oppoBallPosY' not in boss_f1, 'BossF1 swing uses continuous phase, not Y reset/square-root snapping')
+require('this.ball.logic(this.ballPos[4][0], this.ballPos[4][1])' in boss_f1
+        and 'g.translateCanvas((x & 63) / 64f, (y & 63) / 64f)' in boss_f1,
+        'BossF1 render/collider share the fixed-point pose, including fractional rendering')
+
 require('void onUpdate(double deltaSeconds)' in text('com/sega/mobile/framework/MFGameState.java'), 'explicit delta state interface')
 require('Lib.Animation.updateAll()' in text('MFLib/MainState.java'), 'direct animation playback must advance from update')
 require('AnimationDrawer.updateAll()' in text('MFLib/MainState.java'), 'animation time belongs to the update phase')
