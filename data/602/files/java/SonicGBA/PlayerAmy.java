@@ -849,11 +849,7 @@ public class PlayerAmy extends PlayerObject {
          this.slipping = false;
          this.calDivideVelocity();
          int var1;
-         if (this.isInWater) {
-            var1 = JUMP_INWATER_START_VELOCITY;
-         } else {
-            var1 = JUMP_START_VELOCITY;
-         }
+         var1 = jumpStartVelocity();
 
          this.setVelY(var1);
          this.collisionState = 1;

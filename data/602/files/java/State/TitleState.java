@@ -327,7 +327,6 @@ public class TitleState extends State {
     private int optionIndex;
     private int optionMenuCursor;
     private int optionOffsetTmp;
-    private int optionOffsetX;
     private int optionOffsetY;
     private int optionOffsetYAim;
     private boolean optionReturnFlag;
@@ -3346,14 +3345,7 @@ public class TitleState extends State {
             this.optionArrowDownDrawer.draw(var1, (SCREEN_WIDTH >> 1) - 115, (SCREEN_HEIGHT >> 1) + 25);
         }
 
-        muiAniDrawer.setActionId(51);
-        var1.saveCanvas();
-        var1.translateCanvas((float) (GameTime.precise(this, "optionOffsetX", this.optionOffsetX) - this.optionOffsetX), 0f);
-        // A tile on either side also covers the fractional part of the scroll offset.
-        for(var2 = this.optionOffsetX - 100; var2 < SCREEN_WIDTH + 100; var2 += 100) {
-            muiAniDrawer.draw(var1, var2, 0);
-        }
-        var1.restoreCanvas();
+        drawOptionsBanner(var1);
 
         var4 = muiAniDrawer;
         if (Key.touchmenuoptionreturn.Isin() || Key.repeat(524288 | 8388608)) {
@@ -3378,7 +3370,7 @@ public class TitleState extends State {
         this.resetInfoCount = 0;
         warningY = WARNING_Y_DES_2;
         this.offsetOfVolumeInterface = 0;
-        this.optionOffsetX = 0;
+        resetOptionsBanner();
         StringBuilder var3;
         if (muiAniDrawer == null || muiLeftArrowDrawer == null || muiRightArrowDrawer == null) {
             var3 = new StringBuilder("/lang");
@@ -3426,8 +3418,7 @@ public class TitleState extends State {
             this.menuMoving = this.degree != 0;
         }
         if (state == 9 || (state >= 27 && state <= 37) || state == 39 || state == 40) {
-            this.optionOffsetX = GameTime.advance(this, "optionOffsetX", this.optionOffsetX, -4);
-            this.optionOffsetX = GameTime.wrap(this, "optionOffsetX", this.optionOffsetX, 100);
+            updateOptionsBanner();
             if (state != 9) this.menuOptionCursor = -2;
         }
         if (state != 9) this.optionScroll.stop();

@@ -1,5 +1,7 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
+
 import Lib.AnimationDrawer;
 import com.sega.mobile.framework.device.MFGraphics;
 
@@ -19,6 +21,7 @@ class Fountain extends GimmickObject {
    private boolean isActived;
    private boolean nonecrashable;
    private boolean touching = false;
+   private long lastMotionFrame = Long.MIN_VALUE;
 
    static {
       int[] var0 = new int[2];
@@ -116,15 +119,27 @@ class Fountain extends GimmickObject {
 
    public void logic() {
       if (this.touching && player.outOfControl) {
-         if (player.getVelX() < 0) {
-            player.setVelX(player.getVelX() + 300);
-         } else {
-            player.setVelX(player.getVelX() + 100);
+         if (IsGamePause || GameTime.deltaSeconds() <= 0.0 || lastMotionFrame == GameTime.frameId()) return;
+         lastMotionFrame = GameTime.frameId();
+         double units = GameTime.assetUnits();
+         double initial = GameTime.precise(player, "velX", player.getVelX());
+         double velocity = Math.min(PLAYER_ON_WATER_MAX_SPEED, initial);
+         double remaining = units, travel = 0.0;
+         // Integrate the authored 300/100 acceleration and speed cap analytically.
+         // Neither crossing zero nor reaching the cap may consume an extra render frame.
+         if (velocity < 0.0) {
+            double t = Math.min(remaining, -velocity / 300.0);
+            travel += velocity * t + 150.0 * t * t;
+            velocity += 300.0 * t;
+            remaining -= t;
          }
-
-         if (player.getVelX() > 1920) {
-            player.setVelX(1920);
+         if (remaining > 0.0) {
+            double t = Math.min(remaining, Math.max(0.0, (PLAYER_ON_WATER_MAX_SPEED - velocity) / 100.0));
+            travel += velocity * t + 50.0 * t * t;
+            velocity += 100.0 * t;
+            travel += velocity * (remaining - t);
          }
+         player.setVelX(GameTime.advance(player, "velX", player.getVelX(), (velocity - initial) / units));
 
          player.setVelY(0);
          player.setFaceDegree(0);
@@ -135,9 +150,9 @@ class Fountain extends GimmickObject {
          player.showWaterFlush = true;
          player.justLeaveLand = false;
          PlayerObject var4 = player;
-         int var3 = player.getVelX();
-         int var1 = this.getLineY(player.getVelX() + var2);
-         var4.moveOnObject(var3 + var2, var1 + 768, true);
+         int targetX = GameTime.advance(player, "footPointX", var2, travel / units);
+         int var1 = this.getLineY(targetX);
+         var4.moveOnObject(targetX, var1 + 768, true);
          if (player.collisionState == 0) {
             this.touching = false;
             player.outOfControl = false;

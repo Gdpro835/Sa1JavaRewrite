@@ -236,7 +236,6 @@ public class GameState extends State {
     private int optionIndex;
     private int optionMenuCursor;
     private int optionOffsetTmp;
-    private int optionOffsetX;
     private int optionOffsetY;
     private int optionOffsetYAim;
     private boolean optionReturnFlag;
@@ -1639,13 +1638,7 @@ public class GameState extends State {
         var4.setActionId(var5 + 27);
         muiAniDrawer.draw(var1, (SCREEN_WIDTH >> 1) - 96, this.optionDrawOffsetY + 40 + this.optionslide_y + 96);
 
-        this.optionOffsetX = GameTime.advance(this, "optionOffsetX", this.optionOffsetX, -(4));
-        this.optionOffsetX = GameTime.wrap(this, "optionOffsetX", this.optionOffsetX, 100);
-        muiAniDrawer.setActionId(51);
-
-        for(var2 = this.optionOffsetX; var2 < SCREEN_WIDTH * 2; var2 += 100) {
-            muiAniDrawer.draw(var1, var2, 0);
-        }
+        drawOptionsBanner(var1);
 
         var4 = muiAniDrawer;
         if (Key.touchmenuoptionreturn.Isin() || Key.repeat(524288 | 8388608)) {
@@ -1677,7 +1670,7 @@ public class GameState extends State {
 
         Key.touchGamePauseOptionInit();
         this.optionIndex = 0;
-        this.optionOffsetX = 0;
+        resetOptionsBanner();
         this.pauseOptionCursor = 0;
         this.isOptionDisFlag = false;
         fadeInit(102, 102);
@@ -3513,6 +3506,8 @@ public class GameState extends State {
         if (this.state != 18) {
             this.fadeStateLogic();
         }
+
+        if (this.state == 7 || (this.state >= 30 && this.state <= 33) || this.state == 38 || this.state == 39) updateOptionsBanner();
 
         if (Key.press(536870912) && this.state != 0) {
             pause();

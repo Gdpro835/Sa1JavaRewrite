@@ -104,7 +104,6 @@ public class SpecialStageState extends State implements SSDef, BarWord {
     private int optionDrawOffsetY;
     private int optionIndex;
     private int optionOffsetTmp;
-    private int optionOffsetX;
     private int optionOffsetY;
     private int optionOffsetYAim;
     private boolean optionReturnFlag;
@@ -685,13 +684,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
         var4.setActionId(var5 + 27);
         muiAniDrawer.draw(var1, (SCREEN_WIDTH >> 1) - 96, this.optionDrawOffsetY + 40 + this.optionslide_y + 96);
 
-        this.optionOffsetX = GameTime.advance(this, "optionOffsetX", this.optionOffsetX, -(4));
-        this.optionOffsetX = GameTime.wrap(this, "optionOffsetX", this.optionOffsetX, 100);
-        muiAniDrawer.setActionId(51);
-
-        for(var2 = this.optionOffsetX; var2 < SCREEN_WIDTH * 2; var2 += 100) {
-            muiAniDrawer.draw(var1, var2, 0);
-        }
+        drawOptionsBanner(var1);
 
         var4 = muiAniDrawer;
         if (Key.touchmenuoptionreturn.Isin() || Key.repeat(524288 | 8388608)) {
@@ -716,7 +709,7 @@ public class SpecialStageState extends State implements SSDef, BarWord {
         }
 
         Key.touchGamePauseOptionInit();
-        this.optionOffsetX = 0;
+        resetOptionsBanner();
         this.optionIndex = 0;
         this.pauseOptionCursor = 0;
         this.isOptionDisFlag = false;
@@ -1545,6 +1538,8 @@ public class SpecialStageState extends State implements SSDef, BarWord {
 
     public void logic() {
         this.fadeStateLogic();
+        if ((this.state >= 8 && this.state <= 12) || this.state == 15 || this.state == 16) updateOptionsBanner();
+
         if (Key.press(Key.B_PO)) {
         }
 

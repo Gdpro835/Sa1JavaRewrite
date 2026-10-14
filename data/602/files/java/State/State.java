@@ -24,6 +24,7 @@ import com.sega.mobile.framework.device.MFDevice;
 
 public abstract class State implements SonicDef, StringIndex {
     public static double delta = 0;
+    protected int optionOffsetX;
     private static int touchKeyboardAssetSize = -1;
     private int previewSize = -1;
     private int previewLeft = Integer.MIN_VALUE, previewRight = Integer.MIN_VALUE;
@@ -471,6 +472,27 @@ public abstract class State implements SonicDef, StringIndex {
     }
 
     private static void drawLeftSoftKey(MFGraphics var0) {
+    }
+
+    /** Shared by title, ordinary-stage pause and special-stage pause options. */
+    protected final void updateOptionsBanner() {
+        optionOffsetX = GameTime.advanceOnce(this, "optionOffsetX", optionOffsetX, -4);
+        optionOffsetX = GameTime.wrap(this, "optionOffsetX", optionOffsetX, 100);
+    }
+
+    protected final void resetOptionsBanner() {
+        optionOffsetX = GameTime.set(this, "optionOffsetX", 0);
+    }
+
+    protected final void drawOptionsBanner(MFGraphics g) {
+        muiAniDrawer.setActionId(51);
+        g.saveCanvas();
+        try {
+            g.translateCanvas((float) (GameTime.precise(this, "optionOffsetX", optionOffsetX) - optionOffsetX), 0f);
+            for (int x = optionOffsetX - 100; x < SCREEN_WIDTH + 100; x += 100) muiAniDrawer.draw(g, x, 0);
+        } finally {
+            g.restoreCanvas();
+        }
     }
 
     public static void drawMenuBar(MFGraphics var0, int var1, int var2, int var3) {

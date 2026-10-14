@@ -272,12 +272,27 @@ class Boss1 extends BossObject {
 
    }
 
+   private void moveOnPatrol() {
+      int previous = this.posX;
+      // A vault can land beyond the patrol interval. Turn where it landed rather than
+      // snapping the entire machine back by the arm's length.
+      if (this.posX >= this.limitRightX && this.velocity > 0 || this.posX <= this.limitLeftX && this.velocity < 0)
+         this.velocity = -this.velocity;
+      this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
+      if (previous <= this.limitRightX && this.posX > this.limitRightX) {
+         this.posX = this.limitRightX;
+         this.velocity = -Math.abs(this.velocity);
+      } else if (previous >= this.limitLeftX && this.posX < this.limitLeftX) {
+         this.posX = this.limitLeftX;
+         this.velocity = Math.abs(this.velocity);
+      }
+   }
+
    public void logic() {
       if (!this.dead) {
          int var1 = this.posX;
          int var2 = this.posY;
-         int var4 = this.posX;
-         int var3 = this.posY;
+         int var3, var4;
          if (this.HP == 1) {
             if (this.state == 1) {
                this.state = 4;
@@ -369,29 +384,7 @@ class Boss1 extends BossObject {
 
             this.changeAniState(this.cardrawer, this.car_state);
             this.changeAniState(this.facedrawer, this.face_state);
-            if (this.state != 4) {
-               if (this.velocity > 0) {
-                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-                  if (this.posX >= this.limitRightX) {
-                     this.posX = this.limitRightX;
-                     this.velocity = -this.velocity;
-                  }
-               } else {
-                  this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-                  if (this.posX <= this.limitLeftX) {
-                     this.posX = this.limitLeftX;
-                     this.velocity = -this.velocity;
-                  }
-               }
-            } else if (this.velocity > 0) {
-               if (this.posX >= this.limitRightX) {
-                  this.posX = this.limitRightX;
-                  this.velocity = -this.velocity;
-               }
-            } else if (this.posX <= this.limitLeftX) {
-               this.posX = this.limitLeftX;
-               this.velocity = -this.velocity;
-            }
+            moveOnPatrol();
 
             this.arm.logic(this.posX, this.posY - this.offsetY, this.state, this.velocity);
             break;
@@ -441,21 +434,7 @@ class Boss1 extends BossObject {
 
             this.changeAniState(this.cardrawer, this.car_state);
             this.changeAniState(this.facedrawer, this.face_state);
-            this.posX = var4;
-            this.posY = var3;
-            if (this.velocity > 0) {
-               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-               if (this.posX >= this.limitRightX) {
-                  this.posX = this.limitRightX;
-                  this.velocity = -this.velocity;
-               }
-            } else {
-               this.posX = GameTime.advancePosition(this, "posX", this.posX, "velocity", this.velocity);
-               if (this.posX <= this.limitLeftX) {
-                  this.posX = this.limitLeftX;
-                  this.velocity = -this.velocity;
-               }
-            }
+            moveOnPatrol();
 
             this.arm.logic(this.posX, this.posY - this.offsetY, this.state, this.velocity);
             break;

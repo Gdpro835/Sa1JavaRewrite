@@ -195,7 +195,7 @@ class Boss1Arm extends EnemyObject {
                   } else {
                      this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                   }
-               } else if (this.degree + this.plus * this.dg_plus <= 23680) {
+               } else if (nextAngle() <= 23680) {
                   this.degree = 23680;
                   this.state = 4;
                   this.IsTurn = false;
@@ -203,7 +203,7 @@ class Boss1Arm extends EnemyObject {
                   this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                }
             } else if (this.plus > 0) {
-               if (this.degree + this.plus * this.dg_plus >= 10880) {
+               if (nextAngle() >= 10880) {
                   this.degree = 10880;
                   this.state = 4;
                   this.IsTurn = false;
@@ -237,7 +237,7 @@ class Boss1Arm extends EnemyObject {
                   } else {
                      this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                   }
-               } else if (this.degree + this.plus * this.dg_plus <= 10880) {
+               } else if (nextAngle() <= 10880) {
                   this.degree = 10880;
                   this.state = 3;
                   this.IsTurn = false;
@@ -245,7 +245,7 @@ class Boss1Arm extends EnemyObject {
                   this.degree = GameTime.advance(this, "degree", this.degree, this.plus * this.dg_plus);
                }
             } else if (this.plus > 0) {
-               if (this.degree + this.plus * this.dg_plus >= 23680) {
+               if (nextAngle() >= 23680) {
                   this.degree = 23680;
                   this.state = 3;
                   this.IsTurn = false;
@@ -269,12 +269,14 @@ class Boss1Arm extends EnemyObject {
             if (this.state == 3) {
                this.Step2CenterX = this.pos[5][0];
                this.Step2CenterY = this.pos[5][1];
+               // This is a change of angular representation by exactly 360 degrees,
+               // not motion. Scaling it by dt teleports the car around its planted hammer.
                if (this.degree == 23680) {
-                  this.degree = GameTime.advance(this, "degree", this.degree, -(23040));
+                  this.degree = GameTime.set(this, "degree", this.degree - 23040);
                }
 
                if (this.degree == 10880) {
-                  this.degree = GameTime.advance(this, "degree", this.degree, 23040);
+                  this.degree = GameTime.set(this, "degree", this.degree + 23040);
                }
 
                MapManager.setShake(8);
@@ -352,8 +354,12 @@ class Boss1Arm extends EnemyObject {
 
    }
 
+   private double nextAngle() {
+      return GameTime.precise(this, "degree", this.degree) + this.plus * this.dg_plus * GameTime.assetUnits();
+   }
+
    public void setArmAngel(int var1) {
-      this.degree = var1;
+      this.degree = GameTime.set(this, "degree", var1);
    }
 
    public void setArmState(int var1) {

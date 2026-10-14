@@ -90,8 +90,19 @@ require('this.character_move && this.charSelAniDrawer.checkEnd()' in character_l
 require('character_move =' not in character_draw and '.setLoop(' not in character_draw,
         'character selection transitions belong to update, not draw')
 option_draw = title.split('private void optionDraw(', 1)[1].split('private void optionInit()', 1)[0]
-require('GameTime.advance' not in option_draw and 'this.optionOffsetX - 100' in option_draw,
-        'settings header is update-owned and covers the leading tile after modulo wrap')
+shared_state = text('State/State.java')
+banner_draw = shared_state.split('protected final void drawOptionsBanner(', 1)[1].split('\n    }', 1)[0]
+banner_update = shared_state.split('protected final void updateOptionsBanner(', 1)[1].split('\n    }', 1)[0]
+require('GameTime.advance' not in banner_draw and 'optionOffsetX - 100' in banner_draw and 'SCREEN_WIDTH + 100' in banner_draw,
+        'options banner draw is read-only and covers the leading tile after modulo wrap')
+require('GameTime.advanceOnce' in banner_update and 'GameTime.wrap' in banner_update,
+        'options banner is advanced once per update')
+require('drawOptionsBanner(var1)' in option_draw and 'updateOptionsBanner()' in title,
+        'settings header uses the shared update/draw banner')
+for other in ['State/GameState.java', 'State/SpecialStageState.java']:
+    source = text(other)
+    require('drawOptionsBanner(var1)' in source and 'updateOptionsBanner()' in source,
+            'pause options use the shared banner: ' + other)
 require('GameTime.advance(this, "optionDrawOffsetY"' not in title and 'GameTime.advance(this, "stageDrawOffsetY"' not in title,
         'integrated menu displacement must not be time-scaled a second time')
 state = text('State/State.java')

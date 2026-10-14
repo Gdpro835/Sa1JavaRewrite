@@ -4517,6 +4517,14 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
    return animationID == 4;
    }
 
+   /** Authored jump constants include a full gravity step for the old semi-implicit loop.
+    * Continuous integration needs only the half-step bias to retain the authored jump arc.
+    */
+   protected int jumpStartVelocity() {
+      int authored = this.isInWater ? JUMP_INWATER_START_VELOCITY : JUMP_START_VELOCITY;
+      return authored + (int) Math.round(this.getGravity() * 0.5);
+   }
+
    public void doJump() {
       if (this.collisionState == 0) {
          this.calDivideVelocity();
@@ -4526,19 +4534,11 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       this.worldCal.actionState = 1;
       int var2 = this.velY;
       int var1;
-      if (this.isInWater) {
-         var1 = JUMP_INWATER_START_VELOCITY;
-      } else {
-         var1 = JUMP_START_VELOCITY;
-      }
+      var1 = jumpStartVelocity();
 
       this.velY = var2 + var1 * MyAPI.dCos(this.faceDegreeChk()) / 100;
       var2 = this.velX;
-      if (this.isInWater) {
-         var1 = JUMP_INWATER_START_VELOCITY;
-      } else {
-         var1 = JUMP_START_VELOCITY;
-      }
+      var1 = jumpStartVelocity();
 
       this.velX = var2 + var1 * -MyAPI.dSin(this.faceDegreeChk()) / 100;
       if (this.faceDegree >= 0 && this.faceDegree <= 90) {
@@ -4600,11 +4600,7 @@ for (int xx = 0; xx < GameObject.objVecWidth; xx++) {
       this.worldCal.actionState = 1;
       this.setVelX(0);
       int var1;
-      if (this.isInWater) {
-         var1 = JUMP_INWATER_START_VELOCITY;
-      } else {
-         var1 = JUMP_START_VELOCITY;
-      }
+      var1 = jumpStartVelocity();
 
       this.setVelY(var1);
       this.animationID = 4;
