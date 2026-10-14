@@ -442,21 +442,23 @@ class Boss3 extends BossObject {
                }
                break label338;
             case 2:
+               // The timer always advances; the face change is a one-shot event at each threshold.
+               // A clamped timer parked exactly on a threshold could never leave it (eternal laugh).
                if (this.boss_wait_cnt < 16) {
-                  this.boss_wait_cnt = Math.min(16, GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1));
-               } else if (GameTime.event(this, "boss_wait_cnt", "logic:447", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 16))) {
                   this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
-                  this.facedrawer.setActionId(1);
-                  this.facedrawer.setLoop(true);
-               } else if (this.boss_wait_cnt > 16 && this.boss_wait_cnt < 26) {
+               } else if (this.boss_wait_cnt < 26) {
+                  if (GameTime.event(this, "boss_wait_cnt", "logic:447", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 16))) {
+                     this.facedrawer.setActionId(1);
+                     this.facedrawer.setLoop(true);
+                  }
                   this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
-               } else if (GameTime.event(this, "boss_wait_cnt", "logic:453", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 26))) {
+               } else if (this.boss_wait_cnt < 42) {
+                  if (GameTime.event(this, "boss_wait_cnt", "logic:453", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 26))) {
+                     this.facedrawer.setActionId(0);
+                     this.facedrawer.setLoop(true);
+                  }
                   this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
-                  this.facedrawer.setActionId(0);
-                  this.facedrawer.setLoop(true);
-               } else if (this.boss_wait_cnt > 26 && this.boss_wait_cnt < 42) {
-                  this.boss_wait_cnt = GameTime.advance(this, "boss_wait_cnt", this.boss_wait_cnt, 1);
-               } else if (GameTime.event(this, "boss_wait_cnt", "logic:459", GameTime.crosses(this, "boss_wait_cnt", this.boss_wait_cnt, 42))) {
+               } else {
                   this.show_step = 3;
                }
                break label338;
