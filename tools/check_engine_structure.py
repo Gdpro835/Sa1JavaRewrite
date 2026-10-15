@@ -45,6 +45,8 @@ require('System.exit(' not in main, 'lifecycle must not terminate the VM')
 require('new Thread' not in world and 'Thread.sleep' not in world, 'no companion/network-copy game mutation threads')
 require('glDrawArrays' in batch and 'GL_ONE_MINUS_SRC_ALPHA' in batch, 'scene geometry and premultiplied alpha')
 require('getGenerationId()' in batch and 'textures.clear()' in batch, 'mutable bitmap uploads and EGL recreation')
+require('glBindFramebuffer' in batch and 'ensureScene(' in batch and 'endScene(' in batch, 'scene drawn at logical resolution into an FBO, scaled once')
+require('gpu.beginScene(screenWidth, screenHeight, scaleFactor)' in device and 'gpu.endScene(drawRect.left' in device, 'MFDevice renders the scene through the logical FBO (no per-sprite fractional scale)')
 gl = text('com/sega/mobile/framework/opengl/GLGraphics.java')
 require('matrix.getValues(matrixValues)' in gl and 'TextTextureCache.rasterScale(' in gl,
         'system text raster resolution must include the final display transform')

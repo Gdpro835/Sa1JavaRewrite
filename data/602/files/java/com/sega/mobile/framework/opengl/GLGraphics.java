@@ -30,10 +30,27 @@ public final class GLGraphics extends Graphics {
     private int surfaceWidth, surfaceHeight;
     private Font font = Font.getFont(0, 0, 8);
     private boolean linear;
+    // Device pixels per logical pixel while a scene is drawn into the logical target (1 otherwise).
+    private float textScale = 1f;
 
     public GLGraphics(SpriteBatch batch) { this.batch = batch; }
 
+    /** Draws the game scene at logical resolution; {@link #endScene} scales it once onto the screen. */
+    public void beginScene(int logicalWidth, int logicalHeight, float displayScale) {
+        batch.beginScene(logicalWidth, logicalHeight);
+        viewport(logicalWidth, logicalHeight, 1f, 0f, 0f);
+        textScale = Math.max(1f, displayScale);
+    }
+
+    public void endScene(int left, int top, int right, int bottom) {
+        batch.endScene(left, top, right, bottom, linear);
+        textScale = 1f;
+    }
+
+    public boolean isLinear() { return linear; }
+
     public void viewport(int width, int height, float scale, float offsetX, float offsetY) {
+        textScale = 1f;
         surfaceWidth = width; surfaceHeight = height;
         matrix.setScale(scale, scale);
         matrix.postTranslate(offsetX, offsetY);
@@ -190,8 +207,10 @@ public final class GLGraphics extends Graphics {
     @Override public void drawString(String text, int x, int y, int anchor) {
         if (text == null || text.length() == 0) return;
         matrix.getValues(matrixValues);
-        int rasterScale = TextTextureCache.rasterScale(matrixValues[Matrix.MSCALE_X], matrixValues[Matrix.MSKEW_X],
-                matrixValues[Matrix.MSKEW_Y], matrixValues[Matrix.MSCALE_Y]);
+        // Text masks are rasterized at display resolution even inside the logical scene target.
+        int rasterScale = TextTextureCache.rasterScale(matrixValues[Matrix.MSCALE_X] * textScale,
+                matrixValues[Matrix.MSKEW_X] * textScale, matrixValues[Matrix.MSKEW_Y] * textScale,
+                matrixValues[Matrix.MSCALE_Y] * textScale);
         TextTextureCache.Entry mask = textCache.get(font, text, rasterScale, batch.getMaxTextureSize());
         x = anchoredX(x, font.stringWidth(text), anchor);
         y = anchoredY(y, font.getHeight(), anchor);

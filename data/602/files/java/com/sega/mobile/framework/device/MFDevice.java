@@ -192,11 +192,13 @@ public final class MFDevice {
                 preLayerGraphics[0].reset();
                 currentState.onRender(preLayerGraphics[0], -1);
             }
-            gpu.viewport(deviceWidth, deviceHeight, scaleFactor, drawRect.left, drawRect.top);
+            // Scene at logical resolution (like the original bufferImage), scaled once to drawRect.
+            gpu.beginScene(screenWidth, screenHeight, scaleFactor);
             graphics.reset();
             graphics.setClip(0, 0, screenWidth, screenHeight);
             if (interruptPauseFlag) MFMain.getInstance().drawDeviceSuspend(graphics);
             else currentState.onRender(graphics);
+            gpu.endScene(drawRect.left, drawRect.top, drawRect.right, drawRect.bottom);
             if (postLayerGraphics[0] != null) {
                 gpu.viewport(deviceWidth, deviceHeight, 1f, 0f, 0f);
                 postLayerGraphics[0].reset();

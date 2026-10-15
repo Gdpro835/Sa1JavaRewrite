@@ -55,6 +55,11 @@ public final class SpriteBatch {
     private long textureBytes;
     private int drawCalls;
     private int maxTextureSize;
+    // Scene target at logical (game) resolution, as the original bufferImage: sprites never get a
+    // fractional per-sprite device scale; the whole frame is scaled once when blitted to the screen.
+    private int sceneFramebuffer, sceneTexture, sceneWidth, sceneHeight;
+    private boolean inScene;
+    private int deviceWidth, deviceHeight;
 
     public void create() {
         // A recreated EGL context invalidates ALL previous GL names, not the CPU bitmaps.
@@ -63,6 +68,9 @@ public final class SpriteBatch {
         vertices.clear();
         vertexCount = 0;
         currentTexture = 0;
+        // Names died with the old EGL context; never delete them here.
+        sceneFramebuffer = sceneTexture = sceneWidth = sceneHeight = 0;
+        inScene = false;
         int vs = compile(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
         int fs = compile(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
         program = GLES20.glCreateProgram();
@@ -95,6 +103,79 @@ public final class SpriteBatch {
     public void resize(int width, int height) {
         this.width = Math.max(1, width);
         this.height = Math.max(1, height);
+        this.deviceWidth = this.width;
+        this.deviceHeight = this.height;
+    }
+
+    private void ensureScene(int w, int h) {
+        if (sceneFramebuffer != 0 && sceneWidth == w && sceneHeight == h) return;
+        if (sceneTexture != 0) { names[0] = sceneTexture; GLES20.glDeleteTextures(1, names, 0); }
+        if (sceneFramebuffer != 0) { names[0] = sceneFramebuffer; GLES20.glDeleteFramebuffers(1, names, 0); }
+        GLES20.glGenTextures(1, names, 0);
+        sceneTexture = names[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, sceneTexture);
+        parameters(false);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, w, h, 0,
+                GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        GLES20.glGenFramebuffers(1, names, 0);
+        sceneFramebuffer = names[0];
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, sceneFramebuffer);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, sceneTexture, 0);
+        int status = GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        if (status != GLES20.GL_FRAMEBUFFER_COMPLETE) {
+            throw new IllegalStateException("OpenGL scene framebuffer incomplete: " + status);
+        }
+        sceneWidth = w;
+        sceneHeight = h;
+    }
+
+    /** Starts drawing the game scene into the logical-resolution target (transparent). */
+    public void beginScene(int w, int h) {
+        flush();
+        w = Math.max(1, w);
+        h = Math.max(1, h);
+        ensureScene(w, h);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, sceneFramebuffer);
+        GLES20.glViewport(0, 0, w, h);
+        GLES20.glScissor(0, 0, w, h);
+        GLES20.glClearColor(0f, 0f, 0f, 0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        inScene = true;
+        width = w;
+        height = h;
+        GLES20.glUniform2f(viewportLocation, w, h);
+        clipLeft = clipTop = 0;
+        clipRight = w;
+        clipBottom = h;
+    }
+
+    /** Scales the finished scene once onto the device rectangle, then restores device state. */
+    public void endScene(int left, int top, int right, int bottom, boolean linear) {
+        flush();
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        inScene = false;
+        width = deviceWidth;
+        height = deviceHeight;
+        GLES20.glViewport(0, 0, width, height);
+        GLES20.glUniform2f(viewportLocation, width, height);
+        clipLeft = clipTop = 0;
+        clipRight = width;
+        clipBottom = height;
+        GLES20.glScissor(0, 0, width, height);
+        float hr = hueR, hg = hueG, hb = hueB, g = gray;
+        effect(0f, 0f, 0f, 0f);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, sceneTexture);
+        parameters(linear);
+        float[] xy = {left, top, right, top, right, bottom, left, bottom};
+        // GL framebuffer row 0 is the bottom of the scene, so the top edge samples v = 1.
+        float[] uv = {0f, 1f, 1f, 1f, 1f, 0f, 0f, 0f};
+        select(sceneTexture, 6);
+        vertex(xy, uv, 0, 0xffffffff); vertex(xy, uv, 1, 0xffffffff); vertex(xy, uv, 2, 0xffffffff);
+        vertex(xy, uv, 0, 0xffffffff); vertex(xy, uv, 2, 0xffffffff); vertex(xy, uv, 3, 0xffffffff);
+        flush();
+        effect(hr, hg, hb, g);
     }
 
     public void begin() {
@@ -237,6 +318,10 @@ public final class SpriteBatch {
 
     public void end() {
         flush();
+        if (inScene) {
+            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+            inScene = false;
+        }
         Iterator<Map.Entry<Bitmap, Texture>> it = textures.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Bitmap, Texture> e = it.next();
@@ -261,6 +346,9 @@ public final class SpriteBatch {
         textureBytes = 0;
         names[0] = whiteTexture;
         GLES20.glDeleteTextures(1, names, 0);
+        if (sceneTexture != 0) { names[0] = sceneTexture; GLES20.glDeleteTextures(1, names, 0); }
+        if (sceneFramebuffer != 0) { names[0] = sceneFramebuffer; GLES20.glDeleteFramebuffers(1, names, 0); }
+        sceneTexture = sceneFramebuffer = sceneWidth = sceneHeight = 0;
         GLES20.glDeleteProgram(program);
         whiteTexture = program = 0;
     }
