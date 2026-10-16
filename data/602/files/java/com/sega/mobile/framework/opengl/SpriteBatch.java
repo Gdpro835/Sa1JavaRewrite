@@ -58,6 +58,10 @@ public final class SpriteBatch {
     // Scene target at logical (game) resolution, as the original bufferImage: sprites never get a
     // fractional per-sprite device scale; the whole frame is scaled once when blitted to the screen.
     private int sceneFramebuffer, sceneTexture, sceneWidth, sceneHeight;
+    // Device-size surface that persists between frames, like the original Canvas: the scene is
+    // composited over it and never cleared, so uncovered pixels keep the previous frame instead
+    // of flashing black. It is copied opaquely to the default framebuffer once per frame.
+    private int surfaceFramebuffer, surfaceTexture, surfaceWidth, surfaceHeight;
     private boolean inScene;
     private int deviceWidth, deviceHeight;
 
@@ -70,6 +74,7 @@ public final class SpriteBatch {
         currentTexture = 0;
         // Names died with the old EGL context; never delete them here.
         sceneFramebuffer = sceneTexture = sceneWidth = sceneHeight = 0;
+        surfaceFramebuffer = surfaceTexture = surfaceWidth = surfaceHeight = 0;
         inScene = false;
         int vs = compile(GLES20.GL_VERTEX_SHADER, VERTEX_SHADER);
         int fs = compile(GLES20.GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
@@ -105,6 +110,35 @@ public final class SpriteBatch {
         this.height = Math.max(1, height);
         this.deviceWidth = this.width;
         this.deviceHeight = this.height;
+    }
+
+    /** Creates the persistent device surface, cleared once to opaque black (first frame only). */
+    private void ensureSurface(int w, int h) {
+        if (surfaceFramebuffer != 0 && surfaceWidth == w && surfaceHeight == h) return;
+        if (surfaceTexture != 0) { names[0] = surfaceTexture; GLES20.glDeleteTextures(1, names, 0); }
+        if (surfaceFramebuffer != 0) { names[0] = surfaceFramebuffer; GLES20.glDeleteFramebuffers(1, names, 0); }
+        GLES20.glGenTextures(1, names, 0);
+        surfaceTexture = names[0];
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, surfaceTexture);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, w, h, 0,
+                GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glGenFramebuffers(1, names, 0);
+        surfaceFramebuffer = names[0];
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, surfaceFramebuffer);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, surfaceTexture, 0);
+        GLES20.glViewport(0, 0, w, h);
+        GLES20.glScissor(0, 0, w, h);
+        GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
+        GLES20.glClearColor(0f, 0f, 0f, 1f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        surfaceWidth = w;
+        surfaceHeight = h;
     }
 
     private void ensureScene(int w, int h) {
@@ -154,7 +188,8 @@ public final class SpriteBatch {
     /** Scales the finished scene once onto the device rectangle, then restores device state. */
     public void endScene(int left, int top, int right, int bottom, boolean linear) {
         flush();
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        ensureSurface(deviceWidth, deviceHeight);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, surfaceFramebuffer);
         inScene = false;
         width = deviceWidth;
         height = deviceHeight;
@@ -188,8 +223,9 @@ public final class SpriteBatch {
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         GLES20.glDisable(GLES20.GL_CULL_FACE);
         GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
-        GLES20.glClearColor(0f, 0f, 0f, 1f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        // No clear: the persistent surface keeps last frame's pixels wherever this frame draws nothing.
+        ensureSurface(deviceWidth, deviceHeight);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, surfaceFramebuffer);
         GLES20.glEnable(GLES20.GL_BLEND);
         // Android bitmaps are premultiplied; using SRC_ALPHA here darkens sprite edges.
         GLES20.glBlendFunc(GLES20.GL_ONE, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -318,10 +354,8 @@ public final class SpriteBatch {
 
     public void end() {
         flush();
-        if (inScene) {
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-            inScene = false;
-        }
+        if (inScene) inScene = false;
+        presentSurface();
         Iterator<Map.Entry<Bitmap, Texture>> it = textures.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Bitmap, Texture> e = it.next();
@@ -334,6 +368,37 @@ public final class SpriteBatch {
                 it.remove();
             }
         }
+    }
+
+    /** Copies the persistent surface to the screen opaquely (1:1, no blending, no clear needed). */
+    private void presentSurface() {
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+        if (surfaceFramebuffer == 0) {
+            GLES20.glClearColor(0f, 0f, 0f, 1f);
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            return;
+        }
+        GLES20.glViewport(0, 0, deviceWidth, deviceHeight);
+        GLES20.glScissor(0, 0, deviceWidth, deviceHeight);
+        GLES20.glDisable(GLES20.GL_SCISSOR_TEST);
+        GLES20.glDisable(GLES20.GL_BLEND);
+        width = deviceWidth;
+        height = deviceHeight;
+        GLES20.glUniform2f(viewportLocation, width, height);
+        clipLeft = clipTop = 0;
+        clipRight = width;
+        clipBottom = height;
+        float hr = hueR, hg = hueG, hb = hueB, g = gray;
+        effect(0f, 0f, 0f, 0f);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, surfaceTexture);
+        parameters(false);
+        float[] xy = {0, 0, deviceWidth, 0, deviceWidth, deviceHeight, 0, deviceHeight};
+        float[] uv = {0f, 1f, 1f, 1f, 1f, 0f, 0f, 0f};
+        select(surfaceTexture, 6);
+        vertex(xy, uv, 0, 0xffffffff); vertex(xy, uv, 1, 0xffffffff); vertex(xy, uv, 2, 0xffffffff);
+        vertex(xy, uv, 0, 0xffffffff); vertex(xy, uv, 2, 0xffffffff); vertex(xy, uv, 3, 0xffffffff);
+        flush();
+        effect(hr, hg, hb, g);
     }
 
     public void release() {
@@ -349,6 +414,9 @@ public final class SpriteBatch {
         if (sceneTexture != 0) { names[0] = sceneTexture; GLES20.glDeleteTextures(1, names, 0); }
         if (sceneFramebuffer != 0) { names[0] = sceneFramebuffer; GLES20.glDeleteFramebuffers(1, names, 0); }
         sceneTexture = sceneFramebuffer = sceneWidth = sceneHeight = 0;
+        if (surfaceTexture != 0) { names[0] = surfaceTexture; GLES20.glDeleteTextures(1, names, 0); }
+        if (surfaceFramebuffer != 0) { names[0] = surfaceFramebuffer; GLES20.glDeleteFramebuffers(1, names, 0); }
+        surfaceTexture = surfaceFramebuffer = surfaceWidth = surfaceHeight = 0;
         GLES20.glDeleteProgram(program);
         whiteTexture = program = 0;
     }
