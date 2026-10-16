@@ -1,5 +1,6 @@
 package SonicGBA;
 
+import GameEngine.time.GameTime;
 import Lib.MyAPI;
 import com.sega.mobile.framework.device.MFGraphics;
 import com.sega.mobile.framework.device.MFImage;
@@ -46,8 +47,12 @@ class ShipSystem extends GimmickObject {
    }
 
    public void getNewShipPosition(Ship var1) {
-      this.lineVelocity += GRAVITY * 2 * MyAPI.dSin((this.degree >> 6) - 90) / 100 / 3;
-      this.degree -= ((this.lineVelocity << 6) / 5632 << 6) * 180 / 201;
+      // Authored per-tick increments, integrated over real frame time (GameTime.advance)
+      // so the swing period no longer depends on the render frame rate.
+      int accel = GRAVITY * 2 * MyAPI.dSin((this.degree >> 6) - 90) / 100 / 3;
+      this.lineVelocity = GameTime.advance(this, "lineVelocity", this.lineVelocity, accel);
+      int step = ((this.lineVelocity << 6) / 5632 << 6) * 180 / 201;
+      this.degree = GameTime.advance(this, "degree", this.degree, -step);
       int var2 = var1.posX;
       int var3 = var1.posY;
       var1.posX = this.posX + MyAPI.dCos(this.degree >> 6) * 5632 / 100;
